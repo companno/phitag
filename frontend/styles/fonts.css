@@ -1,0 +1,29 @@
+@font-face {
+    font-family: 'DM Mono Light';
+    src: url('../public/font/DMMono/DMMono-Light.ttf');
+}
+
+@font-face {
+    font-family: 'DM Mono Light Italic';
+    src: url('../public/font/DMMono/DMMono-LightItalic.ttf');
+}
+
+@font-face {
+    font-family: 'DM Mono Regular';
+    src: url('../public/font/DMMono/DMMono-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'DM Mono Italic';
+    src: url('../public/font/DMMono/DMMono-Italic.ttf');
+}
+
+@font-face {
+    font-family: 'DM Mono Medium';
+    src: url('../public/font/DMMono/DMMono-Medium.ttf');
+}
+
+@font-face {
+    font-family: 'DM Mono Medium Italic';
+    src: url('../public/font/DMMono/DMMono-MediumItalic.ttf');
+}
