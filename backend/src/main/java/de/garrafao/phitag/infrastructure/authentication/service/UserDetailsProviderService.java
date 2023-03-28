@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import de.garrafao.phitag.infrastructure.persistance.jpa.user.UserRepositoryBridge;
+import de.garrafao.phitag.infrastructure.persistence.jpa.user.UserRepositoryBridge;
 
 @Service
 public class UserDetailsProviderService implements UserDetailsService {
