@@ -103,6 +103,7 @@
 		</dependency>
 
 		<!-- Test -->
+        <!-- JUnit 4 -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -129,12 +130,19 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- In-Memory DB -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+<!-- 
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
             <version>1.16.2</version>
             <scope>test</scope>
-        </dependency>
+        </dependency> -->
 
 	</dependencies>
 

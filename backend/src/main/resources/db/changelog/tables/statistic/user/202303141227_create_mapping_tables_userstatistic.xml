@@ -26,7 +26,7 @@
         <createTable tableName="phitag_annotationtype_count">
             <column name="username" type="varchar">
                 <constraints primaryKey="true"
-                    foreignKeyName="FK_projectlanguage_count_userstatistic"
+                    foreignKeyName="FK_annotationtype_count_userstatistic"
                     references="phitaguserstatistic(username)" />
             </column>
 
@@ -43,7 +43,7 @@
         <createTable tableName="phitag_project_annotationcount">
             <column name="username" type="varchar">
                 <constraints primaryKey="true"
-                    foreignKeyName="FK_projectlanguage_count_userstatistic"
+                    foreignKeyName="FK_project_annotationcount_userstatistic"
                     references="phitaguserstatistic(username)" />
             </column>
 
