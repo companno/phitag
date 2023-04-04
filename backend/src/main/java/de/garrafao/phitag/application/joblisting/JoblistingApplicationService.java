@@ -14,6 +14,7 @@ import de.garrafao.phitag.application.joblisting.data.command.CreateJoblistingCo
 import de.garrafao.phitag.application.joblisting.data.command.JoinJoblistingCommand;
 import de.garrafao.phitag.application.joblisting.data.dto.JoblistingDto;
 import de.garrafao.phitag.application.joblisting.data.dto.PersonalJoblistingDto;
+import de.garrafao.phitag.application.statistics.annotatostatistic.AnnotatorStatisticApplicationService;
 import de.garrafao.phitag.application.validation.ValidationService;
 import de.garrafao.phitag.domain.annotator.Annotator;
 import de.garrafao.phitag.domain.annotator.AnnotatorRepository;
@@ -38,6 +39,8 @@ public class JoblistingApplicationService {
 
     // Services
 
+    private final AnnotatorStatisticApplicationService annotatorStatisticApplicationService;
+
     private final CommonService commonService;
 
     private final ValidationService validationService;
@@ -48,10 +51,15 @@ public class JoblistingApplicationService {
     public JoblistingApplicationService(
             final JoblistingRepository joblistingRepository,
             final AnnotatorRepository annotatorRepository,
+
+            final AnnotatorStatisticApplicationService annotatorStatisticApplicationService,
+
             final CommonService commonService,
             final ValidationService validationService) {
         this.joblistingRepository = joblistingRepository;
         this.annotatorRepository = annotatorRepository;
+
+        this.annotatorStatisticApplicationService = annotatorStatisticApplicationService;
 
         this.commonService = commonService;
         this.validationService = validationService;
@@ -133,7 +141,8 @@ public class JoblistingApplicationService {
 
         if (joblisting.isOpen()) {
             Entitlement entitlement = this.commonService.getEntitlement(EntitlementEnum.ENTITLEMENT_USER.name());
-            this.annotatorRepository.save(new Annotator(requester, project, entitlement));
+            Annotator annotator = this.annotatorRepository.save(new Annotator(requester, project, entitlement));
+            this.annotatorStatisticApplicationService.initializeAnnotatorStatistic(annotator);
         } else {
             joblisting.getWaitinglist().add(requester);
         }
@@ -146,7 +155,7 @@ public class JoblistingApplicationService {
      * TODO: Add validation of command as precondition?
      * 
      * @param authenticationToken the authentication token
-     * @param command the command
+     * @param command             the command
      */
     @Transactional
     public void add(final String authenticationToken, final AddUsersFromWaitinglistCommand command) {
@@ -163,7 +172,6 @@ public class JoblistingApplicationService {
                         command.getOwner())
                 .orElseThrow(JoblistingNotFoundException::new);
 
-
         if (!joblisting.isActive()) {
             throw new JoblistingException("Joblisting is not active.");
         }
@@ -176,7 +184,9 @@ public class JoblistingApplicationService {
                     !this.commonService.isUserAnnotator(project.getId().getOwnername(), project.getId().getName(),
                             userToAdd.getUsername())) {
                 joblisting.getWaitinglist().remove(userToAdd);
-                this.annotatorRepository.save(new Annotator(userToAdd, project, entitlement));
+                Annotator annotator = this.annotatorRepository.save(new Annotator(userToAdd, project, entitlement));
+                this.annotatorStatisticApplicationService.initializeAnnotatorStatistic(annotator);
+
             }
         });
 
