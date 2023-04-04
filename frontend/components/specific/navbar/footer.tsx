@@ -27,6 +27,12 @@ const Footer: React.FC<{}> = () => {
                                 Guidelines
                             </a>
                         </Link>
+                        
+                        <Link href="/guide">
+                            <a className="flex items-center">
+                                Guides
+                            </a>
+                        </Link>
 
                         <Link href="/privacy-policy">
                             <a className="flex items-center">
