@@ -17,4 +17,4 @@ jobs:
           java-version: "17"
           distribution: "temurin"
       - name: Verify
-        run: cd demo && mvn verify
+        run: cd backend && mvn verify
