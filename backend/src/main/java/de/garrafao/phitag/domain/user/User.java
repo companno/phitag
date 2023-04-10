@@ -17,6 +17,7 @@ import de.garrafao.phitag.domain.annotationtype.AnnotationType;
 import de.garrafao.phitag.domain.joblisting.Joblisting;
 import de.garrafao.phitag.domain.language.Language;
 import de.garrafao.phitag.domain.role.Role;
+import de.garrafao.phitag.domain.usecase.Usecase;
 import de.garrafao.phitag.domain.visibility.Visibility;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -43,6 +44,10 @@ public class User implements UserDetails {
     @ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
     @JoinTable(name = "phitaguser_phitagrole", joinColumns = { @JoinColumn(name = "phitaguser_username") }, inverseJoinColumns = { @JoinColumn(name = "phitagrole_name") })
     private Set<Role> roles = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "phitagusecase_name")
+    private Usecase usecase;
 
     @ManyToOne
     @JoinColumn(name = "phitagvisibility_name")
@@ -81,7 +86,7 @@ public class User implements UserDetails {
     User() {
     }
 
-    public User(final String username, final String email, final String password, final Set<Role> roles, final Visibility visibility, final Set<Language> languages) {
+    public User(final String username, final String email, final String password, final Set<Role> roles, final Usecase usecase, final Visibility visibility, final Set<Language> languages) {
         
         Validate.notBlank(username);
         // Validate that username only contains letters, numbers and dashes
@@ -90,6 +95,7 @@ public class User implements UserDetails {
         Validate.notBlank(email);
         Validate.notBlank(password);
         Validate.notNull(roles);
+        Validate.notNull(usecase);
         Validate.notNull(visibility);
         Validate.noNullElements(roles);
         Validate.notNull(languages);
@@ -100,6 +106,7 @@ public class User implements UserDetails {
         this.email = email;
         this.password = password;
         this.roles = roles;
+        this.usecase = usecase;
         this.visibility = visibility;
 
         this.languages = languages;
