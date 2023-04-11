@@ -1,4 +1,4 @@
-package de.garrafao.phitag.application.judgement.usepairjudgement;
+package de.garrafao.phitag.application.judgement.lexsubjudgement;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -20,34 +20,33 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import de.garrafao.phitag.application.judgement.lexsubjudgement.data.AddLexSubJudgementCommand;
+import de.garrafao.phitag.application.judgement.lexsubjudgement.data.DeleteLexSubJudgementCommand;
+import de.garrafao.phitag.application.judgement.lexsubjudgement.data.EditLexSubJudgementCommand;
 import de.garrafao.phitag.application.statistics.annotatostatistic.AnnotatorStatisticApplicationService;
 import de.garrafao.phitag.application.statistics.phasestatistic.PhaseStatisticApplicationService;
 import de.garrafao.phitag.application.statistics.userstatistic.UserStatisticApplicationService;
-import de.garrafao.phitag.domain.judgement.usepairjudgement.page.UsePairJudgementPageBuilder;
-import de.garrafao.phitag.application.judgement.usepairjudgement.data.AddUsePairJudgementCommand;
-import de.garrafao.phitag.application.judgement.usepairjudgement.data.DeleteUsePairJudgementCommand;
-import de.garrafao.phitag.application.judgement.usepairjudgement.data.EditUsePairJudgementCommand;
 import de.garrafao.phitag.domain.annotator.Annotator;
 import de.garrafao.phitag.domain.authentication.error.AccessDenidedException;
+import de.garrafao.phitag.domain.core.PageRequestWraper;
 import de.garrafao.phitag.domain.core.Query;
 import de.garrafao.phitag.domain.error.CsvParseException;
-import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstance;
-import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstanceRepository;
-import de.garrafao.phitag.domain.instance.usepairinstance.query.UsePairInstanceQueryBuilder;
-import de.garrafao.phitag.domain.judgement.usepairjudgement.UsePairJudgement;
-import de.garrafao.phitag.domain.judgement.usepairjudgement.UsePairJudgementRepository;
-import de.garrafao.phitag.domain.judgement.usepairjudgement.error.UsePairJudgementException;
-import de.garrafao.phitag.domain.judgement.usepairjudgement.error.UsePairJudgementNotFoundException;
-import de.garrafao.phitag.domain.judgement.usepairjudgement.query.UsePairJudgementQueryBuilder;
+import de.garrafao.phitag.domain.instance.lexsub.LexSubInstance;
+import de.garrafao.phitag.domain.instance.lexsub.LexSubInstanceRepository;
+import de.garrafao.phitag.domain.instance.lexsub.query.LexSubInstanceQueryBuilder;
+import de.garrafao.phitag.domain.judgement.lexsubjudgement.LexSubJudgement;
+import de.garrafao.phitag.domain.judgement.lexsubjudgement.LexSubJudgementRepository;
+import de.garrafao.phitag.domain.judgement.lexsubjudgement.error.LexSubJudgementException;
+import de.garrafao.phitag.domain.judgement.lexsubjudgement.query.LexSubJudgementQueryBuilder;
 import de.garrafao.phitag.domain.phase.Phase;
 import de.garrafao.phitag.domain.phase.error.TutorialException;
 
 @Service
-public class UsePairJudgementApplicationService {
+public class LexSubJudgementApplicationService {
 
-    private final UsePairJudgementRepository usePairJudgementRepository;
+    private final LexSubJudgementRepository lexSubJudgementRepository;
 
-    private final UsePairInstanceRepository usePairInstanceRepository;
+    private final LexSubInstanceRepository lexSubInstanceRepository;
 
     // Statistics
 
@@ -58,16 +57,15 @@ public class UsePairJudgementApplicationService {
     private final PhaseStatisticApplicationService phaseStatisticApplicationService;
 
     @Autowired
-    public UsePairJudgementApplicationService(
-            final UsePairJudgementRepository usePairJudgementRepository,
-            final UsePairInstanceRepository usePairInstanceRepository,
+    public LexSubJudgementApplicationService(
+            final LexSubJudgementRepository lexSubJudgementRepository,
+            final LexSubInstanceRepository lexSubInstanceRepository,
 
             final UserStatisticApplicationService userStatisticApplicationService,
             final AnnotatorStatisticApplicationService annotatorStatisticApplicationService,
             final PhaseStatisticApplicationService phaseStatisticApplicationService) {
-        this.usePairJudgementRepository = usePairJudgementRepository;
-        this.usePairInstanceRepository = usePairInstanceRepository;
-
+        this.lexSubJudgementRepository = lexSubJudgementRepository;
+        this.lexSubInstanceRepository = lexSubInstanceRepository;
         this.userStatisticApplicationService = userStatisticApplicationService;
         this.annotatorStatisticApplicationService = annotatorStatisticApplicationService;
         this.phaseStatisticApplicationService = phaseStatisticApplicationService;
@@ -76,22 +74,23 @@ public class UsePairJudgementApplicationService {
     // Getter
 
     /**
-     * Get all use pair judgements for a given phase.
+     * Get all judgements for a specific phase
      * 
-     * @param phase the phase
-     * @return a {@link UsePairJudgement} list
+     * @param phase
+     * @return List of judgements
      */
-    public List<UsePairJudgement> findByPhase(final Phase phase) {
-        final Query query = new UsePairJudgementQueryBuilder()
+    public List<LexSubJudgement> findByPhase(final Phase phase) {
+        final Query query = new LexSubJudgementQueryBuilder()
                 .withOwner(phase.getId().getProjectid().getOwnername())
                 .withProject(phase.getId().getProjectid().getName())
                 .withPhase(phase.getId().getName())
                 .build();
-        return this.usePairJudgementRepository.findByQuery(query);
+
+        return this.lexSubJudgementRepository.findByQuery(query);
     }
 
     /**
-     * Get all use pair judgements for a given phase as a paged list.
+     * Get all judgements for a specific phase as paged list
      * 
      * @param phase
      * @param pagesize
@@ -99,39 +98,41 @@ public class UsePairJudgementApplicationService {
      * @param orderBy
      * @return
      */
-    public Page<UsePairJudgement> findByPhase(
+    public Page<LexSubJudgement> findByPhase(
             final Phase phase,
             final int pagesize,
             final int pagenumber,
             final String orderBy) {
-        final Query query = new UsePairJudgementQueryBuilder()
+        final Query query = new LexSubJudgementQueryBuilder()
                 .withOwner(phase.getId().getProjectid().getOwnername())
                 .withProject(phase.getId().getProjectid().getName())
                 .withPhase(phase.getId().getName())
                 .build();
-        return this.usePairJudgementRepository.findByQueryPaged(query, new UsePairJudgementPageBuilder()
-                .withPageSize(pagesize)
-                .withPageNumber(pagenumber)
-                .withOrderBy(orderBy)
-                .build());
+
+        return this.lexSubJudgementRepository.findByQueryPaged(query,
+                new PageRequestWraper(pagesize, pagenumber, orderBy));
     }
 
     /**
-     * Get all use pair judgements for a given annotator.
+     * Get all judgements for a specific phase and annotator
      * 
-     * @param phase     the phase
-     * @param annotator the annotator
-     * @return a {@link UsePairJudgement} list
+     * @param phase
+     * @param annotator
+     * @return List of judgements
      */
-    public List<UsePairJudgement> getHistory(final Phase phase, final Annotator annotator) {
-        final Query query = new UsePairJudgementQueryBuilder().withOwner(phase.getId().getProjectid().getOwnername())
-                .withProject(phase.getId().getProjectid().getName()).withPhase(phase.getId().getName())
-                .withAnnotator(annotator.getId().getUsername()).build();
-        return this.usePairJudgementRepository.findByQuery(query);
+    public List<LexSubJudgement> findByPhaseAndAnnotator(final Phase phase, final Annotator annotator) {
+        final Query query = new LexSubJudgementQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .withAnnotator(annotator.getId().getUsername())
+                .build();
+
+        return this.lexSubJudgementRepository.findByQuery(query);
     }
 
     /**
-     * Get all use pair judgements for a given annotator as a paged list.
+     * Get all judgements for a specific phase and annotator as paged list
      * 
      * @param phase
      * @param annotator
@@ -140,23 +141,21 @@ public class UsePairJudgementApplicationService {
      * @param orderBy
      * @return
      */
-    public Page<UsePairJudgement> getHistory(
+    public Page<LexSubJudgement> findByPhaseAndAnnotator(
             final Phase phase,
             final Annotator annotator,
             final int pagesize,
             final int pagenumber,
             final String orderBy) {
-        final Query query = new UsePairJudgementQueryBuilder()
+        final Query query = new LexSubJudgementQueryBuilder()
                 .withOwner(phase.getId().getProjectid().getOwnername())
                 .withProject(phase.getId().getProjectid().getName())
                 .withPhase(phase.getId().getName())
                 .withAnnotator(annotator.getId().getUsername())
                 .build();
-        return this.usePairJudgementRepository.findByQueryPaged(query, new UsePairJudgementPageBuilder()
-                .withPageSize(pagesize)
-                .withPageNumber(pagenumber)
-                .withOrderBy(orderBy)
-                .build());
+
+        return this.lexSubJudgementRepository.findByQueryPaged(query,
+                new PageRequestWraper(pagesize, pagenumber, orderBy));
     }
 
     /**
@@ -165,12 +164,12 @@ public class UsePairJudgementApplicationService {
      * @param phase the phase
      * @return a CSV file as {@link InputStreamResource}
      */
-    public InputStreamResource exportUsePairJudgement(final Phase phase) {
-        List<UsePairJudgement> resultData = this.findByPhase(phase);
+    public InputStreamResource exportJudgement(final Phase phase) {
+        List<LexSubJudgement> resultData = this.findByPhase(phase);
         String[] csvHeader = {
                 "instanceID", "label", "comment", "annotator"
         };
-        List<List<String>> csvData = parseUsePairJudgementsToCsvBody(resultData);
+        List<List<String>> csvData = parseJudgementsToCsvBody(resultData);
 
         ByteArrayInputStream outputStream;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -192,35 +191,6 @@ public class UsePairJudgementApplicationService {
         return new InputStreamResource(outputStream);
     }
 
-    /**
-     * Count all use pair judgements for a given annotator.
-     * 
-     * @param annotator the annotator
-     * @return the number of use pair judgements
-     */
-    public int countJudgements(Annotator annotator) {
-        return this.usePairJudgementRepository.findByQuery(
-                new UsePairJudgementQueryBuilder()
-                        .withAnnotator(annotator.getId().getUsername())
-                        .build())
-                .size();
-    }
-
-    /**
-     * Count all use pair judgements for a given annotator and phase.
-     * 
-     * @param annotator the annotator
-     * @param phase     the phase
-     * @return the number of use pair judgements
-     */
-    public int countJudgements(Annotator annotator, Phase phase) {
-        return this.usePairJudgementRepository.findByQuery(
-                new UsePairJudgementQueryBuilder()
-                        .withAnnotator(annotator.getId().getUsername())
-                        .withPhase(phase.getId().getName()).build())
-                .size();
-    }
-
     // Setter Files
 
     /**
@@ -234,8 +204,8 @@ public class UsePairJudgementApplicationService {
         validateCsvFile(file);
 
         parseCsvFile(file).forEach(csvrecord -> {
-            final UsePairJudgement resultData = parseRecordToUsePairJudgement(phase, annotator, csvrecord);
-            this.usePairJudgementRepository.save(resultData);
+            final LexSubJudgement resultData = parseRecordToJudgement(phase, annotator, csvrecord);
+            this.lexSubJudgementRepository.save(resultData);
         });
 
     }
@@ -248,8 +218,8 @@ public class UsePairJudgementApplicationService {
      * @param command   the command
      */
     @Transactional
-    public void edit(final Phase phase, final Annotator annotator, final EditUsePairJudgementCommand command) {
-        final Query query = new UsePairJudgementQueryBuilder()
+    public void edit(final Phase phase, final Annotator annotator, final EditLexSubJudgementCommand command) {
+        final Query query = new LexSubJudgementQueryBuilder()
                 .withOwner(command.getOwner())
                 .withProject(command.getProject())
                 .withPhase(command.getPhase())
@@ -257,27 +227,23 @@ public class UsePairJudgementApplicationService {
                 .withInstanceid(command.getInstance())
                 .withUUID(command.getUUID())
                 .build();
-        final List<UsePairJudgement> usePairJudgements = this.usePairJudgementRepository.findByQuery(query);
+        final List<LexSubJudgement> usePairJudgements = this.lexSubJudgementRepository.findByQuery(query);
         if (usePairJudgements.size() != 1) {
-            throw new UsePairJudgementNotFoundException();
+            throw new LexSubJudgementException("Judgement not found");
 
         }
-        final UsePairJudgement judgement = usePairJudgements.get(0);
+        final LexSubJudgement judgement = usePairJudgements.get(0);
 
         if (!annotator.equals(judgement.getAnnotator())) {
             throw new AccessDenidedException();
         }
 
         if (!command.getLabel().isBlank()) {
-            if (!(judgement.getUsePairInstance().getLabelSet().contains(command.getLabel())
-                    || judgement.getUsePairInstance().getNonLabel().equals(command.getLabel()))) {
-                throw new UsePairJudgementException("Label not found");
-            }
             judgement.setLabel(command.getLabel());
         }
 
         judgement.setComment(command.getComment());
-        this.usePairJudgementRepository.save(judgement);
+        this.lexSubJudgementRepository.save(judgement);
     }
 
     /**
@@ -288,8 +254,8 @@ public class UsePairJudgementApplicationService {
      * @param command   the command
      */
     @Transactional
-    public void delete(final Phase phase, final Annotator annotator, final DeleteUsePairJudgementCommand command) {
-        final Query query = new UsePairJudgementQueryBuilder()
+    public void delete(final Phase phase, final Annotator annotator, final DeleteLexSubJudgementCommand command) {
+        final Query query = new LexSubJudgementQueryBuilder()
                 .withOwner(command.getOwner())
                 .withProject(command.getProject())
                 .withPhase(command.getPhase())
@@ -297,18 +263,18 @@ public class UsePairJudgementApplicationService {
                 .withInstanceid(command.getInstance())
                 .withUUID(command.getUUID())
                 .build();
-        final List<UsePairJudgement> usePairJudgements = this.usePairJudgementRepository.findByQuery(query);
+        final List<LexSubJudgement> usePairJudgements = this.lexSubJudgementRepository.findByQuery(query);
         if (usePairJudgements.size() != 1) {
-            throw new UsePairJudgementNotFoundException();
+            throw new LexSubJudgementException("Judgement not found");
 
         }
-        final UsePairJudgement judgement = usePairJudgements.get(0);
+        final LexSubJudgement judgement = usePairJudgements.get(0);
 
         if (!annotator.equals(judgement.getAnnotator())) {
             throw new AccessDenidedException();
         }
 
-        this.usePairJudgementRepository.delete(judgement);
+        this.lexSubJudgementRepository.delete(judgement);
     }
 
     // Setter Command
@@ -321,15 +287,15 @@ public class UsePairJudgementApplicationService {
      * @param command   the command
      */
     @Transactional
-    public void annotate(final Phase phase, final Annotator annotator, final AddUsePairJudgementCommand command) {
+    public void annotate(final Phase phase, final Annotator annotator, final AddLexSubJudgementCommand command) {
         String instanceId = command.getInstance();
 
-        final UsePairInstance instance = this.findCorrespondingInstanceData(phase, instanceId);
-        validateAddUsePairJudgementCommand(instance, command);
+        final LexSubInstance instance = this.findCorrespondingInstanceData(phase, instanceId);
+        validateAddLexSubJudgementCommand(instance, command);
 
-        final UsePairJudgement resultData = new UsePairJudgement(instance, annotator, command.getLabel(),
+        final LexSubJudgement resultData = new LexSubJudgement(instance, annotator, command.getLabel(),
                 command.getComment());
-        this.usePairJudgementRepository.save(resultData);
+        this.lexSubJudgementRepository.save(resultData);
 
         // Update annotation count for the project
         this.userStatisticApplicationService.incrementAnnotationCountProject(phase.getProject());
@@ -349,7 +315,7 @@ public class UsePairJudgementApplicationService {
      */
     @Transactional
     public void annotateBulk(final Phase phase, final Annotator annotator,
-            final List<AddUsePairJudgementCommand> commands) {
+            final List<AddLexSubJudgementCommand> commands) {
         if (phase.isTutorial()) {
             tutorialAnnotationCorrectness(phase, annotator, commands);
             return;
@@ -362,13 +328,13 @@ public class UsePairJudgementApplicationService {
 
     // Helper
 
-    private UsePairInstance findCorrespondingInstanceData(final Phase phase, final String instanceid) {
-        final Query query = new UsePairInstanceQueryBuilder()
+    private LexSubInstance findCorrespondingInstanceData(final Phase phase, final String instanceid) {
+        final Query query = new LexSubInstanceQueryBuilder()
                 .withOwner(phase.getId().getProjectid().getOwnername())
                 .withProject(phase.getId().getProjectid().getName())
                 .withPhase(phase.getId().getName())
                 .withInstanceid(instanceid).build();
-        List<UsePairInstance> resultData = this.usePairInstanceRepository.findByQuery(query);
+        List<LexSubInstance> resultData = this.lexSubInstanceRepository.findByQuery(query);
         if (resultData.size() == 1) {
             return resultData.get(0);
         } else {
@@ -393,13 +359,13 @@ public class UsePairJudgementApplicationService {
      */
     @Transactional
     private void tutorialAnnotationCorrectness(final Phase phase, final Annotator annotator,
-            List<AddUsePairJudgementCommand> commands) {
-        final Query judgementQuery = new UsePairJudgementQueryBuilder()
+            List<AddLexSubJudgementCommand> commands) {
+        final Query judgementQuery = new LexSubJudgementQueryBuilder()
                 .withOwner(phase.getId().getProjectid().getOwnername())
                 .withProject(phase.getId().getProjectid().getName())
                 .withPhase(phase.getId().getName()).build();
 
-        final List<UsePairJudgement> golds = this.usePairJudgementRepository.findByQuery(judgementQuery);
+        final List<LexSubJudgement> golds = this.lexSubJudgementRepository.findByQuery(judgementQuery);
 
         if (commands.size() != golds.size()) {
             throw new TutorialException(
@@ -407,7 +373,7 @@ public class UsePairJudgementApplicationService {
         }
 
         commands.forEach(command -> {
-            final UsePairJudgement gold = golds.stream()
+            final LexSubJudgement gold = golds.stream()
                     .filter(j -> j.getId().getInstanceid().getInstanceid().equals(command.getInstance()))
                     .findFirst()
                     .orElseThrow(() -> new TutorialException(
@@ -441,16 +407,16 @@ public class UsePairJudgementApplicationService {
         return printer;
     }
 
-    private List<List<String>> parseUsePairJudgementsToCsvBody(List<UsePairJudgement> usePairJudgements) {
+    private List<List<String>> parseJudgementsToCsvBody(List<LexSubJudgement> judgements) {
         List<List<String>> csvBody = new ArrayList<>();
 
-        for (UsePairJudgement data : usePairJudgements) {
+        for (LexSubJudgement judgement : judgements) {
             List<String> csvRow = new ArrayList<>();
 
-            csvRow.add(data.getInstance().getId().getInstanceid());
-            csvRow.add(data.getLabel());
-            csvRow.add(data.getComment());
-            csvRow.add(data.getAnnotator().getId().getUsername());
+            csvRow.add(judgement.getInstance().getId().getInstanceid());
+            csvRow.add(judgement.getLabel());
+            csvRow.add(judgement.getComment());
+            csvRow.add(judgement.getAnnotator().getId().getUsername());
 
             csvBody.add(csvRow);
         }
@@ -473,7 +439,7 @@ public class UsePairJudgementApplicationService {
         }
     }
 
-    private UsePairJudgement parseRecordToUsePairJudgement(final Phase phase, final Annotator annotator,
+    private LexSubJudgement parseRecordToJudgement(final Phase phase, final Annotator annotator,
             final CSVRecord csvrecord) {
         final String instanceId;
         final String label;
@@ -490,8 +456,8 @@ public class UsePairJudgementApplicationService {
             throw new CsvParseException("CSV record is not valid, please check the format");
         }
 
-        UsePairInstance instanceData = findCorrespondingInstanceData(phase, instanceId);
-        return new UsePairJudgement(instanceData, annotator, label, comment);
+        LexSubInstance instanceData = findCorrespondingInstanceData(phase, instanceId);
+        return new LexSubJudgement(instanceData, annotator, label, comment);
     }
 
     // Validation
@@ -508,8 +474,8 @@ public class UsePairJudgementApplicationService {
         }
     }
 
-    private void validateAddUsePairJudgementCommand(final UsePairInstance instance,
-            final AddUsePairJudgementCommand command) {
+    private void validateAddLexSubJudgementCommand(final LexSubInstance instance,
+            final AddLexSubJudgementCommand command) {
 
         if (!(instance.getLabelSet().contains(command.getLabel())
                 || instance.getNonLabel().equals(command.getLabel()))) {

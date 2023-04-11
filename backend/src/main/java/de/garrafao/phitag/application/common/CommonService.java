@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import de.garrafao.phitag.application.annotationtype.data.AnnotationTypeEnum;
 import de.garrafao.phitag.application.authentication.AuthenticationApplicationService;
+import de.garrafao.phitag.application.judgement.lexsubjudgement.LexSubJudgementApplicationService;
 import de.garrafao.phitag.application.judgement.usepairjudgement.UsePairJudgementApplicationService;
 import de.garrafao.phitag.application.judgement.wssimjudgement.WSSIMJudgementApplicationService;
 import de.garrafao.phitag.domain.annotationprocessinformation.AnnotationProcessInformation;
@@ -29,6 +30,9 @@ import de.garrafao.phitag.domain.entitlement.Entitlement;
 import de.garrafao.phitag.domain.entitlement.EntitlementRepository;
 import de.garrafao.phitag.domain.entitlement.error.EntitlementNotFoundException;
 import de.garrafao.phitag.domain.instance.IInstance;
+import de.garrafao.phitag.domain.instance.lexsub.LexSubInstance;
+import de.garrafao.phitag.domain.instance.lexsub.LexSubInstanceRepository;
+import de.garrafao.phitag.domain.instance.lexsub.query.LexSubInstanceQueryBuilder;
 import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstance;
 import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstanceRepository;
 import de.garrafao.phitag.domain.instance.usepairinstance.query.UsePairInstanceQueryBuilder;
@@ -116,6 +120,8 @@ public class CommonService {
 
     private final WSSIMInstanceRepository wssimInstanceRepository;
 
+    private final LexSubInstanceRepository lexSubInstanceRepository;
+
     // Instance information repository
 
     private final AnnotationProcessInformationRepository annotationProcessInformationRepository;
@@ -125,6 +131,8 @@ public class CommonService {
     private final UsePairJudgementApplicationService usePairJudgementApplicationService;
 
     private final WSSIMJudgementApplicationService wssimJudgementApplicationService;
+
+    private final LexSubJudgementApplicationService lexSubJudgementApplicationService;
 
     // Authentication application service
 
@@ -151,11 +159,13 @@ public class CommonService {
             final UsePairInstanceRepository usePairInstanceRepository,
             final WSSIMTagRepository wssimTagRepository,
             final WSSIMInstanceRepository wssimInstanceRepository,
+            final LexSubInstanceRepository lexSubInstanceRepository,
 
             final AnnotationProcessInformationRepository annotationProcessInformationRepository,
 
             final UsePairJudgementApplicationService usePairJudgementApplicationService,
             final WSSIMJudgementApplicationService wssimJudgementApplicationService,
+            final LexSubJudgementApplicationService lexSubJudgementApplicationService,
 
             final AuthenticationApplicationService authenticationApplicationService) {
         this.userRepository = userRepository;
@@ -176,11 +186,13 @@ public class CommonService {
         this.usePairInstanceRepository = usePairInstanceRepository;
         this.wssimTagRepository = wssimTagRepository;
         this.wssimInstanceRepository = wssimInstanceRepository;
+        this.lexSubInstanceRepository = lexSubInstanceRepository;
 
         this.annotationProcessInformationRepository = annotationProcessInformationRepository;
 
         this.usePairJudgementApplicationService = usePairJudgementApplicationService;
         this.wssimJudgementApplicationService = wssimJudgementApplicationService;
+        this.lexSubJudgementApplicationService = lexSubJudgementApplicationService;
 
         this.authenticationApplicationService = authenticationApplicationService;
     }
@@ -429,6 +441,10 @@ public class CommonService {
                 return this.findWSSIMTagByPhase(phase).stream()
                         .map(IInstance.class::cast).collect(Collectors.toList());
         }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            return this.findLexSubInstanceByPhase(phase).stream()
+                    .map(IInstance.class::cast).collect(Collectors.toList());    
+        }
 
         return new ArrayList<>();
     }
@@ -479,6 +495,22 @@ public class CommonService {
     }
 
     /**
+     * Get all LexSub instances for a given phase.
+     * 
+     * @param phase The phase.
+     * @return A list of all {@link LexSubInstance} for the given phase.
+     */
+    public List<LexSubInstance> findLexSubInstanceByPhase(final Phase phase) {
+        final Query query = new LexSubInstanceQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+
+        return this.lexSubInstanceRepository.findByQuery(query);
+    }
+
+    /**
      * Get all judgements for a given phase.
      * 
      * @param phase The phase.
@@ -491,6 +523,10 @@ public class CommonService {
         }
         if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             return this.wssimJudgementApplicationService.findByPhase(phase).stream()
+                    .map(IJudgement.class::cast).collect(Collectors.toList());
+        }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            return this.lexSubJudgementApplicationService.findByPhase(phase).stream()
                     .map(IJudgement.class::cast).collect(Collectors.toList());
         }
 
