@@ -195,6 +195,7 @@ public class UserApplicationService {
         validatePassword(command.getNewPassword());
         validateVisibility(command.getNewVisibility());
         validateLanguages(command.getNewLanguages());
+        validateUsecase(command.getNewUsecase());
 
         // Description validation
         if (command.getNewDescription() == null) {
@@ -250,6 +251,14 @@ public class UserApplicationService {
         this.validationService.languageSet(newLanguages);
     }
 
+    private void validateUsecase(final String newUsecase) {
+        if (newUsecase == null || newUsecase.isEmpty() || newUsecase.isBlank()) {
+            return;
+        }
+
+        this.commonService.getUsecase(newUsecase);
+    }
+
     // Helper methods
 
     private void updateUser(final User user, final UpdateUserCommand command) {
@@ -272,6 +281,11 @@ public class UserApplicationService {
         if (command.getNewVisibility() != null && !command.getNewVisibility().isEmpty()
                 && !command.getNewVisibility().isBlank()) {
             user.setVisibility(this.commonService.getVisibility(command.getNewVisibility()));
+        }
+
+        if (command.getNewUsecase() != null && !command.getNewUsecase().isEmpty()
+                && !command.getNewUsecase().isBlank()) {
+            user.setUsecase(this.commonService.getUsecase(command.getNewUsecase()));
         }
 
         if (command.getNewLanguages() != null && !command.getNewLanguages().isEmpty()) {

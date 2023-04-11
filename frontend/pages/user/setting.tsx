@@ -10,7 +10,7 @@ import Head from "next/head";
 import { toast } from "react-toastify";
 
 // React Icons
-import { FiEye, FiFeather, FiGlobe, FiLock, FiMail, FiUser } from "react-icons/fi";
+import { FiEye, FiFeather, FiGlobe, FiLock, FiMail, FiSettings, FiSliders, FiUser } from "react-icons/fi";
 
 // Services
 import useAuthenticated from "../../lib/hook/useAuthenticated";
@@ -34,6 +34,8 @@ import SingleContentLayout from "../../components/generic/layout/singlecontentla
 import DropdownSelect from "../../components/generic/dropdown/dropdownselect";
 import PasswordConfirmationModal from "../../components/generic/modal/passwordconfirmationmodal";
 import FullLoadingPage from "../../components/pages/fullloadingpage";
+import { useFetchAllUsecase } from "../../lib/service/usecase/UsecaseResource";
+import Usecase from "../../lib/model/usecase/model/Usecase";
 
 
 const SettingIndex: NextPage = () => {
@@ -45,6 +47,7 @@ const SettingIndex: NextPage = () => {
     const personalData = useFetchPersonalData();
     const languages = useFetchAllLanguages();
     const visibilities = useFetchAllVisibility();
+    const usecases = useFetchAllUsecase();
 
     languages.languages.sort((a, b) => a.getName().localeCompare(b.getName()));
     visibilities.visibilities.sort((a, b) => a.getName().localeCompare(b.getName()));
@@ -60,6 +63,8 @@ const SettingIndex: NextPage = () => {
 
         languages: Array<Language>(),
         visibility: null as unknown as Visibility,
+        usecase: null as unknown as Usecase,
+
         description: "",
     });
 
@@ -85,6 +90,17 @@ const SettingIndex: NextPage = () => {
 
         updateUserApi(updateUserCommand, storage.get).then(() => {
             toast.success("User updated successfully. Please login again to see the changes.");
+            // clear the state
+            setUpdateUser({
+                username: "",
+                email: "",
+                password: "",
+                passwordConfirm: "",
+                languages: Array<Language>(),
+                visibility: null as unknown as Visibility,
+                usecase: null as unknown as Usecase,
+                description: "",
+            });
         }).catch(error => {
             if (error?.response?.status === 500) {
                 toast.error("Error while updating data: " + error.response.data.message + "!");
@@ -117,6 +133,13 @@ const SettingIndex: NextPage = () => {
                     visibility: personalData.user.getVisibility() || null,
                 })
             }
+
+            if (updateUser.usecase == null) {
+                setUpdateUser({
+                    ...updateUser,
+                    usecase: personalData.user.getUsecase() || null,
+                })
+            }
         }
     }, [personalData, updateUser]);
 
@@ -136,7 +159,7 @@ const SettingIndex: NextPage = () => {
 
     }, [authenticated, personalData.isError, setCorrectState]);
 
-    if (personalData.isLoading || languages.isLoading || visibilities.isLoading) {
+    if (personalData.isLoading || languages.isLoading || visibilities.isLoading || usecases.isLoading) {
         return <FullLoadingPage headtitle="PhiTag: Settings" />;
     }
 
@@ -208,7 +231,7 @@ const SettingIndex: NextPage = () => {
 
                     <div className="flex flex-col xl:flex-row justify-between my-6 space-y-4 xl:space-y-0 xl:space-x-8">
 
-                        <div className="xl:w-1/3 flex flex-col grow items-left">
+                        <div className="xl:w-1/2 flex flex-col grow items-left xl:mr-4">
                             <div className="font-bold text-lg">
                                 Visibility
                             </div>
@@ -225,41 +248,60 @@ const SettingIndex: NextPage = () => {
                             </div>
                         </div>
 
-                        <div className="xl:w-2/3 flex flex-col grow items-left xl:ml-4">
+                        <div className="xl:w-1/2 flex flex-col grow items-left xl:ml-4">
+                            <div className="font-bold text-lg">
+                                Usecase
+                            </div>
+                            <div className="flex flex-auto items-center border-b-2 py-2 px-3">
+                                <DropdownSelect
+                                    icon={<FiSliders className="basic-svg" />}
+                                    items={usecases.usecases}
+                                    selected={updateUser.usecase ? [updateUser.usecase] : []}
+                                    onSelectFunction={(item: Usecase) => setUpdateUser({
+                                        ...updateUser,
+                                        usecase: item,
+                                    })}
+                                    message={updateUser.usecase ? updateUser.usecase.getVisiblename() : ""} />
+                            </div>
+                        </div>
+                    </div>
 
 
+                    <div className="flex flex-col xl:flex-row justify-between my-6 space-y-4 xl:space-y-0 xl:space-x-8">
+
+                        <div className="xl:w-1/2 flex flex-col grow items-left xl:mr-4">
                             <div className="font-bold text-lg">
                                 New Password
                             </div>
-                            <div className="flex flex-col xl:flex-row justify-between mt-2 space-y-4 xl:space-y-0 xl:space-x-8">
-                                <div className="flex flex-auto items-center border-b-2 py-2 px-3 xl:mr-4">
-                                    <FiLock className="basic-svg" />
-                                    <input
-                                        id="password"
-                                        name="password"
-                                        className="pl-3 flex flex-auto outline-none border-none "
-                                        type={"password"}
-                                        placeholder="New Password"
-                                        value={updateUser.password}
-                                        onChange={(e: any) => setUpdateUser({
-                                            ...updateUser,
-                                            password: e.target.value,
-                                        })} />
-                                </div>
-                                <div className="flex flex-auto items-center border-b-2 py-2 px-3 xl:ml-4">
-                                    <FiLock className="basic-svg" />
-                                    <input
-                                        id="passwordConfirmation"
-                                        name="password"
-                                        className="pl-3 flex flex-auto outline-none border-none "
-                                        placeholder="Confirm Password"
-                                        type={"password"}
-                                        value={updateUser.passwordConfirm}
-                                        onChange={(e: any) => setUpdateUser({
-                                            ...updateUser,
-                                            passwordConfirm: e.target.value,
-                                        })} />
-                                </div>
+                            <div className="flex flex-auto items-center border-b-2 py-2 px-3">
+                                <FiLock className="basic-svg" />
+                                <input
+                                    id="password"
+                                    name="password"
+                                    className="pl-3 flex flex-auto outline-none border-none "
+                                    type={"password"}
+                                    placeholder="New Password"
+                                    value={updateUser.password}
+                                    onChange={(e: any) => setUpdateUser({
+                                        ...updateUser,
+                                        password: e.target.value,
+                                    })} />
+                            </div>
+                        </div>
+                        <div className="xl:w-1/2 flex flex-col grow items-left xl:ml-4">
+                            <div className="flex flex-auto items-center border-b-2 py-2 px-3">
+                                <FiLock className="basic-svg" />
+                                <input
+                                    id="passwordConfirmation"
+                                    name="password"
+                                    className="pl-3 flex flex-auto outline-none border-none "
+                                    placeholder="Confirm Password"
+                                    type={"password"}
+                                    value={updateUser.passwordConfirm}
+                                    onChange={(e: any) => setUpdateUser({
+                                        ...updateUser,
+                                        passwordConfirm: e.target.value,
+                                    })} />
                             </div>
                         </div>
                     </div>
@@ -332,7 +374,7 @@ const SettingIndex: NextPage = () => {
                 />
 
             </SingleContentLayout>
-        </Layout>
+        </Layout >
     );
 
 
@@ -376,6 +418,8 @@ function verifyUpdate(user: UserData, currentPassword: string, updateUser: {
 
     languages: Array<Language>,
     visibility: Visibility,
+    usecase: Usecase,
+
     description: string,
 }): UpdateUserCommand | null {
     if (updateUser.username === user.getUsername()) {
@@ -408,6 +452,7 @@ function verifyUpdate(user: UserData, currentPassword: string, updateUser: {
         updateUser.email,
         updateUser.password,
         updateUser.visibility.getName(),
+        updateUser.usecase.getName(),
         updateUser.languages.map(l => l.getName()),
         updateUser.description,
         currentPassword);
