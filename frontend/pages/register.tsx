@@ -20,10 +20,9 @@ import Language from "../lib/model/language/model/Language";
 import CreateUserCommand from "../lib/model/user/command/CreateUserCommand";
 
 // React Icons
-import { FiLock, FiUser, FiMail, FiGlobe } from "react-icons/fi";
+import { FiLock, FiUser, FiMail, FiGlobe, FiSliders } from "react-icons/fi";
 
 // Custom Components
-import DropdownSelect from "../components/generic/dropdown/dropdownselect";
 import BasicCheckbox from "../components/generic/checkbox/basiccheckbox";
 
 // Layout
@@ -31,12 +30,15 @@ import BasicLayout from "../components/generic/layout/basiclayout";
 import CenteredLayout from "../components/generic/layout/centeredlayout";
 import useAuthenticated from "../lib/hook/useAuthenticated";
 import BasicDropdownSelect from "../components/generic/dropdown/basicdropdownselect";
+import { useFetchAllUsecase } from "../lib/service/usecase/UsecaseResource";
+import Usecase from "../lib/model/usecase/model/Usecase";
 
 const Register: NextPage = () => {
 
     // Hooks & Fetching
     const authenticated = useAuthenticated();
     const language = useFetchAllLanguages();
+    const usecase = useFetchAllUsecase();
     language.languages.sort((a, b) => a.getName().localeCompare(b.getName()));
 
     // Register State and Handlers
@@ -46,6 +48,7 @@ const Register: NextPage = () => {
         password: "",
         passwordConfirm: "",
         language: Array<Language>(),
+        usecase: null as unknown as Usecase,
         terms: false,
         age: false
     });
@@ -172,6 +175,18 @@ const Register: NextPage = () => {
                                     message={`${registerState.language.length} Languages selected`} />
                             </div>
 
+                            <div className="flex w-full items-center border-b-2 py-2 px-3 my-6">
+                                <BasicDropdownSelect
+                                    icon={<FiSliders className="basic-svg" />}
+                                    items={usecase.usecases}
+                                    selected={registerState.usecase ? [registerState.usecase] : []}
+                                    onSelectFunction={(usecase: Usecase) => setRegisterState({
+                                        ...registerState,
+                                        usecase: usecase
+                                    })}
+                                    message={registerState.usecase ? `${registerState.usecase.getVisiblename()}` : "No use case selected"} />
+                            </div>
+
                             <div className="flex w-full items-center px-3 my-6">
                                 <BasicCheckbox
                                     selected={registerState.terms}
@@ -212,6 +227,7 @@ function verifySignUp(registerState: {
     password: string;
     passwordConfirm: string;
     language: Language[];
+    usecase: Usecase;
     terms: boolean;
     age: boolean;
 }): null | CreateUserCommand {
@@ -230,6 +246,11 @@ function verifySignUp(registerState: {
         return null;
     }
 
+    if (!registerState.usecase) {
+        toast.error("Please select a usecase");
+        return null;
+    }
+
     if (registerState.password !== registerState.passwordConfirm) {
         toast.error("Passwords do not match");
         return null;
@@ -239,6 +260,7 @@ function verifySignUp(registerState: {
         registerState.username,
         registerState.email,
         registerState.password,
+        registerState.usecase.getName(),
         registerState.language.map(l => l.getName()),
         registerState.terms,
         registerState.age

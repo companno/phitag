@@ -2,6 +2,7 @@ import UserDataDto from "../dto/UserDataDto";
 
 import Visibility from "../../visibility/model/Visibility";
 import Language from "../../language/model/Language";
+import Usecase from "../../usecase/model/Usecase";
 
 export default class UserData {
 
@@ -10,12 +11,16 @@ export default class UserData {
     private readonly email: string;
 
     private readonly enabled: boolean;
-    
+
     private readonly visibility: Visibility;
+    private readonly usecase: Usecase;
+
     private readonly languages: Array<Language>;
     private readonly description: string;
 
-    constructor(username: string = '', displayname: string = '', email: string = '', enabled: boolean = false, visibility: Visibility = new Visibility(), languages: Array<Language> = [new Language()], description: string = '') {
+    constructor(username: string = '', displayname: string = '', email: string = '', enabled: boolean = false,
+        visibility: Visibility = new Visibility(), usecase: Usecase = new Usecase(),
+        languages: Array<Language> = [new Language()], description: string = '') {
         this.username = username;
         this.displayname = displayname;
         this.email = email;
@@ -23,6 +28,8 @@ export default class UserData {
         this.enabled = enabled;
 
         this.visibility = visibility;
+        this.usecase = usecase;
+
         this.languages = languages;
         this.languages.sort((a, b) => a.getName().localeCompare(b.getName()));
         this.description = description;
@@ -48,6 +55,10 @@ export default class UserData {
         return this.visibility;
     }
 
+    public getUsecase(): Usecase {
+        return this.usecase;
+    }
+
     public getLanguages(): Array<Language> {
         return this.languages;
     }
@@ -57,6 +68,6 @@ export default class UserData {
     }
 
     public static fromDto(dto: UserDataDto): UserData {
-        return new UserData(dto.username, dto.displayname, dto.email, dto.enabled, Visibility.fromDto(dto.visibility), dto.languages.map(Language.fromDto), dto.description);
+        return new UserData(dto.username, dto.displayname, dto.email, dto.enabled, Visibility.fromDto(dto.visibility), Usecase.fromDto(dto.usecase), dto.languages.map(Language.fromDto), dto.description);
     }
 }

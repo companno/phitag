@@ -1,4 +1,5 @@
 import LanguageDto from "../../language/dto/LanguageDto";
+import UsecaseDto from "../../usecase/dto/UsecaseDto";
 import VisibilityDto from "../../visibility/dto/VisibilityDto";
 
 export default interface UserDataDto {
@@ -9,6 +10,8 @@ export default interface UserDataDto {
     readonly enabled: boolean;
     
     readonly visibility: VisibilityDto;
+    readonly usecase: UsecaseDto;
+    
     readonly languages: Array<LanguageDto>;
     readonly description: string;
 }

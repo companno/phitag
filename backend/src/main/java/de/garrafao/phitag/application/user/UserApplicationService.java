@@ -22,6 +22,7 @@ import de.garrafao.phitag.application.visibility.data.VisibilityEnum;
 import de.garrafao.phitag.domain.core.Query;
 import de.garrafao.phitag.domain.language.Language;
 import de.garrafao.phitag.domain.role.Role;
+import de.garrafao.phitag.domain.usecase.Usecase;
 import de.garrafao.phitag.domain.user.User;
 import de.garrafao.phitag.domain.user.UserRepository;
 import de.garrafao.phitag.domain.user.error.NotOfLegalAgeException;
@@ -131,12 +132,13 @@ public class UserApplicationService {
         roles.add(this.commonService.getRole(RoleEnum.ROLE_USER.name()));
 
         final Visibility visibility = this.commonService.getVisibility(VisibilityEnum.VISIBILITY_PUBLIC.name());
+        final Usecase usecase = this.commonService.getUsecase(command.getUsecase());
 
         final Set<Language> languages = new HashSet<>();
         command.getLanguages().forEach(language -> languages.add(this.commonService.getLanguage(language)));
 
         final User entity = this.userRepository.save(new User(command.getUsername(), command.getEmail(),
-                passwordEncoder.encode(command.getPassword()), roles, visibility, languages));
+                passwordEncoder.encode(command.getPassword()), roles, usecase, visibility, languages));
 
         this.userStatisticApplicationService.initializeUserStatistic(entity);
     }
@@ -193,6 +195,7 @@ public class UserApplicationService {
         validatePassword(command.getNewPassword());
         validateVisibility(command.getNewVisibility());
         validateLanguages(command.getNewLanguages());
+        validateUsecase(command.getNewUsecase());
 
         // Description validation
         if (command.getNewDescription() == null) {
@@ -248,6 +251,14 @@ public class UserApplicationService {
         this.validationService.languageSet(newLanguages);
     }
 
+    private void validateUsecase(final String newUsecase) {
+        if (newUsecase == null || newUsecase.isEmpty() || newUsecase.isBlank()) {
+            return;
+        }
+
+        this.commonService.getUsecase(newUsecase);
+    }
+
     // Helper methods
 
     private void updateUser(final User user, final UpdateUserCommand command) {
@@ -270,6 +281,11 @@ public class UserApplicationService {
         if (command.getNewVisibility() != null && !command.getNewVisibility().isEmpty()
                 && !command.getNewVisibility().isBlank()) {
             user.setVisibility(this.commonService.getVisibility(command.getNewVisibility()));
+        }
+
+        if (command.getNewUsecase() != null && !command.getNewUsecase().isEmpty()
+                && !command.getNewUsecase().isBlank()) {
+            user.setUsecase(this.commonService.getUsecase(command.getNewUsecase()));
         }
 
         if (command.getNewLanguages() != null && !command.getNewLanguages().isEmpty()) {

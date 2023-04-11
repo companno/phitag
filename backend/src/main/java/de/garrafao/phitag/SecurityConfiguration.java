@@ -62,6 +62,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/v1/user/create").permitAll()
                 .antMatchers("/api/v1/authentication").permitAll().antMatchers("/api/v1/authentication/**").permitAll()
                 .antMatchers("/api/v1/language").permitAll().antMatchers("/api/v1/language/**").permitAll()
+                .antMatchers("/api/v1/usecase").permitAll().antMatchers("/api/v1/usecase/**").permitAll()
                 // Private endpoints
                 .anyRequest().authenticated();
 

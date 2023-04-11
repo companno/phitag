@@ -36,6 +36,7 @@ public class AuthenticationTokenGenerationService implements IAuthenticationToke
         String token = Jwts.builder()
                 .setSubject(user.getUsername())
                 .claim("roles", roles)
+                .claim("usecase", user.getUsecase().getName())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(jwtAuthenticationKey.getKey()).compact();
 
