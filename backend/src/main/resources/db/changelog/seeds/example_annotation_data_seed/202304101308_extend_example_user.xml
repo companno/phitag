@@ -7,7 +7,7 @@
 
     <changeSet id="202304041036" author="serge">
         <update tableName="phitaguser">
-            <column name="phitagusecase_name" value="USECASE_ANNOTATOR" />
+            <column name="phitagusecase_name" value="USECASE_DEFAULT" />
             <where>username =
             'Example-User'</where>
         </update>

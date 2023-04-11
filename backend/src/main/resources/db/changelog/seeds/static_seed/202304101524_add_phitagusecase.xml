@@ -7,6 +7,11 @@
     <changeSet id="202304101524" author="serge">
 
         <insert tableName="phitagusecase">
+            <column name="name" value="USECASE_DEFAULT" />
+            <column name="visiblename" value="Default" />
+        </insert>
+
+        <insert tableName="phitagusecase">
             <column name="name" value="USECASE_ANNOTATOR" />
             <column name="visiblename" value="Annotator" />
         </insert>
