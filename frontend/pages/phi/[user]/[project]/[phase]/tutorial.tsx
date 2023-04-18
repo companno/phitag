@@ -3,7 +3,7 @@ import { NextPage } from "next";
 import Router, { useRouter } from "next/router";
 
 // React
-import { useEffect} from "react";
+import { useEffect } from "react";
 
 // Toast
 import { toast } from "react-toastify";
@@ -15,6 +15,7 @@ import { useFetchPhase } from "../../../../../lib/service/phase/PhaseResource";
 import UsePairTutorial from "../../../../../components/specific/tutorial/usepair/usepairtutorial";
 import ANNOTATIONTYPES from "../../../../../lib/AnnotationTypes";
 import WSSIMTutorial from "../../../../../components/specific/tutorial/wssim/wssimtutorial";
+import LexSubTutorial from "../../../../../components/specific/tutorial/lexsub/lexsubtutorial";
 
 // Helper
 
@@ -62,6 +63,10 @@ const TutorialPage: NextPage = () => {
 
     if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_WSSIM) {
         return <WSSIMTutorial phase={phase.phase} />;
+    }
+
+    if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_LEXSUB) {
+        return <LexSubTutorial phase={phase.phase} />;
     }
 
     return (

@@ -44,7 +44,7 @@ const JoblistingCard: React.FC<IJoblistingCardProps> = ({ joblisting, onClick })
                     Description: {joblisting.getDescription() ? joblisting.getDescription() : "No description"}
                 </p>
 
-                <button type="button" className="block w-full mt-8 py-2 font-dm-mono-medium bg-base16-gray-900 text-base16-gray-100 " onClick={() => onClick()}>
+                <button type="button" className="block w-full mt-auto py-2 font-dm-mono-medium bg-base16-gray-900 text-base16-gray-100 " onClick={() => onClick()}>
                     {joblisting.isOpen() ? "Join Project" : "Join Waitinglist"}
                 </button>
             </div>

@@ -29,7 +29,7 @@ const UsePairJudgementTable: React.FC<{ phase: Phase, modalState: { open: boolea
     const [page, setPage] = useState(0);
     const usepairjudgements = useFetchPagedUsePairJudgements(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), page, !!phase);
 
-    const username = useStorage().get("USER")
+    const username = useStorage().get("USER");
 
     const [editModal, setEditModal] = useState({
         open: false,

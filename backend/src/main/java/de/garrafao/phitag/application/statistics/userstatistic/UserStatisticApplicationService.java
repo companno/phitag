@@ -1,5 +1,6 @@
 package de.garrafao.phitag.application.statistics.userstatistic;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.transaction.Transactional;
@@ -60,8 +61,20 @@ public class UserStatisticApplicationService {
             throw new StatisticException("User is not active or visible");
         }
 
-        return UserStatisticDto.from(userStatisticRepository.findByUsername(username)
-                .orElseThrow(() -> new StatisticException("No user statistic found for user")));
+        UserStatistic statistic = userStatisticRepository.findByUsername(username)
+                .orElseThrow(() -> new StatisticException("No user statistic found for user"));
+        UserStatisticDto statisticDto = UserStatisticDto.from(statistic);
+
+        Map<String, Integer> annotationTypeCountMap = new HashMap<String, Integer>();
+        statistic.getAnnotationTypeCountMap().forEach((k, v) -> {
+            if (v > 0) {
+                annotationTypeCountMap.put(this.commonService.getAnnotationType(k).getVisiblename(), v);
+            }
+        });
+        statisticDto.setAnnotationTypeCountMap(annotationTypeCountMap);
+
+        return statisticDto;
+
     }
 
     // Setter

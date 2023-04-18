@@ -37,7 +37,7 @@ const WSSIMAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
         instance: null as unknown as WSSIMInstance,
 
         comment: "",
-        loadNewAnnotation: true
+        initialLoad: true
 
     });
 
@@ -54,16 +54,17 @@ const WSSIMAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
         }
 
         const resultCommand = verifyResultCommand(phase, judgement, annotation);
+        setAnnotation({
+            ...annotation,
+
+            instance: null as unknown as WSSIMInstance,
+            comment: "",
+        });
 
         if (resultCommand !== null) {
             annotateWSSIM(resultCommand, storage.get)
                 .then((result) => {
-                    setAnnotation({
-                        ...annotation,
-
-                        comment: "",
-                        loadNewAnnotation: true
-                    });
+                    fetchNewAnnotation();
                 }).catch((error) => {
                     if (error?.response?.status === 500) {
                         toast.error("Error while adding judgement: " + error.response.data.message + "!");
@@ -75,6 +76,21 @@ const WSSIMAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
         }
     }
 
+    const fetchNewAnnotation = () => {
+        fetchRandomInstance<WSSIMInstance, WSSIMInstanceConstructor>(phase.getId().getOwner(), phase.getId().getProject(), phase.getId().getPhase(), (new WSSIMInstanceConstructor()), storage.get)
+            .then((instance) => {
+                setAnnotation({
+                    ...annotation,
+
+                    instance: instance,
+                    comment: "",
+                });
+            }).catch((error) => {
+                toast.error("Currently there are no more instances available for annotation.");
+                Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
+            });
+    }
+
     // Hook
 
     useEffect(() => {
@@ -82,24 +98,23 @@ const WSSIMAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
             Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
         }
 
-        if (!annotationAccess.isError && annotationAccess.hasAccess && annotation.loadNewAnnotation) {
+        if (!annotationAccess.isError && annotationAccess.hasAccess && annotation.initialLoad) {
             fetchRandomInstance<WSSIMInstance, WSSIMInstanceConstructor>(phase.getId().getOwner(), phase.getId().getProject(), phase.getId().getPhase(), (new WSSIMInstanceConstructor()), storage.get)
                 .then((instance) => {
                     setAnnotation({
-                        //@ts-ignore
                         instance: instance,
-
                         comment: "",
-                        loadNewAnnotation: false
+
+                        initialLoad: false
                     });
                 }).catch((error) => {
                     toast.error("Currently there are no more instances available for annotation.");
                     Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
                 });
         }
-    }, [annotationAccess, annotation.loadNewAnnotation, storage, phase]);
+    }, [annotationAccess, annotation.initialLoad, storage, phase]);
 
-    if (!phase || !annotation.instance) {
+    if (!phase || !annotation.instance || annotation.initialLoad) {
         return <LoadingComponent />;
     }
 
@@ -164,7 +179,7 @@ function verifyResultCommand(phase: Phase, judgement: string, annotation: {
     instance: WSSIMInstance;
 
     comment: string;
-    loadNewAnnotation: boolean;
+    initialLoad: boolean;
 }): AddWSSIMJudmentCommand | null {
     if (phase === undefined || phase === null) {
         toast.warning("This should not happen. Please contact the administrator.");
