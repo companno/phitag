@@ -47,6 +47,16 @@ export default class PagedLexSubInstance implements PagedGeneric<LexSubInstance>
         public getTotalPages(): number {
             return this.totalPages;
         }
+
+        public static empty(): PagedLexSubInstance {
+            return new PagedLexSubInstance(
+                [],
+                0,
+                0,
+                0,
+                0
+            );
+        }
     
         public static fromDto(dto: PagedGenericDto<LexSubInstanceDto>): PagedLexSubInstance {
             return new PagedLexSubInstance(

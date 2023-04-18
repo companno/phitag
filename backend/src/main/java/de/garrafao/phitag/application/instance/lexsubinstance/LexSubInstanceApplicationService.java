@@ -6,10 +6,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -319,7 +317,7 @@ public class LexSubInstanceApplicationService {
     private List<String> generateSamplingOrderWithoutReplacement(final Phase phase) {
         List<String> samplingOrder = new ArrayList<>();
 
-        this.commonService.findUsePairInstanceByPhase(phase).forEach(usePairInstance -> {
+        this.commonService.findLexSubInstanceByPhase(phase).forEach(usePairInstance -> {
             samplingOrder.add(usePairInstance.getId().getInstanceid());
         });
 
@@ -337,7 +335,7 @@ public class LexSubInstanceApplicationService {
     private List<String> generateSamplingIDOrder(final Phase phase) {
         List<String> samplingOrder = new ArrayList<>();
 
-        this.commonService.findUsePairInstanceByPhase(phase).forEach(usePairInstance -> {
+        this.commonService.findLexSubInstanceByPhase(phase).forEach(usePairInstance -> {
             samplingOrder.add(usePairInstance.getId().getInstanceid());
         });
 

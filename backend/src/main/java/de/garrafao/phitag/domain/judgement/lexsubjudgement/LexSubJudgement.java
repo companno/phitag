@@ -45,7 +45,7 @@ public class LexSubJudgement implements IJudgement {
     public LexSubJudgement(final LexSubInstance instance, final Annotator annotator, final String label, final String comment) {
         Validate.notNull(instance, "instance must not be null");
         Validate.notNull(annotator, "annotator must not be null");
-        Validate.notBlank(label, "label must not be null");
+        // Validate.notBlank(label, "label must not be null");
 
         this.id = new LexSubJudgementId(instance.getId(), annotator.getId());
 

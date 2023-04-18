@@ -567,6 +567,14 @@ public class JudgementApplicationService {
                 throw new AnnotationTypeNotFoundException();
             }
             return;
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            try {
+                this.lexSubJudgementApplicationService.annotateBulk(phaseEntity, annotator,
+                        commands.stream().map(AddLexSubJudgementCommand.class::cast).collect(Collectors.toList()));
+            } catch (ClassCastException e) {
+                throw new AnnotationTypeNotFoundException();
+            }
+            return;
         }
 
         throw new AnnotationTypeNotFoundException();

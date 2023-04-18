@@ -22,6 +22,7 @@ import ANNOTATIONTYPES from "../../../../../lib/AnnotationTypes";
 // services
 import useAuthenticated from "../../../../../lib/hook/useAuthenticated";
 import { useFetchPhase } from "../../../../../lib/service/phase/PhaseResource";
+import LexSubAnnotation from "../../../../../components/specific/annotation/lexsub/lexsubannotation";
 
 // model
 
@@ -137,6 +138,45 @@ const AnnotatePage: NextPage = () => {
 
                     <div className="mt-2 xl:mt-10">
                         <WSSIMAnnotation phase={phase.phase} />
+                    </div>
+
+                </SingleContentLayout>
+            </Layout>
+        );
+    }
+
+    if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_LEXSUB) {
+        return (
+            <Layout>
+
+                <Head>
+                    <title>PhiTag : {phase.phase.getName()} : Annotate </title>
+                </Head>
+
+                <SingleContentLayout>
+                    <LinkHead icon={<FiEdit3 className="stroke-2" />}
+                        links={[
+                            {
+                                href: `/phi/${username}`,
+                                name: username,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}`,
+                                name: projectname,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}/${phasename}`,
+                                name: phasename,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}/${phasename}/annotate`,
+                                name: "Annotate",
+                            }
+                        ]}
+                    />
+
+                    <div className="mt-2 xl:mt-10">
+                        <LexSubAnnotation phase={phase.phase} />
                     </div>
 
                 </SingleContentLayout>

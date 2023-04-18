@@ -291,7 +291,6 @@ public class LexSubJudgementApplicationService {
         String instanceId = command.getInstance();
 
         final LexSubInstance instance = this.findCorrespondingInstanceData(phase, instanceId);
-        validateAddLexSubJudgementCommand(instance, command);
 
         final LexSubJudgement resultData = new LexSubJudgement(instance, annotator, command.getLabel(),
                 command.getComment());
@@ -471,15 +470,6 @@ public class LexSubJudgementApplicationService {
         }
         if (file.getContentType() == null) {
             throw new IllegalArgumentException("file is not a csv");
-        }
-    }
-
-    private void validateAddLexSubJudgementCommand(final LexSubInstance instance,
-            final AddLexSubJudgementCommand command) {
-
-        if (!(instance.getLabelSet().contains(command.getLabel())
-                || instance.getNonLabel().equals(command.getLabel()))) {
-            throw new IllegalArgumentException("Not in label set, therefore not valid judgement");
         }
     }
 

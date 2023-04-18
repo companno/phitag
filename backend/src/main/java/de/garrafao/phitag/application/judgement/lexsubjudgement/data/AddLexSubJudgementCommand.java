@@ -23,8 +23,6 @@ public class AddLexSubJudgementCommand implements IAddJudgementCommand {
         Validate.notNull(project, "project must not be null");
         Validate.notNull(phase, "phase must not be null");
         Validate.notNull(instance, "instance must not be null");
-        Validate.notNull(label, "label must not be null");
-        Validate.notNull(comment, "comment must not be null");
 
         this.owner = owner;
         this.project = project;

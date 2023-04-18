@@ -36,7 +36,10 @@ const Dashboard: NextPage = () => {
     // if (storage.get('USECASE') === USECASES.LEXICOGRAPHY) {
     //     return (
     //         <Layout>
-    //             NO
+    //             {/* Center */}
+    //             <div className="flex flex-col items-center justify-center w-full h-full">
+    //                 <h1 className="font-dm-mono-medium text-7xl">LEXICOGRAPHY ROCKS</h1>
+    //             </div>
     //         </Layout>
     //     )
     // }
