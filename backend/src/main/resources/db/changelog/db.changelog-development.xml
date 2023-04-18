@@ -27,5 +27,5 @@
 
     <!-- Seeds -->
     <includeAll path="seeds/static_seed/**" relativeToChangelogFile="true" />
-    <!-- <includeAll path="seeds/example_annotation_data_seed/**" relativeToChangelogFile="true" /> -->
+    <includeAll path="seeds/example_annotation_data_seed/**" relativeToChangelogFile="true" />
 </databaseChangeLog>

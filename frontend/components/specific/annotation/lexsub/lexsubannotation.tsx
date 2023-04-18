@@ -19,7 +19,7 @@ const LexSubAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
 
         judgement: "",
         comment: "",
-        loadNewAnnotation: true
+        initialLoad: true
 
     });
 
@@ -40,18 +40,19 @@ const LexSubAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
 
             annotation.judgement,
             annotation.comment
-        )
+        );
+        setAnnotation({
+            ...annotation,
+
+            instance: null as unknown as LexSubInstance,
+            judgement: "",
+            comment: "",
+        });
 
         if (resultCommand !== null) {
             annotateLexSub(resultCommand, storage.get)
                 .then((result) => {
-                    setAnnotation({
-                        ...annotation,
-
-                        judgement: "",
-                        comment: "",
-                        loadNewAnnotation: true
-                    });
+                    fetchNewAnnotation();
                 }).catch((error) => {
                     if (error?.response?.status === 500) {
                         toast.error("Error while adding judgement: " + error.response.data.message + "!");
@@ -63,32 +64,46 @@ const LexSubAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
         }
     }
 
+    const fetchNewAnnotation = () => {
+        fetchRandomInstance<LexSubInstance, LexSubInstanceConstructor>(phase.getId().getOwner(), phase.getId().getProject(), phase.getId().getPhase(), (new LexSubInstanceConstructor()), storage.get)
+            .then((instance) => {
+                setAnnotation({
+                    ...annotation,
+
+                    instance: instance,
+                    judgement: "",
+                    comment: "",
+                });
+            }).catch((error) => {
+                toast.error("Could not fetch new annotation. Check if instances are provided for annotation.");
+                Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
+            });
+    }
+
 
     useEffect(() => {
         if (annotationAccess.isError) {
             Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
         }
 
-        // ERROR: TRIGGERED TWICE 
-        if (!annotationAccess.isError && annotationAccess.hasAccess && annotation.loadNewAnnotation) {
+        if (!annotationAccess.isError && annotationAccess.hasAccess && annotation.initialLoad) {
             fetchRandomInstance<LexSubInstance, LexSubInstanceConstructor>(phase.getId().getOwner(), phase.getId().getProject(), phase.getId().getPhase(), (new LexSubInstanceConstructor()), storage.get)
                 .then((instance) => {
                     setAnnotation({
-                        //@ts-ignore
                         instance: instance,
 
                         judgement: "",
                         comment: "",
-                        loadNewAnnotation: false
+                        initialLoad: false
                     });
                 }).catch((error) => {
                     toast.error("Could not fetch new annotation. Check if instances are provided for annotation.");
                     Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
                 });
         }
-    }, [annotationAccess, annotation.loadNewAnnotation, storage, phase]);
+    }, [annotationAccess, annotation.initialLoad, storage, phase]);
 
-    if (!phase || !annotation.instance) {
+    if (!phase || !annotation.instance || annotation.initialLoad) {
         return <LoadingComponent />;
     }
 
