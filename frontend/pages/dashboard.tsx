@@ -6,8 +6,12 @@ import { NextPage } from "next";
 import Router from 'next/router';
 import Head from "next/head";
 
+import { toast } from "react-toastify";
+
 // Custom Hooks
+import USECASES from "../lib/model/usecase/Usecases";
 import useAuthenticated from "../lib/hook/useAuthenticated";
+import useStorage from "../lib/hook/useStorage";
 
 // Custom Components
 import DashboardCard from "../components/generic/card/dashboardcard";
@@ -15,12 +19,12 @@ import DashboardCard from "../components/generic/card/dashboardcard";
 // Custom Layouts
 import Layout from "../components/generic/layout/layout";
 import CenteredLayout from "../components/generic/layout/centeredlayout";
-import { toast } from "react-toastify";
 
 const Dashboard: NextPage = () => {
 
     // Hooks & Fetching
     const authenticated = useAuthenticated();
+    const storage = useStorage();
 
     useEffect(() => {
         if (authenticated.isReady && !authenticated.isAuthenticated) {
@@ -29,6 +33,15 @@ const Dashboard: NextPage = () => {
         }
     }, [authenticated]);
 
+    // if (storage.get('USECASE') === USECASES.LEXICOGRAPHY) {
+    //     return (
+    //         <Layout>
+    //             NO
+    //         </Layout>
+    //     )
+    // }
+
+    // default view, i,e, USECASES_DEFAULT  
     return (
         <Layout>
 

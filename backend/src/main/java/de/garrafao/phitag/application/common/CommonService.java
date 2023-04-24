@@ -59,6 +59,9 @@ import de.garrafao.phitag.domain.sampling.error.SamplingNotFoundException;
 import de.garrafao.phitag.domain.status.Status;
 import de.garrafao.phitag.domain.status.StatusRepository;
 import de.garrafao.phitag.domain.status.error.StatusNotFoundException;
+import de.garrafao.phitag.domain.usecase.Usecase;
+import de.garrafao.phitag.domain.usecase.UsecaseRepository;
+import de.garrafao.phitag.domain.usecase.error.UsecaseException;
 import de.garrafao.phitag.domain.user.User;
 import de.garrafao.phitag.domain.user.UserRepository;
 import de.garrafao.phitag.domain.user.error.UserNotExistsException;
@@ -101,6 +104,8 @@ public class CommonService {
 
     private final SamplingRepository samplingRepository;
 
+    private final UsecaseRepository usecaseRepository;
+
     // Application service dependencies
 
     // Instance repository
@@ -141,6 +146,7 @@ public class CommonService {
             final AnnotationTypeRepository annotationTypeRepository,
             final StatusRepository statusRepository,
             final SamplingRepository samplingRepository,
+            final UsecaseRepository usecaseRepository,
 
             final UsePairInstanceRepository usePairInstanceRepository,
             final WSSIMTagRepository wssimTagRepository,
@@ -165,6 +171,7 @@ public class CommonService {
         this.annotationTypeRepository = annotationTypeRepository;
         this.statusRepository = statusRepository;
         this.samplingRepository = samplingRepository;
+        this.usecaseRepository = usecaseRepository;
 
         this.usePairInstanceRepository = usePairInstanceRepository;
         this.wssimTagRepository = wssimTagRepository;
@@ -534,4 +541,7 @@ public class CommonService {
         return this.samplingRepository.findByName(sampling).orElseThrow(SamplingNotFoundException::new);
     }
 
+    public Usecase getUsecase(final String usecase) {
+        return this.usecaseRepository.findByName(usecase).orElseThrow(() -> new UsecaseException("Usecase not found"));
+    }
 }
