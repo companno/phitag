@@ -11,6 +11,7 @@ import Pagination from "../../components/generic/table/pagination";
 import useAuthenticated from "../../lib/hook/useAuthenticated";
 import useStorage from "../../lib/hook/useStorage";
 import { markAsRead, useFetchNotifications } from "../../lib/service/notification/NotificationResource"
+import HelpButton from "../../components/generic/button/helpbutton";
 
 const NotificationsPage = () => {
 
@@ -121,6 +122,16 @@ const NotificationsPage = () => {
                                     onClick={() => {
                                         markSelectedAsRead();
                                     }} />
+                            </div>
+
+                            <div className="flex items-center my-4 ml-4">
+                                <HelpButton
+                                    title="Help: Notifications"
+                                    tooltip="Help: Notifications"
+                                    text="Notifications are messages that are sent to you by the system. You can mark them as read or unread. You can also select multiple notifications and mark them as read at once."
+                                    reference="/guide/explained-pools"
+                                    linkage={false}
+                                />
                             </div>
                         </div>
                     </div>

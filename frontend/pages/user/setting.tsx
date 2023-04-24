@@ -36,6 +36,7 @@ import PasswordConfirmationModal from "../../components/generic/modal/passwordco
 import FullLoadingPage from "../../components/pages/fullloadingpage";
 import { useFetchAllUsecase } from "../../lib/service/usecase/UsecaseResource";
 import Usecase from "../../lib/model/usecase/model/Usecase";
+import HelpButton from "../../components/generic/button/helpbutton";
 
 
 const SettingIndex: NextPage = () => {
@@ -170,9 +171,20 @@ const SettingIndex: NextPage = () => {
             </Head>
 
             <SingleContentLayout>
-                <h1 className="font-dm-mono-medium font-black text-3xl">
-                    Personal Settings
-                </h1>
+                <div className="flex flex-row justify-between items-center">
+                    <h1 className="font-dm-mono-medium font-black text-3xl">
+                        Personal Settings
+                    </h1>
+
+                    <HelpButton
+                        title="Help: Settings"
+                        tooltip="Help: Settings"
+                        text="Here you can change your personal settings. You can change your username, email, password, language, visibility and usecase. You can also change your description. 
+                    After saving your change, you will be logged out and have to login again."
+                        reference=""
+                        linkage={false}
+                    />
+                </div>
 
 
                 {/* Account */}

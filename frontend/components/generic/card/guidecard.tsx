@@ -7,7 +7,7 @@ import Link from "next/link";
 import GuideHeader from "../../../lib/model/guides/GuideHeader";
 
 // TODO: refactor when project
-export default function GuideCard({ guide }: { guide: GuideHeader}) {
+export default function GuideCard({ guide }: { guide: GuideHeader }) {
 
     if (!guide) {
         return <div />;
@@ -22,9 +22,7 @@ export default function GuideCard({ guide }: { guide: GuideHeader}) {
                     </h1>
 
                     <div className="my-2">
-                        <div className="mb-2">
-                            Preview:
-                        </div>
+                        Description:
                         <div className="markdown-preview" dangerouslySetInnerHTML={{ __html: guide.description }} />
                     </div>
 
