@@ -14,9 +14,9 @@ const BasicNavbar: React.FC<{}> = () => {
         <div className="sticky top-0 z-50 w-full bg-base16-gray-900 text-base16-gray-200 flex flex-row justify-between items-center">
             <div className="">
                 <Link href='/'>
-                    <a className="flex flex-row items-center my-2 mx-4">
+                    <a className="flex flex-row items-center my-2 mx-4 grow">
                         <FiShare2 className="basic-svg" />
-                        <div className="ml-2 font-dm-mono-medium font-bold text-2xl">
+                        <div className="ml-2 font-dm-mono-medium">
                             PhiTag
                         </div>
                     </a>

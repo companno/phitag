@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import DropdownSelect from "../dropdown/dropdownselect";
 import { useFetchPersonalProject } from "../../../lib/service/project/ProjectResource";
 import useStorage from "../../../lib/hook/useStorage";
+import HelpButton from "../button/helpbutton";
 
 
 const CorpusTable: React.FC<{}> = ({ }) => {
@@ -59,6 +60,13 @@ const CorpusTable: React.FC<{}> = ({ }) => {
 
                 <CorpusTableSearch search={searchField.lemma} changeCallback={(e: string) => setSearchField({ ...searchField, lemma: e, page: 0, selected: [] })} possibleLemmas={lemmaSelection.data} />
                 <IconButtonOnClick icon={<FiSliders className="basic-svg" />} tooltip="Expand Search" onClick={() => setSearchField({ ...searchField, open: true })} />
+                <HelpButton
+                    title="Help: Corpus"
+                    tooltip="Help: Corpus"
+                    text="The corpus is a collection of texts. You can search for a specific lemma and filter the results by PoS and year. You can also search for a specific token. The corpus is not editable. You can add the results to your project as usages."
+                    reference="none"
+                    linkage={false}
+                />
             </div>
 
             <CorpusTableEntries texts={corpusresults.data?.getContent() || []} context={searchField.context} normalized={searchField.normalized} tokens={possibletokens.data} selected={searchField.selected} selectCallback={selectCallback} />

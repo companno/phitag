@@ -45,7 +45,12 @@ const ProjectGuidelinesCard: React.FC<IProps> = ({ project, showAddGuideline }) 
                 <div className="flex flex-row space-x-2">
                     <IconButtonOnClick icon={<FiFilePlus className="basic-svg" />} onClick={() => setShowAddGuidelineModal(true)} tooltip="Add Guideline" hide={!showAddGuideline} />
                     {/* TOOD: placeholder */}
-                    <HelpButton tooltip="Guideline Help" reference="/guideline" title="Guidelines" text="Placeholder" buttontext="To the Guidelines" />
+                    <HelpButton
+                        title="Help: Guidelines"
+                        tooltip="Help: Guidelines"
+                        text="Guidelines can be added to a project, to help you and your team to follow a certain set of rules."
+                        reference="/guide/how-to-annotation-project"
+                    />
                 </div>
             </div>
             <div className="flex flex-col mt-2">

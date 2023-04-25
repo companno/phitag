@@ -30,6 +30,7 @@ import SingleContentLayout from "../../components/generic/layout/singlecontentla
 
 // Components
 import DropdownSelect from "../../components/generic/dropdown/dropdownselect";
+import HelpButton from "../../components/generic/button/helpbutton";
 
 const Create: NextPage = () => {
 
@@ -110,9 +111,27 @@ const Create: NextPage = () => {
 
                 <form className="font-dm-mono-medium">
 
-                    <h1 className="font-bold text-2xl">
-                        Create a new Project!
-                    </h1>
+                    <div className="flex flex-row justify-between">
+
+                        <h1 className="font-bold text-2xl">
+                            Create a new Project!
+                        </h1>
+
+                        <HelpButton
+                            title="Help: Create Project"
+                            tooltip="Help: Create Project"
+                            text="
+                                Here you can create a new project. 
+                                You can choose a name, a language and a visibility. 
+                                The name must be unique not used for a different project created by you. 
+                                The visibility determines who can see your project. 
+                                If you choose private, only you can see it. 
+                                If you choose public, everyone can see it.
+                                "
+                            reference="none"
+                            linkage={false}
+                        />
+                    </div>
 
                     <div className="flex flex-col items-left my-6">
                         <div className="font-bold text-lg">
