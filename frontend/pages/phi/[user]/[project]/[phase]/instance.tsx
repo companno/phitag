@@ -34,6 +34,7 @@ import UsePairInstanceTable from "../../../../../components/specific/table/usepa
 import WSSIMInstanceTable from "../../../../../components/specific/table/wssim/wssiminstancetable";
 import WSSIMTagTable from "../../../../../components/specific/table/wssim/wssimtagtable";
 import LinkHead from "../../../../../components/generic/linker/linkhead";
+import LexSubInstanceTable from "../../../../../components/specific/table/lexsub/lexsubinstancetable";
 
 const InstancePage: NextPage = () => {
 
@@ -275,6 +276,76 @@ const InstancePage: NextPage = () => {
                                 } />
                         }
                     </div>
+                </SingleContentLayout>
+            </Layout>
+        );
+    }
+
+    if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_LEXSUB) {
+        return (
+            <Layout>
+                <Head>
+                    <title>PhiTag : {phase.phase.getName()} : Instances </title>
+                </Head>
+
+
+                <SingleContentLayout>
+
+                    <LinkHead icon={<FiLayers className="stroke-2" />}
+                        links={[
+                            {
+                                href: `/phi/${username}`,
+                                name: username,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}`,
+                                name: projectname,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}/${phasename}`,
+                                name: phasename,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}/${phasename}/instance`,
+                                name: instanceState.tagfile ? "Tags" : "Instances",
+                            }
+                        ]}
+                    />
+
+                    <div className="w-full flex flex-col 2xl:flex-row justify-between">
+                        <PhaseTabBar />
+
+                        <div className="flex mt-8 2xl:mt-0 mx-4 space-x-4 justify-end">
+                            <IconButtonOnClick
+                                icon={<FiFilePlus className="basic-svg" />}
+                                tooltip="Add Data"
+                                onClick={() => setModalState({
+                                    ...modalState,
+                                    isOpenAddDataModal: true,
+                                })}
+                                hide={entitlement.entitlement !== ENTITLEMENTS.ADMIN} />
+                            <IconButtonOnClick
+                                icon={<FiDownload className="basic-svg " />}
+                                tooltip="Download Instance Data"
+                                onClick={() => handleExport()}
+                                hide={entitlement.entitlement !== ENTITLEMENTS.ADMIN} />
+                        </div>
+                    </div>
+
+
+                    <div className="m-8">
+                        <LexSubInstanceTable phase={phase.phase}
+                            modalState={{
+                                open: modalState.isOpenAddDataModal,
+                                callback: () => setModalState({
+                                    ...modalState,
+                                    isOpenAddDataModal: false,
+                                })
+                            }}
+                        />
+                    </div>
+
+
                 </SingleContentLayout>
             </Layout>
         );

@@ -26,9 +26,9 @@ const UsePairAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
     // States
     const [annotation, setAnnotation] = useState({
         instance: null as unknown as UsePairInstance,
-
         comment: "",
-        loadNewAnnotation: true
+
+        initialLoad: true
 
     });
 
@@ -45,16 +45,16 @@ const UsePairAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
         }
 
         const resultCommand = verifyResultCommand(phase, judgement, annotation);
+        setAnnotation({
+            ...annotation,
+            instance: null as unknown as UsePairInstance,
+            comment: ""
+        });
 
         if (resultCommand !== null) {
             annotateUsepair(resultCommand, storage.get)
                 .then((result) => {
-                    setAnnotation({
-                        ...annotation,
-
-                        comment: "",
-                        loadNewAnnotation: true
-                    });
+                    fetchNewAnnotation();
                 }).catch((error) => {
                     if (error?.response?.status === 500) {
                         toast.error("Error while adding judgement: " + error.response.data.message + "!");
@@ -66,6 +66,21 @@ const UsePairAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
         }
     }
 
+    const fetchNewAnnotation = () => {
+        fetchRandomInstance<UsePairInstance, UsePairInstanceConstructor>(phase.getId().getOwner(), phase.getId().getProject(), phase.getId().getPhase(), (new UsePairInstanceConstructor()), storage.get)
+            .then((instance) => {
+                setAnnotation({
+                    ...annotation,
+
+                    instance: instance,
+                    comment: "",
+                });
+            }).catch((error) => {
+                toast.error("Could not fetch new annotation. Check if instances are provided for annotation.");
+                Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
+            });
+    }
+
     // Hook
 
     useEffect(() => {
@@ -73,25 +88,23 @@ const UsePairAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
             Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
         }
 
-        // ERROR: TRIGGERED TWICE 
-        if (!annotationAccess.isError && annotationAccess.hasAccess && annotation.loadNewAnnotation) {
+        if (!annotationAccess.isError && annotationAccess.hasAccess && annotation.initialLoad) {
             fetchRandomInstance<UsePairInstance, UsePairInstanceConstructor>(phase.getId().getOwner(), phase.getId().getProject(), phase.getId().getPhase(), (new UsePairInstanceConstructor()), storage.get)
                 .then((instance) => {
                     setAnnotation({
-                        //@ts-ignore
                         instance: instance,
-
                         comment: "",
-                        loadNewAnnotation: false
+
+                        initialLoad: false
                     });
                 }).catch((error) => {
                     toast.error("Could not fetch new annotation. Check if instances are provided for annotation.");
                     Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
                 });
         }
-    }, [annotationAccess, annotation.loadNewAnnotation, storage, phase]);
+    }, [annotationAccess, annotation.initialLoad, storage, phase]);
 
-    if (!phase || !annotation.instance) {
+    if (!phase || !annotation.instance || annotation.initialLoad) {
         return <LoadingComponent />;
     }
 
@@ -153,7 +166,7 @@ function verifyResultCommand(phase: Phase, judgement: string, annotation: {
     instance: UsePairInstance;
 
     comment: string;
-    loadNewAnnotation: boolean;
+    initialLoad: boolean;
 }): AddUsePairJudgementCommand | null {
     if (phase === undefined || phase === null) {
         toast.warning("This should not happen. Please contact the administrator.");

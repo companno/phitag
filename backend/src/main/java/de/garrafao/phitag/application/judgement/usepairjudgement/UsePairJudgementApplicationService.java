@@ -82,8 +82,11 @@ public class UsePairJudgementApplicationService {
      * @return a {@link UsePairJudgement} list
      */
     public List<UsePairJudgement> findByPhase(final Phase phase) {
-        final Query query = new UsePairJudgementQueryBuilder().withOwner(phase.getId().getProjectid().getOwnername())
-                .withProject(phase.getId().getProjectid().getName()).withPhase(phase.getId().getName()).build();
+        final Query query = new UsePairJudgementQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
         return this.usePairJudgementRepository.findByQuery(query);
     }
 

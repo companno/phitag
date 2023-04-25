@@ -20,6 +20,8 @@ import UsePairInstanceDto from "../../model/instance/usepairinstance/dto/UsePair
 import WSSIMInstanceDto from "../../model/instance/wssiminstance/dto/WSSIMInstanceDto";
 import PagedWSSIMInstance from "../../model/instance/wssiminstance/model/PagedWSSIMInstance";
 import PagedWSSIMTag from "../../model/instance/wssimtag/model/PagedWSSIMTag";
+import LexSubInstanceDto from "../../model/instance/lexsubinstance/dto/LexSubInstanceDto";
+import PagedLexSubInstance from "../../model/instance/lexsubinstance/model/PagedLexSubInstance";
 
 /**
  * Returns all instances of a phase
@@ -150,6 +152,37 @@ export function useFetchPagedWSSIMTAG(owner: string, project: string, phase: str
         mutate: mutate
     }
 }
+
+/**
+ * Returns all lexsub instances of a phase as a page.
+ * 
+ * @param owner owner of the project
+ * @param project project name
+ * @param phase phase name in the project
+ * 
+ * @param page page number
+ * @param fetch if data should be fetched
+ */
+export function useFetchPagedLexSubInstance(owner: string, project: string, phase: string, page: number = 0, fetch: boolean = true) {
+    const { get } = useStorage();
+    const token = get('JWT') ?? '';
+
+    const queryPhaseDataFetcher = (url: string) => axios.get<PagedGenericDto<LexSubInstanceDto>>(url, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(res => res.data)
+
+    const { data, error, mutate } = useSWR(fetch ? `${BACKENDROUTES.INSTANCE}/paged?owner=${owner}&project=${project}&phase=${phase}&additional=${false}&page=${page}` : null, queryPhaseDataFetcher)
+
+    return {
+        data: data ? PagedLexSubInstance.fromDto(data) : PagedLexSubInstance.empty(),
+        isLoading: !error && !data,
+        isError: error,
+        mutate: mutate
+    }
+}
+
 
 
 
