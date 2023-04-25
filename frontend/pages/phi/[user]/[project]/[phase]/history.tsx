@@ -30,6 +30,7 @@ import UsePairJudgementHistoryTable from "../../../../../components/specific/tab
 import WSSIMJudgementHistoryTable from "../../../../../components/specific/table/wssim/wssimjudgementhistorytable";
 import LinkHead from "../../../../../components/generic/linker/linkhead";
 import { FiLayers } from "react-icons/fi";
+import LexSubJudgementHistoryTable from "../../../../../components/specific/table/lexsub/lexsubjudgementhistorytable";
 
 
 const AnnotationHistory: NextPage = () => {
@@ -163,6 +164,54 @@ const AnnotationHistory: NextPage = () => {
                 </SingleContentLayout>
             </Layout>
 
+        );
+    } 
+
+    if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_LEXSUB) {
+        return (
+            <Layout>
+
+                <Head>
+
+                    <title>PhiTag : {phase.phase.getName()} : History </title>
+                </Head>
+
+
+                <SingleContentLayout>
+                    <LinkHead icon={<FiLayers className="stroke-2" />}
+                        links={[
+                            {
+                                href: `/phi/${username}`,
+                                name: username,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}`,
+                                name: projectname,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}/${phasename}`,
+                                name: phasename,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}/${phasename}/history`,
+                                name: "History",
+                            }
+                        ]}
+                    />
+
+
+                    <div className="w-full flex flex-col 2xl:flex-row justify-between">
+                        <PhaseTabBar />
+                        <div />
+                    </div>
+
+                    <div className="m-8">
+                        {/* @ts-ignore */}
+                        <LexSubJudgementHistoryTable phase={phase.phase} />
+                    </div>
+
+                </SingleContentLayout>
+            </Layout>
         );
     }
 
