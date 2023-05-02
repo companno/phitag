@@ -25,6 +25,7 @@ import de.garrafao.phitag.domain.annotator.Annotator;
 import de.garrafao.phitag.domain.annotator.AnnotatorRepository;
 import de.garrafao.phitag.domain.annotator.error.AnnotatorNotFoundException;
 import de.garrafao.phitag.domain.annotator.query.AnnotatorQueryBuilder;
+import de.garrafao.phitag.domain.core.PageRequestWraper;
 import de.garrafao.phitag.domain.core.Query;
 import de.garrafao.phitag.domain.entitlement.Entitlement;
 import de.garrafao.phitag.domain.entitlement.EntitlementRepository;
@@ -443,10 +444,34 @@ public class CommonService {
         }
         if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
             return this.findLexSubInstanceByPhase(phase).stream()
-                    .map(IInstance.class::cast).collect(Collectors.toList());    
+                    .map(IInstance.class::cast).collect(Collectors.toList());
         }
 
         return new ArrayList<>();
+    }
+
+    /**
+     * Get the number of instances for a given phase.
+     * 
+     * @param phase      the phase
+     * @param additional if additional instances should be included
+     * @return the number of {@IInstance} for the given phase
+     */
+    public long countInstancesOfPhase(final Phase phase, final boolean additional) {
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
+            return this.countUsePairInstanceByPhase(phase);
+        }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
+            if (!additional)
+                return this.countWSSIMInstanceByPhase(phase);
+            else
+                return this.countWSSIMTagByPhase(phase);
+        }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            return this.countLexSubInstanceByPhase(phase);
+        }
+
+        return 0;
     }
 
     /**
@@ -465,6 +490,22 @@ public class CommonService {
     }
 
     /**
+     * Get number of use pair instances for a given phase.
+     * 
+     * @param phase The phase.
+     * @return The number of {@link UsePairInstance} for the given phase.
+     */
+    public long countUsePairInstanceByPhase(final Phase phase) {
+        final Query query = new UsePairInstanceQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+        return this.usePairInstanceRepository.findByQueryPaged(query, new PageRequestWraper(1, 0, null))
+                .getTotalElements();
+    }
+
+    /**
      * Get all WSSIM instances for a given phase.
      * 
      * @param phase the phase
@@ -477,6 +518,22 @@ public class CommonService {
                 .withPhase(phase.getId().getName())
                 .build();
         return this.wssimInstanceRepository.findByQuery(query);
+    }
+
+    /**
+     * Get number of WSSIM instances for a given phase.
+     * 
+     * @param phase The phase.
+     * @return The number of {@link WSSIMInstance} for the given phase.
+     */
+    public long countWSSIMInstanceByPhase(final Phase phase) {
+        final Query query = new WSSIMInstanceQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+        return this.wssimInstanceRepository.findByQueryPaged(query, new PageRequestWraper(1, 0, null))
+                .getTotalElements();
     }
 
     /**
@@ -495,6 +552,22 @@ public class CommonService {
     }
 
     /**
+     * Get number of WSSIMTags for a given phase.
+     * 
+     * @param phase The phase.
+     * @return The number of {@link WSSIMTag} for the given phase.
+     */
+    public long countWSSIMTagByPhase(final Phase phase) {
+        final Query query = new WSSIMTagQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+        return this.wssimTagRepository.findByQueryPaged(query, new PageRequestWraper(1, 0, null))
+                .getTotalElements();
+    }
+
+    /**
      * Get all LexSub instances for a given phase.
      * 
      * @param phase The phase.
@@ -508,6 +581,23 @@ public class CommonService {
                 .build();
 
         return this.lexSubInstanceRepository.findByQuery(query);
+    }
+
+    /**
+     * Get number of LexSub instances for a given phase.
+     * 
+     * @param phase The phase.
+     * @return The number of {@link LexSubInstance} for the given phase.
+     */
+    public long countLexSubInstanceByPhase(final Phase phase) {
+        final Query query = new LexSubInstanceQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+
+        return this.lexSubInstanceRepository.findByQueryPaged(query, new PageRequestWraper(1, 0, null))
+                .getTotalElements();
     }
 
     /**
@@ -531,6 +621,26 @@ public class CommonService {
         }
 
         return new ArrayList<>();
+    }
+
+    /**
+     * Get number of judgements for a given phase.
+     * 
+     * @param phase The phase.
+     * @return The number of {@link Judgement} for the given phase.
+     */
+    public long countJudgementsOfPhase(final Phase phase) {
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
+            return this.usePairJudgementApplicationService.findByPhase(phase, 1, 0, null).getTotalElements();
+        }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
+            return this.wssimJudgementApplicationService.findByPhase(phase, 1, 0, null).getTotalElements();
+        }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            return this.lexSubJudgementApplicationService.findByPhase(phase, 0, 0, null).getTotalElements();
+        }
+
+        return 0;
     }
 
     /**

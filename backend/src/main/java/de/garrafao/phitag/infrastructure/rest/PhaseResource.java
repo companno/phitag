@@ -106,6 +106,7 @@ public class PhaseResource {
             @RequestParam(value = "project") final String project,
             @RequestParam(value = "phase") final String phase) {
         return phaseApplicationService.hasAccessToAnnotate(authenticationToken, owner, project, phase);
+
     }
 
     /**
@@ -129,6 +130,7 @@ public class PhaseResource {
 
     /**
      * Closes a phase.
+     * 
      * @param authenticationToken
      * @param owner
      * @param project
@@ -141,6 +143,7 @@ public class PhaseResource {
             @RequestParam(value = "phase") final String phase) {
         this.phaseApplicationService.close(authenticationToken, owner, project, phase);
     }
+
     /**
      * Add requirements to a phase.
      * 
@@ -164,7 +167,7 @@ public class PhaseResource {
      * Start computational annotation for a specific project.
      * 
      * @param authenticationToken The authentication token of the requesting user
-     * @param command           The command to start computational annotation
+     * @param command             The command to start computational annotation
      */
     @PostMapping(value = "/start-computational-annotation")
     public void startComputationalAnnotation(

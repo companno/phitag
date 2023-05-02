@@ -29,6 +29,7 @@ import de.garrafao.phitag.application.judgement.wssimjudgement.data.DeleteWSSIMJ
 import de.garrafao.phitag.application.judgement.wssimjudgement.data.EditWSSIMJudgementCommand;
 import de.garrafao.phitag.domain.annotator.Annotator;
 import de.garrafao.phitag.domain.authentication.error.AccessDenidedException;
+import de.garrafao.phitag.domain.core.PageRequestWraper;
 import de.garrafao.phitag.domain.core.Query;
 import de.garrafao.phitag.domain.error.CsvParseException;
 import de.garrafao.phitag.domain.instance.wssiminstance.WSSIMInstance;
@@ -197,11 +198,11 @@ public class WSSIMJudgementApplicationService {
      * @return the number of use pair judgements
      */
     public int countJudgements(Annotator annotator) {
-        return this.wssimJudgementRepository.findByQuery(
+        return (int) this.wssimJudgementRepository.findByQueryPaged(
                 new WSSIMJudgementQueryBuilder()
                         .withAnnotator(annotator.getId().getUsername())
-                        .build())
-                .size();
+                        .build(),
+                new PageRequestWraper(1, 0)).getTotalElements();
     }
 
     /**
@@ -212,11 +213,11 @@ public class WSSIMJudgementApplicationService {
      * @return the number of use pair judgements
      */
     public int countJudgements(Annotator annotator, Phase phase) {
-        return this.wssimJudgementRepository.findByQuery(
+        return (int) this.wssimJudgementRepository.findByQueryPaged(
                 new WSSIMJudgementQueryBuilder()
                         .withAnnotator(annotator.getId().getUsername())
-                        .withPhase(phase.getId().getName()).build())
-                .size();
+                        .withPhase(phase.getId().getName()).build(),
+                new PageRequestWraper(1, 0)).getTotalElements();
     }
 
     // Setter Files

@@ -129,7 +129,7 @@ public class WSSIMInstanceApplicationService {
             throw new WSSIMInstanceNotFoundException();
         }
 
-        return this.wssimInstanceRepository.findByQuery(query).get(0);
+        return wssimInstances.get(0);
     }
 
     /**

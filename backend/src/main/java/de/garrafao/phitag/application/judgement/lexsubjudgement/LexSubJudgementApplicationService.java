@@ -120,7 +120,7 @@ public class LexSubJudgementApplicationService {
      * @param annotator
      * @return List of judgements
      */
-    public List<LexSubJudgement> findByPhaseAndAnnotator(final Phase phase, final Annotator annotator) {
+    public List<LexSubJudgement> getHistory(final Phase phase, final Annotator annotator) {
         final Query query = new LexSubJudgementQueryBuilder()
                 .withOwner(phase.getId().getProjectid().getOwnername())
                 .withProject(phase.getId().getProjectid().getName())
@@ -141,7 +141,7 @@ public class LexSubJudgementApplicationService {
      * @param orderBy
      * @return
      */
-    public Page<LexSubJudgement> findByPhaseAndAnnotator(
+    public Page<LexSubJudgement> getHistory(
             final Phase phase,
             final Annotator annotator,
             final int pagesize,

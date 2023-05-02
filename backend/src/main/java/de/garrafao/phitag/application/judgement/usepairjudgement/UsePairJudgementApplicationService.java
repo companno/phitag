@@ -29,6 +29,7 @@ import de.garrafao.phitag.application.judgement.usepairjudgement.data.DeleteUseP
 import de.garrafao.phitag.application.judgement.usepairjudgement.data.EditUsePairJudgementCommand;
 import de.garrafao.phitag.domain.annotator.Annotator;
 import de.garrafao.phitag.domain.authentication.error.AccessDenidedException;
+import de.garrafao.phitag.domain.core.PageRequestWraper;
 import de.garrafao.phitag.domain.core.Query;
 import de.garrafao.phitag.domain.error.CsvParseException;
 import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstance;
@@ -199,11 +200,11 @@ public class UsePairJudgementApplicationService {
      * @return the number of use pair judgements
      */
     public int countJudgements(Annotator annotator) {
-        return this.usePairJudgementRepository.findByQuery(
+        return (int) this.usePairJudgementRepository.findByQueryPaged(
                 new UsePairJudgementQueryBuilder()
                         .withAnnotator(annotator.getId().getUsername())
-                        .build())
-                .size();
+                        .build(),
+                new PageRequestWraper(1, 0)).getTotalElements();
     }
 
     /**
@@ -214,11 +215,11 @@ public class UsePairJudgementApplicationService {
      * @return the number of use pair judgements
      */
     public int countJudgements(Annotator annotator, Phase phase) {
-        return this.usePairJudgementRepository.findByQuery(
+        return (int) this.usePairJudgementRepository.findByQueryPaged(
                 new UsePairJudgementQueryBuilder()
                         .withAnnotator(annotator.getId().getUsername())
-                        .withPhase(phase.getId().getName()).build())
-                .size();
+                        .withPhase(phase.getId().getName()).build(),
+                new PageRequestWraper(1, 0)).getTotalElements();
     }
 
     // Setter Files
