@@ -1,6 +1,5 @@
 package de.garrafao.phitag.application.validation;
 
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -16,8 +15,6 @@ import de.garrafao.phitag.domain.annotationtype.error.AnnotationTypeNotFoundExce
 import de.garrafao.phitag.domain.annotationtype.error.EmptyAnnotationTypeSelectionException;
 import de.garrafao.phitag.domain.authentication.error.AccessDenidedException;
 import de.garrafao.phitag.domain.error.InvalidNameExcepion;
-import de.garrafao.phitag.domain.instance.IInstance;
-import de.garrafao.phitag.domain.judgement.IJudgement;
 import de.garrafao.phitag.domain.language.error.EmptyLanguageSelectionException;
 import de.garrafao.phitag.domain.language.error.LanguageNotFoundException;
 import de.garrafao.phitag.domain.phase.Phase;
@@ -102,6 +99,7 @@ public class ValidationService {
 
     /**
      * Validates that the user is an admin.
+     * 
      * @param requester
      */
     public void validateUserIsAdmin(final User requester) {
@@ -211,20 +209,20 @@ public class ValidationService {
             throw new AccessDenidedException();
         }
 
-        final List<IInstance> instances = commonService.getInstancesOfPhase(phase, false);
+        final long numberOfInstances = this.commonService.countInstancesOfPhase(phase, false);
 
-        if (instances.isEmpty()) {
+        if (numberOfInstances == 0) {
             throw new AccessDenidedException("No instances available for annotation.");
         }
 
         if (phase.isTutorial()) {
-            final List<IJudgement> goldJudgements = commonService.getJudgementsOfPhase(phase);
+            final long countGoldJudgements = commonService.countJudgementsOfPhase(phase);
 
-            if (goldJudgements.isEmpty()) {
+            if (countGoldJudgements == 0) {
                 throw new AccessDenidedException("No Gold-Judgements available for tutorial.");
             }
 
-            if (goldJudgements.size() != instances.size()) {
+            if (countGoldJudgements != numberOfInstances) {
                 throw new AccessDenidedException("Gold judgements and instances do not match.");
             }
 
@@ -314,6 +312,5 @@ public class ValidationService {
         annotationTypes.forEach(this::annotationType);
         return this;
     }
-
 
 }

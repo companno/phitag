@@ -241,7 +241,7 @@ public class JudgementApplicationService {
             this.wssimJudgementApplicationService.getHistory(phaseEntity, annotator)
                     .forEach(wssimJudgement -> judgementDtos.add(WSSIMJudgementDto.from(wssimJudgement)));
         } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
-            this.lexSubJudgementApplicationService.findByPhaseAndAnnotator(phaseEntity, annotator)
+            this.lexSubJudgementApplicationService.getHistory(phaseEntity, annotator)
                     .forEach(lexSubJudgement -> judgementDtos.add(LexJudgementDto.from(lexSubJudgement)));
         }
 
@@ -303,7 +303,7 @@ public class JudgementApplicationService {
                     wssimJudgements.getTotalElements(),
                     wssimJudgements.getTotalPages());
         } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
-            Page<LexSubJudgement> lexSubJudgements = this.lexSubJudgementApplicationService.findByPhaseAndAnnotator(
+            Page<LexSubJudgement> lexSubJudgements = this.lexSubJudgementApplicationService.getHistory(
                     phaseEntity, annotator, size, page, sort);
 
             pagedJudgementDto = new PagedJudgementDto(
@@ -461,7 +461,8 @@ public class JudgementApplicationService {
             this.wssimJudgementApplicationService.delete(phaseEntity, annotator, (DeleteWSSIMJudgementCommand) command);
             return;
         } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
-            this.lexSubJudgementApplicationService.delete(phaseEntity, annotator, (DeleteLexSubJudgementCommand) command);
+            this.lexSubJudgementApplicationService.delete(phaseEntity, annotator,
+                    (DeleteLexSubJudgementCommand) command);
             return;
         }
 
@@ -497,7 +498,6 @@ public class JudgementApplicationService {
                 this.usePairJudgementApplicationService.annotate(phaseEntity, annotator,
                         (AddUsePairJudgementCommand) command);
                 annotationProcessInformation.setIndex(annotationProcessInformation.getIndex() + 1);
-
             } catch (ClassCastException e) {
                 throw new AnnotationTypeNotFoundException();
             }
