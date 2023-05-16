@@ -22,13 +22,18 @@ const BasicFooter: React.FC<{}> = () => {
                             </a>
                         </Link>
 
+                        <Link href="/guide">
+                            <a className="flex items-center">
+                                Guides
+                            </a>
+                        </Link>
+
                         <Link href="/privacy-policy">
                             <a className="flex items-center">
                                 Privacy Policy
                             </a>
                         </Link>
-
-                        {/* currently no */}
+                        
                         <Link href="/">
                             <a className="flex items-center">
                                 Legal Notice

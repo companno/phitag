@@ -54,10 +54,12 @@ public class UserStatisticApplicationService {
      *                 the username of the user
      * @return the user statistic as a {@link UserStatisticDto}
      */
-    public UserStatisticDto getUserStatistic(String username) {
+    public UserStatisticDto getUserStatistic(final String authenticationToken, final String username) {
         // validate user exists, active and visible
         final User user = this.commonService.getUser(username);
-        if (!user.isEnabled() || user.getVisibility().getName().equals(VisibilityEnum.VISIBILITY_PRIVATE.name())) {
+        final User requester = this.commonService.getUserByAuthenticationToken(authenticationToken);
+
+        if (!user.equals(requester) && (!user.isEnabled() || user.getVisibility().getName().equals(VisibilityEnum.VISIBILITY_PRIVATE.name()))) {
             throw new StatisticException("User is not active or visible");
         }
 

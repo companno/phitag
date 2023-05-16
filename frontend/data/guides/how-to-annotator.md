@@ -1,6 +1,7 @@
 ---
 id: 'how-to-annotator'
 title: 'How to: Annotator'
+priority: 30
 description: 'Learn how to use the web app as an annotator.'
 ---
 

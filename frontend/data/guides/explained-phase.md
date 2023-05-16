@@ -1,6 +1,7 @@
 ---
 id: 'explained-phase'
-title: 'Explained: Phase '
+title: 'Explained: Phase'
+priority: 0
 description: 'Explanation of the Phase page.'
 ---
 

@@ -35,20 +35,6 @@ export function Guides({ allGuides }: { allGuides: GuideHeader[] }) {
         });
     }
 
-
-
-    // auth
-    const authenticated = useAuthenticated();
-
-    useEffect(() => {
-
-        if (authenticated.isReady && !authenticated.isAuthenticated) {
-            toast.info("Session expired, please login again.");
-            Router.push("/");
-        }
-
-    }, [authenticated]);
-
     return (
         <Layout>
 

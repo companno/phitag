@@ -1,6 +1,7 @@
 ---
 id: 'explained-pools'
 title: 'Explained: Pools'
+priority: 0
 description: 'Learn how to use the pools.'
 ---
 

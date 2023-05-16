@@ -1,12 +1,13 @@
 ---
-id: 'how-to-annotation-project'
-title: 'How to: Annotation Project'
+id: 'how-to-annotation-manager'
+title: 'How to: Annotation Manager'
+priority: 30
 description: 'Learn how to use the web app for your personal annotation project.'
 ---
 
-# How to: Annotation Project
+# How to: Annotation Manager
 
-This guide will show you how to use the web app for your personal annotation project. If you are looking for a guide on how to use the platform as an annotator, see the [How to: Annotator](/guide/how-to-annotator) guide.
+This guide will show you how to use the web app for your personal annotation project. If you are looking for a guide on how to use the platform as an annotator, see the [How to: Annotator](/guide/how-to-annotator) guide. If you are in need for a custom solution in any part of the annotation process, please check out [Custom Solution Guide](/guide/custom-solution).
 
 ## Create a Project
 
@@ -18,9 +19,10 @@ Now that the project is created, you will need to add some data on which the ann
 
 ## Annotators
 
+### Manualy Adding Annotators
 Now that you have added some data, you will need to add some annotators. To do this, click on the "Add Annotator" button in the top right corner of the "annotators tab". You will be redirected to the pool page. Here you can search for annotators and add them to your project. You can also add computational annotators to your project. Computational annotators are used to automatically annotate data.
 
-## Jobs
+### Using The Job Pool to find Annotators
 
 If you do not want to manually add annotators to your project, you can create a job listing for your project. For this you have to navigate to the [jobs pool](/pool/joblisting) and click on the "Create Job" button. Here you can enter the name of your job, select the project and the if the job has a waitinglist. You can also add a short description of the goal for your job.
 
