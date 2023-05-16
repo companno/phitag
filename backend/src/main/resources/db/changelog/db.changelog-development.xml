@@ -26,6 +26,6 @@
     <includeAll path="tables/report/**" relativeToChangelogFile="true" />
 
     <!-- Seeds -->
-    <includeAll path="seeds/static_seed/**" relativeToChangelogFile="true" />
-    <includeAll path="seeds/example_annotation_data_seed/**" relativeToChangelogFile="true" />
+    <includeAll path="seeds/static-seeds/**" relativeToChangelogFile="true" />
+    <includeAll path="seeds/**" relativeToChangelogFile="true" />
 </databaseChangeLog>

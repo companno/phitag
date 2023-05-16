@@ -1,6 +1,7 @@
 ---
 id: 'explained-dashboard'
-title: 'Explained: Dashboard '
+title: 'Explained: Dashboard'
+priority: 0
 description: 'Learn how to use the dashboard.'
 ---
 

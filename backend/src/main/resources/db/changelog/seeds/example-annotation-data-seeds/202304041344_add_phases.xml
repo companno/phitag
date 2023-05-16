@@ -11,7 +11,7 @@
             <column name="name" value="ALL"/>
             <column name="projectname" value="Example-Project-Use-Pair"/>
             <column name="ownername" value="Example-User"/>
-            <column name="displayname" value="Example-Project-Use-Pair"/>
+            <column name="displayname" value="ALL"/>
             <column name="phitagannotationtype_name" value="ANNOTATIONTYPE_USEPAIR"/>
             <column name="phitagsamplingstrategy_name" value="SAMPLING_RANDOM_WITH_REPLACEMENT"/>
             <column name="description" value="Phase, where all lemmas are considered"/>
@@ -24,7 +24,7 @@
             <column name="name" value="ALL"/>
             <column name="projectname" value="Example-Project-WSSIM"/>
             <column name="ownername" value="Example-User"/>
-            <column name="displayname" value="Example-Project-WSSIM"/>
+            <column name="displayname" value="ALL"/>
             <column name="phitagannotationtype_name" value="ANNOTATIONTYPE_WSSIM"/>
             <column name="phitagsamplingstrategy_name" value="SAMPLING_RANDOM_WITH_REPLACEMENT"/>
             <column name="description" value="Phase, where all lemmas are considered"/>

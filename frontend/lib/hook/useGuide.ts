@@ -21,7 +21,9 @@ export function getSortedGuideHeader() {
         const fileContents = fs.readFileSync(fullPath, 'utf8');
 
         const matterResult = { ...matter(fileContents).data } as IGuideHeader;
-        return new GuideHeader(fileName.replace(/\.md$/, ''), matterResult.title,
+        return new GuideHeader(fileName.replace(/\.md$/, ''), 
+            matterResult.title, 
+            matterResult.priority,
             micromark(matterResult.description, {
                 extensions: [gfm()],
                 htmlExtensions: [gfmHtml()],
@@ -29,8 +31,8 @@ export function getSortedGuideHeader() {
                 // Only allow for static markdown files
                 allowDangerousHtml: true
             }));
-    }).sort(({ title: a }, { title: b }) => {
-        return (a > b) ? 1 : -1;
+    }).sort(({ title: t1, priority: p1 }, { title: t2, priority: p2 }) => {
+        return (p1 == p2) ? (t1 > t2) ? 1 : -1 : (p1 > p2) ? 1 : -1;
     }).reverse();
 }
 
@@ -50,7 +52,9 @@ export async function getGuide(id: string) {
     const fileContents = fs.readFileSync(fullPath, 'utf8');
 
     const matterResult = { ...matter(fileContents).data } as IGuideHeader;
-    return new Guide(id, matterResult.title,
+    return new Guide(id, 
+        matterResult.title,
+        matterResult.priority,
         micromark(matterResult.description, {
             extensions: [gfm()],
             htmlExtensions: [gfmHtml()],

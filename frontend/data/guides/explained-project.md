@@ -1,6 +1,7 @@
 ---
 id: 'explained-project'
 title: 'Explained: Project '
+priority: 0
 description: 'Explanation of the Project page.'
 ---
 
