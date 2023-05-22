@@ -148,11 +148,26 @@ const Dashboard: NextPage = () => {
 
                         <div className="col-span-1 row-span-1 aspect-square">
                             <DashboardCard
-                                title="Quick Start: Annotation Project"
-                                description="Read up onto how to use this tool effectively"
-                                link="guide/how-to-annotation-project" />
+                                title="Introduction"
+                                description="This guide will give you the core idea of Phitag."
+                                link="guide/introduction" />
                         </div>
 
+                        <div className="col-span-1 row-span-1 aspect-square">
+                            <DashboardCard
+                                title="Supported Tasks"
+                                description="Current overview of Phitag's supported annotation tasks."
+                                link="guide/supported-tasks" />
+                        </div>
+
+                        <div className="col-span-1 row-span-1 aspect-square">
+                            <DashboardCard
+                                title="Browse Guides"
+                                description="Browse all available guides"
+                                link="guide" />
+                        </div>
+
+{/* 
                         <div className="hidden sm:visible col-span-1 row-span-1 aspect-square " />
 
                         <div className="col-span-1 row-span-1 aspect-square">
@@ -160,7 +175,7 @@ const Dashboard: NextPage = () => {
                                 title="Quick Start: Lexicography"
                                 description="Read up onto how to use this tool as a lexicographer"
                                 link="guide/how-to-lexicography" />
-                        </div>
+                        </div> */}
                     </div>
                 </div>
 
