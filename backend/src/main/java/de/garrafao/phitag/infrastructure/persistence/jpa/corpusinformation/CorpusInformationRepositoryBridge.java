@@ -1,5 +1,6 @@
 package de.garrafao.phitag.infrastructure.persistence.jpa.corpusinformation;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,11 @@ public class CorpusInformationRepositoryBridge implements CorpusInformationRepos
     @Override
     public Optional<CorpusInformation> findById(final String id) {
         return corpusInformationRepositoryJpa.findById(id);
+    }
+
+    @Override
+    public List<String> findDistinctCorpusnamesShort() {
+        return corpusInformationRepositoryJpa.findDistinctCorpusnameshortBy();
     }
     
 }

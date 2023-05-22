@@ -104,9 +104,15 @@ public class CorpusApplicationService {
         // remove non unique ids
         final List<String> uniqueIds = possibleIds.stream().distinct().toList();
 
+        // get corpus names from command and clean empty
+        final List<String> corpusNames = Arrays.stream(command.getCorpus().split(",")) // split by comma
+                .filter(name -> name != null && !name.isBlank())
+                .toList();
+
         // Get Corpus Entries
         final Query corpusQuery = new CorpusQueryBuilder()
                 .betweenDate(command.getFrom(), command.getTo())
+                .withCorpusNames(corpusNames)
                 .withLexiconIds(uniqueIds)
                 .build();
 
@@ -155,6 +161,10 @@ public class CorpusApplicationService {
 
         return lemmas;
 
+    }
+
+    public List<String> getPossibleCorpora() {
+        return corpusInformationRepository.findDistinctCorpusnamesShort();
     }
 
     /**
@@ -206,9 +216,10 @@ public class CorpusApplicationService {
         this.validationService.projectAdminAccess(requester, projectEntity);
 
         final List<String> possibleToken = this.getPossibleTokens(command.getLemma(), command.getPos());
-        
+
         for (String id : command.getCorpusTextIds()) {
-            final CorpusText corpusText = this.corpusTextRepository.findById(id).orElseThrow(() -> new CorpusTextException("Corpus Text not found"));
+            final CorpusText corpusText = this.corpusTextRepository.findById(id)
+                    .orElseThrow(() -> new CorpusTextException("Corpus Text not found"));
 
             // calculate start and end index of target lemma
             final List<Pair<Integer, Integer>> startAndEndIndex = this.getStartAndEndIndex(corpusText, possibleToken,
@@ -219,7 +230,8 @@ public class CorpusApplicationService {
                     command.isIncludeContext());
 
             String indeciestoken = startAndEndIndex.stream()
-                    .map(pair -> (pair.getLeft() + extendedContext.getLeft()) + ":" + (pair.getRight() + extendedContext.getLeft()))
+                    .map(pair -> (pair.getLeft() + extendedContext.getLeft()) + ":"
+                            + (pair.getRight() + extendedContext.getLeft()))
                     .collect(Collectors.joining(","));
 
             String indicessentence = String.format("%d:%d", extendedContext.getLeft(),

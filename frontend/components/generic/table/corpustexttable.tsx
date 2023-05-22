@@ -2,7 +2,7 @@
 import LoadingComponent from "../loadingcomponent";
 import CorpusText from "../../../lib/model/corpus/model/CorpusText";
 import { useState } from "react";
-import { addUsagesFromCorpusToProject, useFetchByQuery, useFetchPoSOfLemma, useFetchPossibleLemma, useFetchPossibleToken } from "../../../lib/service/corpus/CorpusResource";
+import { addUsagesFromCorpusToProject, useFetchByQuery, useFetchCorpusnamesShort, useFetchPoSOfLemma, useFetchPossibleLemma, useFetchPossibleToken } from "../../../lib/service/corpus/CorpusResource";
 import { FiArrowLeft, FiArrowRight, FiCalendar, FiCheckSquare, FiFolder, FiLink2, FiPlus, FiSearch, FiSliders, FiSquare } from "react-icons/fi";
 import IconButtonOnClick from "../button/iconbuttononclick";
 import Checkbox from "../checkbox/checkbox";
@@ -23,6 +23,7 @@ const CorpusTable: React.FC<{}> = ({ }) => {
 
         lemma: "",
         pos: "",
+        corpus: "",
         from: 0,
         to: 2023,
 
@@ -47,8 +48,9 @@ const CorpusTable: React.FC<{}> = ({ }) => {
     // Fetch Data
     const lemmaSelection = useFetchPossibleLemma(searchField.lemma, searchField.lemma.length > 2);
     const posSelection = useFetchPoSOfLemma(searchField.lemma, searchField.lemma.length > 2);
-    const corpusresults = useFetchByQuery(searchField.lemma, searchField.pos, searchField.context, searchField.from, searchField.to, searchField.page, searchField.size, searchField.lemma.length > 2);
     const possibletokens = useFetchPossibleToken(searchField.lemma, searchField.lemma.length > 2);
+    const possibleCorpus = useFetchCorpusnamesShort();
+    const corpusresults = useFetchByQuery(searchField.lemma, searchField.pos, searchField.corpus, searchField.context, searchField.from, searchField.to, searchField.page, searchField.size, searchField.lemma.length > 2);
 
     return (
 
@@ -76,9 +78,12 @@ const CorpusTable: React.FC<{}> = ({ }) => {
                 open={searchField.open}
                 openChangeCallback={(e: boolean) => setSearchField({ ...searchField, open: e })}
                 lemma={searchField.lemma}
-                lemmaChangeCallback={(e: string) => setSearchField({ ...searchField, lemma: e, page: 0, selected: [] })} lemmaSelection={lemmaSelection.data}
+                lemmaChangeCallback={(e: string) => setSearchField({ ...searchField, lemma: e, pos: "", corpus: "", page: 0, selected: [] })} lemmaSelection={lemmaSelection.data}
 
-                pos={searchField.pos} posChangeCallback={(e: string) => setSearchField({ ...searchField, pos: e, page: 0, selected: [] })} posSelection={posSelection.data}
+                pos={searchField.pos} posChangeCallback={(e: string) => setSearchField({ ...searchField, pos: e, page: 0 })} posSelection={posSelection.data}
+                
+                corpus={searchField.corpus} 
+                corpusChangeCallback={(e: string) => setSearchField({ ...searchField, corpus: e, page: 0 })} corpusSelection={possibleCorpus.data}
 
                 from={searchField.from} fromChangeCallback={(e: number) => setSearchField({ ...searchField, from: e || 0 })}
                 to={searchField.to} toChangeCallback={(e: number) => setSearchField({ ...searchField, to: e || 0 })}
@@ -148,6 +153,10 @@ const CorpusTableEntries: React.FC<{ texts: CorpusText[], context: boolean, norm
                             </th>
                             <th scope="col"
                                 className="px-6 py-3 text-left uppercase tracking-wider ">
+                                Corpus
+                            </th>
+                            <th scope="col"
+                                className="px-6 py-3 text-left uppercase tracking-wider ">
                                 Resource
                             </th>
                             <th scope="col"
@@ -185,6 +194,16 @@ const CorpusTableEntries: React.FC<{ texts: CorpusText[], context: boolean, norm
                                 <td className="px-6 py-4 break-words">
                                     {text.getInformation().getDate()}
                                 </td>
+
+                                <td className="px-6 py-4 break-words">
+                                    <div className="tooltip-resource group flex justify-center">
+                                        {text.getInformation().getCorpusnameShort()}
+                                        <div className="tooltip-resource-container group-hover:scale-100">
+                                            {text.getInformation().getCorpusnameFull()}
+                                        </div>
+                                    </div>
+                                </td>
+
                                 <td className="px-6 py-4">
                                     <a className="tooltip-resource group flex justify-center" href={text.getInformation().getResource()} target="_blank" rel="noreferrer">
                                         <FiLink2 className='basic-svg' />
@@ -251,6 +270,10 @@ const CorpusTableExpandSearchModal: React.FC<{
     posChangeCallback: (arg0: string) => void,
     posSelection: string[],
 
+    corpus: string,
+    corpusChangeCallback: (arg0: string) => void,
+    corpusSelection: string[],
+
     from: number,
     fromChangeCallback: (arg0: number) => void,
     to: number,
@@ -266,6 +289,7 @@ const CorpusTableExpandSearchModal: React.FC<{
     open, openChangeCallback,
     lemma, lemmaChangeCallback, lemmaSelection,
     pos, posChangeCallback, posSelection,
+    corpus, corpusChangeCallback, corpusSelection,
     from, fromChangeCallback, to, toChangeCallback,
 
     context, contextChangeCallback, normalized, normalizedChangeCallback
@@ -303,6 +327,13 @@ const CorpusTableExpandSearchModal: React.FC<{
                                             PoS Tag
                                         </div>
                                         <CorpusTableSearch search={pos} changeCallback={(e: string) => posChangeCallback(e)} possibleLemmas={posSelection} />
+                                    </div>
+
+                                    <div className="flex flex-col items-left mb-3">
+                                        <div className="font-bold text-lg -mb-4">
+                                            Corpus
+                                        </div>
+                                        <CorpusTableSearch search={corpus} changeCallback={(e: string) => corpusChangeCallback(e)} possibleLemmas={corpusSelection} />
                                     </div>
 
                                     <div className="flex flex-col items-left mb-3">
