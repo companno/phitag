@@ -5,8 +5,9 @@ import LoadingComponent from "../../../generic/loadingcomponent";
 import AddInstanceToPhaseModal from "../../modal/addinstancetophasemodal";
 import PageChange from "../../../generic/table/pagination";
 import Usage from "../../../../lib/model/phitagdata/usage/model/Usage";
+import GenerateInstancesForPhaseModal from "../../modal/generateinstancesforphasemodal";
 
-const LexSubInstanceTable: React.FC<{ phase: Phase, modalState: { open: boolean, callback: Function } }> = ({ phase, modalState }) => {
+const LexSubInstanceTable: React.FC<{ phase: Phase, modalState: { openData: boolean, callbackData: Function, openGenerate: boolean, callbackGenerate: Function } }> = ({ phase, modalState }) => {
 
     const [page, setPage] = useState(0);
     const lexsubinstances = useFetchPagedLexSubInstance(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), page, !!phase);
@@ -81,7 +82,9 @@ const LexSubInstanceTable: React.FC<{ phase: Phase, modalState: { open: boolean,
 
             <PageChange page={page} maxPage={lexsubinstances.data.getTotalPages()} pageChangeCallback={(p: number) => { setPage(p) }} />
 
-            <AddInstanceToPhaseModal isOpen={modalState.open} closeModalCallback={modalState.callback} phase={phase} mutateCallback={lexsubinstances.mutate} />
+            <AddInstanceToPhaseModal isOpen={modalState.openData} closeModalCallback={modalState.callbackData} phase={phase} mutateCallback={lexsubinstances.mutate} />
+            <GenerateInstancesForPhaseModal isOpen={modalState.openGenerate} closeModalCallback={modalState.callbackGenerate} phase={phase} mutateCallback={lexsubinstances.mutate} additional={false} additionalFileName="" />
+    
         </div>
     );
 }

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -32,6 +33,7 @@ import de.garrafao.phitag.domain.annotator.Annotator;
 import de.garrafao.phitag.domain.core.Query;
 import de.garrafao.phitag.domain.error.CsvParseException;
 import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstance;
+import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstanceFactory;
 import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstanceRepository;
 import de.garrafao.phitag.domain.instance.usepairinstance.error.UsePairInstanceAlreadyExistsException;
 import de.garrafao.phitag.domain.instance.usepairinstance.query.UsePairInstanceQueryBuilder;
@@ -172,6 +174,39 @@ public class UsePairInstanceApplicationService {
         });
 
         this.generateSamplingTasks(phase);
+    }
+
+    /**
+     * Generate instances from all usages for a phase.
+     * 
+     * @param phase    the phase
+     * @param nonLabel
+     * @param labels
+     */
+    @Transactional
+    public void generateInstances(Phase phase, List<String> labels, String nonLabel) {
+        // fetch all data ids for the project
+        List<String> dataIds = this.usageRepository.findAllDataIdsByProjectnameAndOwnername(
+                phase.getId().getProjectid().getName(),
+                phase.getId().getProjectid().getOwnername());
+
+        // create all possible pairs & save them to reduce memory usage
+        UsePairInstanceFactory factory = new UsePairInstanceFactory();
+        factory.withPhase(phase).withLabelSet(String.join(",", labels)).withNonLabel(nonLabel);
+
+        for (int i = 0; i < dataIds.size(); i++) {
+            for (int j = i + 1; j < dataIds.size(); j++) {
+                Usage usage1 = this.usageRepository.findByIdDataidAndIdProjectidNameAndIdProjectidOwnername(
+                        dataIds.get(i), phase.getId().getProjectid().getName(),
+                        phase.getId().getProjectid().getOwnername()).orElseThrow(UsageNotFoundException::new);
+                Usage usage2 = this.usageRepository.findByIdDataidAndIdProjectidNameAndIdProjectidOwnername(
+                        dataIds.get(j), phase.getId().getProjectid().getName(),
+                        phase.getId().getProjectid().getOwnername()).orElseThrow(UsageNotFoundException::new);
+                UsePairInstance instance = factory.withInstanceId(UUID.randomUUID().toString()).withFirstUsage(usage1).withSecondUsage(usage2).build();
+                this.usePairInstanceRepository.save(instance);
+            }
+        }
+
     }
 
     // Parser
@@ -390,14 +425,14 @@ public class UsePairInstanceApplicationService {
 
         String queryId = annotationProcessInformation.next();
 
-        // If sampling index is null, return null
-        if (queryId == null) {
-            return null;
-        }
-
         if (phase.getSampling().getName().equals(SamplingEnum.SAMPLING_RANDOM_WITH_REPLACEMENT.name())) {
             queryId = annotationProcessInformation.getOrder()
                     .get((int) (Math.random() * annotationProcessInformation.getOrder().size()));
+        }
+
+        // If sampling index is null, return null
+        if (queryId == null) {
+            return null;
         }
 
         final Query query = new UsePairInstanceQueryBuilder()

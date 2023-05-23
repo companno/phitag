@@ -26,7 +26,7 @@ export default function GuidesAndGuidelines({ guidelines }: { guidelines: Static
     return (
         <Layout>
             <Head>
-                <title>PhiTag: Guides & Guidelines</title>
+                <title>PhiTag: Guidelines</title>
             </Head>
 
             <ContentLayout>

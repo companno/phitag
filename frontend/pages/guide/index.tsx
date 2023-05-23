@@ -39,7 +39,7 @@ export function Guides({ allGuides }: { allGuides: GuideHeader[] }) {
         <Layout>
 
             <Head>
-                <title>PhiTag: User Overview</title>
+                <title>PhiTag: Guides</title>
             </Head>
 
             <ContentLayout>

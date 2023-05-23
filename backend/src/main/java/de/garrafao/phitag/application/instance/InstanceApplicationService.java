@@ -260,7 +260,7 @@ public class InstanceApplicationService {
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             return this.usePairInstanceApplicationService.exportUsePairInstance(phaseEntity);
         }
-        
+
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             if (additional) {
                 return this.wssimTagApplicationService.exportWSSIMTag(phaseEntity);
@@ -301,7 +301,7 @@ public class InstanceApplicationService {
             this.usePairInstanceApplicationService.save(phaseEntity, file);
             return;
         }
-        
+
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             if (additional) {
                 this.wssimTagApplicationService.save(phaseEntity, file);
@@ -318,6 +318,56 @@ public class InstanceApplicationService {
 
         throw new AnnotationTypeNotFoundException();
 
+    }
+
+    /**
+     * Generate instance data for a phase from usages associated with the project.
+     * 
+     * @param authenticationToken
+     *                            The authentication token of the requesting user
+     * @param owner
+     *                            The owner of the project
+     * @param project
+     *                            The name of the project
+     * @param phase
+     *                            The name of the phase
+     * @param additional
+     *                            Additional Data (e.g. WSSIM -> sense)
+     * @param file
+     *                            The instancedata to add
+     */
+    @Transactional
+    public void generateInstances(
+            final String authenticationToken,
+            final String owner, final String project, final String phase,
+            final List<String> labels, final String nonLabel, 
+            final MultipartFile file) {
+
+        final User requester = this.commonService.getUserByAuthenticationToken(authenticationToken);
+        final Phase phaseEntity = this.commonService.getPhase(owner, project, phase);
+
+        this.validationService.projectAdminAccess(requester, phaseEntity.getProject());
+
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
+            this.usePairInstanceApplicationService.generateInstances(phaseEntity, labels, nonLabel);
+            return;
+        }
+
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
+            if (file.isEmpty()) {
+                throw new AnnotationTypeNotFoundException();
+            }
+            this.wssimTagApplicationService.save(phaseEntity, file);
+            this.wssimInstanceApplicationService.generateInstances(phaseEntity, labels, nonLabel);
+            return;
+        }
+
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            this.lexSubInstanceApplicationService.generateInstances(phaseEntity);
+            return;
+        }
+
+        throw new AnnotationTypeNotFoundException();
     }
 
     /**

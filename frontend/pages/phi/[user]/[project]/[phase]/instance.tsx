@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 // React Icons
-import { FiDownload, FiFilePlus, FiLayers, FiToggleLeft, FiToggleRight } from "react-icons/fi";
+import { FiCpu, FiDownload, FiFilePlus, FiLayers, FiToggleLeft, FiToggleRight } from "react-icons/fi";
 
 import ANNOTATIONTYPES from "../../../../../lib/AnnotationTypes";
 
@@ -52,6 +52,7 @@ const InstancePage: NextPage = () => {
     // modal
     const [modalState, setModalState] = useState({
         isOpenAddDataModal: false,
+        isOpenGenerateInstancesModal: false,
     });
 
     // other state information
@@ -137,6 +138,14 @@ const InstancePage: NextPage = () => {
 
                         <div className="flex mt-8 2xl:mt-0 mx-4 space-x-4 justify-end">
                             <IconButtonOnClick
+                                icon={<FiCpu className="basic-svg" />}
+                                tooltip="Generate Instances"
+                                onClick={() => setModalState({
+                                    ...modalState,
+                                    isOpenGenerateInstancesModal: true,
+                                })}
+                                hide={entitlement.entitlement !== ENTITLEMENTS.ADMIN} />
+                            <IconButtonOnClick
                                 icon={<FiFilePlus className="basic-svg" />}
                                 tooltip="Add Data"
                                 onClick={() => setModalState({
@@ -157,11 +166,23 @@ const InstancePage: NextPage = () => {
                         {/* @ts-ignore */}
                         <UsePairInstanceTable phase={phase.phase}
                             modalState={{
-                                open: modalState.isOpenAddDataModal,
-                                callback: () => setModalState({
-                                    ...modalState,
-                                    isOpenAddDataModal: false,
-                                })
+                                openData: modalState.isOpenAddDataModal,
+                                openGenerate: modalState.isOpenGenerateInstancesModal,
+
+                                callbackData: () => {
+                                    setModalState({
+                                        ...modalState,
+                                        isOpenAddDataModal: false,
+                                    })
+                                },
+
+                                callbackGenerate: () => {
+                                    setModalState({
+                                        ...modalState,
+                                        isOpenGenerateInstancesModal: false,
+
+                                    })
+                                }
                             }}
                         />
                     </div>
@@ -233,7 +254,14 @@ const InstancePage: NextPage = () => {
                                     Tags
                                 </div>
                             </div>
-
+                            <IconButtonOnClick
+                                icon={<FiCpu className="basic-svg" />}
+                                tooltip="Generate Instances"
+                                onClick={() => setModalState({
+                                    ...modalState,
+                                    isOpenGenerateInstancesModal: true,
+                                })}
+                                hide={entitlement.entitlement !== ENTITLEMENTS.ADMIN} />
                             <IconButtonOnClick
                                 icon={<FiFilePlus className="basic-svg" />}
                                 tooltip="Add Data"
@@ -257,11 +285,23 @@ const InstancePage: NextPage = () => {
                             !instanceState.tagfile ?
                                 <WSSIMInstanceTable phase={phase.phase} modalState={
                                     {
-                                        open: modalState.isOpenAddDataModal,
-                                        callback: () => setModalState({
-                                            ...modalState,
-                                            isOpenAddDataModal: false,
-                                        })
+                                        openData: modalState.isOpenAddDataModal,
+                                        openGenerate: modalState.isOpenGenerateInstancesModal,
+
+                                        callbackData: () => {
+                                            setModalState({
+                                                ...modalState,
+                                                isOpenAddDataModal: false,
+                                            })
+                                        },
+
+                                        callbackGenerate: () => {
+                                            setModalState({
+                                                ...modalState,
+                                                isOpenGenerateInstancesModal: false,
+
+                                            })
+                                        }
                                     }
                                 } />
                                 :
@@ -317,6 +357,14 @@ const InstancePage: NextPage = () => {
 
                         <div className="flex mt-8 2xl:mt-0 mx-4 space-x-4 justify-end">
                             <IconButtonOnClick
+                                icon={<FiCpu className="basic-svg" />}
+                                tooltip="Generate Instances"
+                                onClick={() => setModalState({
+                                    ...modalState,
+                                    isOpenGenerateInstancesModal: true,
+                                })}
+                                hide={entitlement.entitlement !== ENTITLEMENTS.ADMIN} />
+                            <IconButtonOnClick
                                 icon={<FiFilePlus className="basic-svg" />}
                                 tooltip="Add Data"
                                 onClick={() => setModalState({
@@ -336,11 +384,23 @@ const InstancePage: NextPage = () => {
                     <div className="m-8">
                         <LexSubInstanceTable phase={phase.phase}
                             modalState={{
-                                open: modalState.isOpenAddDataModal,
-                                callback: () => setModalState({
-                                    ...modalState,
-                                    isOpenAddDataModal: false,
-                                })
+                                openData: modalState.isOpenAddDataModal,
+                                openGenerate: modalState.isOpenGenerateInstancesModal,
+
+                                callbackData: () => {
+                                    setModalState({
+                                        ...modalState,
+                                        isOpenAddDataModal: false,
+                                    })
+                                },
+
+                                callbackGenerate: () => {
+                                    setModalState({
+                                        ...modalState,
+                                        isOpenGenerateInstancesModal: false,
+
+                                    })
+                                }
                             }}
                         />
                     </div>

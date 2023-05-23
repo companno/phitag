@@ -196,7 +196,7 @@ export function useFetchPagedLexSubInstance(owner: string, project: string, phas
  * @param get storage hook
  * @returns a specific instance without revalidation
  */
-export function fetchRandomInstance<G extends IInstance, T extends IInstanceConstructor>(owner: string, project: string, phase: string, constructor: T, get: Function = () => {}) {
+export function fetchRandomInstance<G extends IInstance, T extends IInstanceConstructor>(owner: string, project: string, phase: string, constructor: T, get: Function = () => { }) {
     const token = get('JWT') ?? '';
 
     return axios.get<IInstanceDto>(`${BACKENDROUTES.INSTANCE}/random?owner=${owner}&project=${project}&phase=${phase}`, {
@@ -215,7 +215,7 @@ export function fetchRandomInstance<G extends IInstance, T extends IInstanceCons
  * @param get storage hook
  * @returns a csv/tsv file
  */
-export function exportInstance(owner: string, project: string, phase: string, additional: boolean = false, get: Function = () => {}) {
+export function exportInstance(owner: string, project: string, phase: string, additional: boolean = false, get: Function = () => { }) {
     const token = get('JWT') ?? '';
 
     return axios.get(`${BACKENDROUTES.INSTANCE}/export?owner=${owner}&project=${project}&phase=${phase}&additional=${additional}`, {
@@ -238,7 +238,7 @@ export function exportInstance(owner: string, project: string, phase: string, ad
  * @param get storage hook
  * @returns Promise
  */
-export function addInstance(owner: string, project: string, phase: string, file: File, additional: boolean = false, get: Function = () => {}) {
+export function addInstance(owner: string, project: string, phase: string, file: File, additional: boolean = false, get: Function = () => { }) {
     const token = get('JWT') ?? '';
 
     const formData = new FormData();
@@ -249,6 +249,44 @@ export function addInstance(owner: string, project: string, phase: string, file:
     formData.append('file', file);
 
     return axios.post(`${BACKENDROUTES.INSTANCE}`,
+        formData,
+        {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data'
+            }
+        }
+    ).then(res => res.data);
+}
+
+/**
+ * Generate instance data for a phase from usages associated with the project.
+ * 
+ * @param owner owner of the project
+ * @param project project name
+ * @param phase phase name in the project
+ * 
+ * @param labels labels to be used for the generation
+ * @param nonLabel non-label to be used for the generation
+ * 
+ * @param file additional file to be uploaded, if needed (e.g. for WSSIMTAG)
+ * 
+ * @param get storage hook 
+ */
+export function generateInstance(owner: string, project: string, phase: string, labels: string, nonLabel: string, file: File | null, get: Function = () => { }) {
+    const token = get('JWT') ?? '';
+
+    const formData = new FormData();
+    formData.append('owner', owner);
+    formData.append('project', project);
+    formData.append('phase', phase);
+    formData.append('labels', labels);
+    formData.append('nonLabel', nonLabel);
+    if (file) {
+        formData.append('file', file);
+    }
+
+    return axios.post(`${BACKENDROUTES.INSTANCE}/generate`,
         formData,
         {
             headers: {

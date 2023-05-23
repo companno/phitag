@@ -54,7 +54,7 @@ public class AnnotationProcessInformation {
     }
 
     public String next() {
-        if (index == null || index >= getOrder().size() - 1)
+        if (index == null || index >= getOrder().size())
             return null;
         return getOrder().get(index);
     }

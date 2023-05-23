@@ -12,8 +12,9 @@ import AddInstanceToPhaseModal from "../../modal/addinstancetophasemodal";
 import { useState } from "react";
 import PageChange from "../../../generic/table/pagination";
 import { data } from "autoprefixer";
+import GenerateInstancesForPhaseModal from "../../modal/generateinstancesforphasemodal";
 
-const UsePairInstanceTable: React.FC<{ phase: Phase, modalState: { open: boolean, callback: Function } }> = ({ phase, modalState }) => {
+const UsePairInstanceTable: React.FC<{ phase: Phase, modalState: { openData: boolean, callbackData: Function, openGenerate: boolean, callbackGenerate: Function } }> = ({ phase, modalState }) => {
 
     const [page, setPage] = useState(0);
     const usepairinstances = useFetchPagedUsePairInstance(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), page, !!phase);
@@ -104,7 +105,8 @@ const UsePairInstanceTable: React.FC<{ phase: Phase, modalState: { open: boolean
             
             <PageChange page={page} maxPage={usepairinstances.data.getTotalPages()} pageChangeCallback={(p: number) => {setPage(p)}} />
 
-            <AddInstanceToPhaseModal isOpen={modalState.open} closeModalCallback={modalState.callback} phase={phase} mutateCallback={usepairinstances.mutate} />
+            <AddInstanceToPhaseModal isOpen={modalState.openData} closeModalCallback={modalState.callbackData} phase={phase} mutateCallback={usepairinstances.mutate} />
+            <GenerateInstancesForPhaseModal isOpen={modalState.openGenerate} closeModalCallback={modalState.callbackGenerate} phase={phase} mutateCallback={usepairinstances.mutate} additional={false} additionalFileName="" />
         </div>
     );
 

@@ -1,7 +1,6 @@
 package de.garrafao.phitag.domain.phitagdata.usage;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -18,6 +17,8 @@ public interface UsageRepository {
     Optional<Usage> findByIdDataidAndIdProjectidNameAndIdProjectidOwnername(String dataid, String projectname, String ownername);
 
     Usage save(Usage phaseData);
+
+    List<String> findAllDataIdsByProjectnameAndOwnername(String projectname, String ownername);
 
     // For statistics
 
