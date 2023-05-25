@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="202305231725" author="serge">
+
+        <createTable tableName="phitagdictionaryunknownentrydata">
+
+            <column name="uname" type="varchar">
+                <constraints primaryKey="true" nullable="false"
+                    primaryKeyName="PK_phitagdictionaryunknownentrydata" />
+            </column>
+
+            <column name="dictionaryname" type="varchar">
+                <constraints primaryKey="true" nullable="false"
+                    primaryKeyName="PK_phitagdictionaryunknownentrydata" />
+            </column>
+
+            <column name="dictionaryentryid" type="string">
+                <constraints primaryKey="true" nullable="false"
+                    primaryKeyName="PK_phitagdictionaryunknownentrydata" />
+            </column>
+
+            <column name="id" type="string">
+                <constraints primaryKey="true" nullable="false"
+                    primaryKeyName="PK_phitagdictionaryunknownentrydata" />
+            </column>
+
+            <column name="data" type="varchar">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="order" type="int">
+                <constraints nullable="false" />
+            </column>
+
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="phitagdictionaryentrysense"
+            baseColumnNames="uname,dictionaryname,dictionaryentryid"
+            constraintName="FK_phitagdictionaryunknownentrydata_phitagdictionaryentry"
+            referencedTableName="phitagdictionaryentry"
+            referencedColumnNames="uname,dictionaryname,id" />
+
+
+    </changeSet>
+
+</databaseChangeLog>

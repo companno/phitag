@@ -9,6 +9,9 @@
     <includeAll path="tables/user/**" relativeToChangelogFile="true" />
     <includeAll path="tables/project/**" relativeToChangelogFile="true" />
 
+    <!-- Dictionaries -->
+    <includeAll path="tables/dictionary/**" relativeToChangelogFile="true" />
+
     <!-- Annotation Tasks -->
     <includeAll path="tables/annotationtask/**" relativeToChangelogFile="true" />
 
