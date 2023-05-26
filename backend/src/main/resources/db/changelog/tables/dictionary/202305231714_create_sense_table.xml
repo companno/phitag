@@ -9,19 +9,23 @@
         <createTable tableName="phitagdictionaryentrysense">
 
             <column name="uname" type="varchar">
-                <constraints primaryKey="true" nullable="false" primaryKeyName="PK_phitagdictionaryentrysense" />
+                <constraints primaryKey="true" nullable="false"
+                    primaryKeyName="PK_phitagdictionaryentrysense" />
             </column>
 
             <column name="dictionaryname" type="varchar">
-                <constraints primaryKey="true" nullable="false" primaryKeyName="PK_phitagdictionaryentrysense" />
+                <constraints primaryKey="true" nullable="false"
+                    primaryKeyName="PK_phitagdictionaryentrysense" />
             </column>
 
             <column name="dictionaryentryid" type="string">
-                <constraints primaryKey="true" nullable="false" primaryKeyName="PK_phitagdictionaryentrysense" />
+                <constraints primaryKey="true" nullable="false"
+                    primaryKeyName="PK_phitagdictionaryentrysense" />
             </column>
 
             <column name="id" type="string">
-                <constraints primaryKey="true" nullable="false" primaryKeyName="PK_phitagdictionaryentrysense" />
+                <constraints primaryKey="true" nullable="false"
+                    primaryKeyName="PK_phitagdictionaryentrysense" />
             </column>
 
             <column name="definition" type="varchar">
@@ -39,7 +43,10 @@
             baseColumnNames="uname,dictionaryname,dictionaryentryid"
             constraintName="FK_phitagdictionaryentrysense_phitagdictionaryentry"
             referencedTableName="phitagdictionaryentry"
-            referencedColumnNames="uname,dictionaryname,id" />
+            referencedColumnNames="uname,dictionaryname,id"
+            onDelete="CASCADE"
+            onUpdate="CASCADE"
+        />
 
     </changeSet>
 

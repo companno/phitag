@@ -4,11 +4,14 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Repository;
 
-import de.garrafao.phitag.domain.core.PageRequestWraper;
 import de.garrafao.phitag.domain.dictionary.dictionary.Dictionary;
+import de.garrafao.phitag.domain.dictionary.dictionary.DictionaryId;
 import de.garrafao.phitag.domain.dictionary.dictionary.DictionaryRepository;
 
+@Repository
 public class DictionaryRepositoryBridge implements DictionaryRepository {
 
     private final DictionaryRepositoryJpa dictionaryRepositoryJpa;
@@ -19,13 +22,18 @@ public class DictionaryRepositoryBridge implements DictionaryRepository {
     }
 
     @Override
-    public Page<Dictionary> findByName(String name, PageRequestWraper page) {
-        return dictionaryRepositoryJpa.findByName(name, page.getPageRequest());
+    public Page<Dictionary> findAllByIdName(String name, PageRequest pagerequest) {
+        return dictionaryRepositoryJpa.findAllByIdName(name, pagerequest);
     }
 
     @Override
-    public Optional<Dictionary> findByIdNameAndIdUname(String name, String uname) {
-        return dictionaryRepositoryJpa.findByIdNameAndIdUname(name, uname);
+    public Page<Dictionary> findAllByIdUname(String uname, PageRequest pagerequest) {
+        return dictionaryRepositoryJpa.findAllByIdUname(uname, pagerequest);
+    }
+
+    @Override
+    public Optional<Dictionary> findById(final DictionaryId id) {
+        return dictionaryRepositoryJpa.findById(id);
     }
 
     @Override

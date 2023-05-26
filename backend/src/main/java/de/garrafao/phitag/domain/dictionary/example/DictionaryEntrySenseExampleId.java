@@ -30,5 +30,10 @@ public class DictionaryEntrySenseExampleId implements Serializable {
         this.id = UUID.randomUUID().toString();
         this.dictionaryentrysenseid = dictionaryentrysenseid;
     }
+
+    public DictionaryEntrySenseExampleId(final String id, final DictionaryEntrySenseId dictionaryentrysenseid) {
+        this.id = id;
+        this.dictionaryentrysenseid = dictionaryentrysenseid;
+    }
     
 }

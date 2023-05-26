@@ -3,17 +3,15 @@ package de.garrafao.phitag.domain.dictionary.dictionary;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
-
-import de.garrafao.phitag.domain.core.PageRequestWraper;
-import de.garrafao.phitag.domain.core.Query;
+import org.springframework.data.domain.PageRequest;
 
 public interface DictionaryRepository {
+
+    Page<Dictionary> findAllByIdUname(final String uname, final PageRequest pagerequest);
     
-    // Page<Dictionary> findByQueryPaged(Query query, PageRequestWraper page);
+    Page<Dictionary> findAllByIdName(final String name, final PageRequest pagerequest);
 
-    Page<Dictionary> findByName(final String name, final PageRequestWraper page);
-
-    Optional<Dictionary> findByIdNameAndIdUname(String name, String uname);
+    Optional<Dictionary> findById(final DictionaryId id);
 
     Dictionary save(Dictionary dictionary);
 }

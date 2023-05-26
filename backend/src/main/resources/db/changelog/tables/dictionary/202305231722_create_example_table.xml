@@ -9,23 +9,28 @@
         <createTable tableName="phitagdictionaryentrysenseexample">
 
             <column name="uname" type="varchar">
-                <constraints primaryKey="true" nullable="false" primaryKeyName="PK_phitagdictionaryentrysenseexample" />
+                <constraints primaryKey="true" nullable="false"
+                    primaryKeyName="PK_phitagdictionaryentrysenseexample" />
             </column>
 
             <column name="dictionaryname" type="varchar">
-                <constraints primaryKey="true" nullable="false" primaryKeyName="PK_phitagdictionaryentrysenseexample" />
+                <constraints primaryKey="true" nullable="false"
+                    primaryKeyName="PK_phitagdictionaryentrysenseexample" />
             </column>
 
             <column name="dictionaryentryid" type="string">
-                <constraints primaryKey="true" nullable="false" primaryKeyName="PK_phitagdictionaryentrysenseexample" />
+                <constraints primaryKey="true" nullable="false"
+                    primaryKeyName="PK_phitagdictionaryentrysenseexample" />
             </column>
 
             <column name="dictionaryentrysenseid" type="string">
-                <constraints primaryKey="true" nullable="false" primaryKeyName="PK_phitagdictionaryentrysenseexample" />
+                <constraints primaryKey="true" nullable="false"
+                    primaryKeyName="PK_phitagdictionaryentrysenseexample" />
             </column>
 
             <column name="id" type="string">
-                <constraints primaryKey="true" nullable="false" primaryKeyName="PK_phitagdictionaryentrysenseexample" />
+                <constraints primaryKey="true" nullable="false"
+                    primaryKeyName="PK_phitagdictionaryentrysenseexample" />
             </column>
 
             <column name="example" type="varchar">
@@ -43,7 +48,10 @@
             baseColumnNames="uname,dictionaryname,dictionaryentryid,dictionaryentrysenseid"
             constraintName="FK_phitagdictionaryentrysenseexample_phitagdictionaryentrysense"
             referencedTableName="phitagdictionaryentrysense"
-            referencedColumnNames="uname,dictionaryname,dictionaryentryid,id" />
+            referencedColumnNames="uname,dictionaryname,dictionaryentryid,id"
+            onDelete="CASCADE"
+            onUpdate="CASCADE"
+        />
 
 
     </changeSet>

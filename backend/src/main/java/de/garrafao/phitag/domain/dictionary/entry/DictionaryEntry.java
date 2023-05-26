@@ -14,15 +14,13 @@ import org.apache.commons.lang3.Validate;
 
 import de.garrafao.phitag.domain.dictionary.dictionary.Dictionary;
 import de.garrafao.phitag.domain.dictionary.sense.DictionaryEntrySense;
-import de.garrafao.phitag.domain.dictionary.unknownentrydata.DictionaryUnknownEntryData;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 @Entity
 @Table(name = "phitagdictionaryentry")
 @Getter
-@EqualsAndHashCode
 @ToString
 public class DictionaryEntry {
 
@@ -33,21 +31,16 @@ public class DictionaryEntry {
     @ManyToOne
     private Dictionary dictionary;
 
-    @EqualsAndHashCode.Exclude
+    @Setter
     @Column(name = "headword", nullable = false)
     private String headword;
 
-    @EqualsAndHashCode.Exclude
+    @Setter
     @Column(name = "partofspeech", nullable = false)
-    private String partOfSpeech;
+    private String partofspeech;
 
-    @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "dictionaryentry")
     private List<DictionaryEntrySense> senses;
-
-    @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "dictionaryentry")
-    private List<DictionaryUnknownEntryData> unknownentrydata;
 
     DictionaryEntry() {
     }
@@ -60,7 +53,22 @@ public class DictionaryEntry {
         this.dictionary = dictionary;
 
         this.headword = headword;
-        this.partOfSpeech = partOfSpeech;
+        this.partofspeech = partOfSpeech;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof DictionaryEntry)) {
+            return false;
+        }
+
+        DictionaryEntry other = (DictionaryEntry) obj;
+        return this.id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return this.id.hashCode();
     }
 
 }

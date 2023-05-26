@@ -9,22 +9,25 @@
         <createTable tableName="phitagdictionaryentry">
 
             <column name="uname" type="varchar">
-                <constraints primaryKey="true" nullable="false" primaryKeyName="PK_phitagdictionaryentry" />
+                <constraints primaryKey="true" nullable="false"
+                    primaryKeyName="PK_phitagdictionaryentry" />
             </column>
 
             <column name="dictionaryname" type="varchar">
-                <constraints primaryKey="true" nullable="false" primaryKeyName="PK_phitagdictionaryentry" />
+                <constraints primaryKey="true" nullable="false"
+                    primaryKeyName="PK_phitagdictionaryentry" />
             </column>
 
             <column name="id" type="string">
-                <constraints primaryKey="true" nullable="false" primaryKeyName="PK_phitagdictionaryentry" />
+                <constraints primaryKey="true" nullable="false"
+                    primaryKeyName="PK_phitagdictionaryentry" />
             </column>
 
             <column name="headword" type="varchar">
                 <constraints nullable="false" />
             </column>
 
-            <column name="partofspeech" type="varchar"/>
+            <column name="partofspeech" type="varchar" />
 
         </createTable>
 
@@ -33,7 +36,10 @@
             baseColumnNames="uname,dictionaryname"
             constraintName="FK_phitagdictionaryentry_phitagdictionary"
             referencedTableName="phitagdictionary"
-            referencedColumnNames="uname,name" />
+            referencedColumnNames="uname,name"
+            onDelete="CASCADE"
+            onUpdate="CASCADE"
+        />
 
 
     </changeSet>

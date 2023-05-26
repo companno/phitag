@@ -12,10 +12,12 @@ import org.apache.commons.lang3.Validate;
 
 import de.garrafao.phitag.domain.user.User;
 import lombok.Getter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "phitagdictionary")
 @Getter
+@ToString
 public class Dictionary {
 
     @EmbeddedId
@@ -24,7 +26,7 @@ public class Dictionary {
     @MapsId("uname")
     @ManyToOne
     @JoinColumn(name = "uname", referencedColumnName = "username")
-    private User uname;
+    private User owner;
 
     @Column(name = "description", nullable = false)
     private String description;
@@ -32,15 +34,30 @@ public class Dictionary {
     Dictionary() {
     }
 
-    public Dictionary(final String name, final User uname, final String description) {
+    public Dictionary(final String name, final User owner, final String description) {
         Validate.notEmpty(name);
         Validate.matchesPattern(name, "^[a-zA-Z0-9-]+$");
 
-        Validate.notNull(uname);
+        Validate.notNull(owner);
 
-        this.id = new DictionaryId(name, uname.getUsername());
-        this.uname = uname;
+        this.id = new DictionaryId(name, owner.getUsername());
+        this.owner = owner;
         this.description = description;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof Dictionary)) {
+            return false;
+        }
+
+        Dictionary other = (Dictionary) obj;
+        return this.id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return this.id.hashCode();
     }
 
     

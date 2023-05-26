@@ -10,14 +10,13 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.Validate;
 
 import de.garrafao.phitag.domain.dictionary.sense.DictionaryEntrySense;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 @Entity
 @Table(name = "phitagdictionaryentrysenseexample")
 @Getter
-@EqualsAndHashCode
 @ToString
 public class DictionaryEntrySenseExample {
 
@@ -28,17 +27,19 @@ public class DictionaryEntrySenseExample {
     @ManyToOne
     private DictionaryEntrySense dictionaryentrysense;
 
+    @Setter
     @Column(name = "example", nullable = false)
     private String example;
 
+    @Setter
     @Column(name = "order", nullable = false)
-    private int order;
+    private Integer order;
 
     DictionaryEntrySenseExample() {
     }
 
     public DictionaryEntrySenseExample(final DictionaryEntrySense dictionaryentrysense, final String example,
-            final int order) {
+            final Integer order) {
         Validate.notNull(dictionaryentrysense, "dictionaryentrysense must not be null");
         Validate.notEmpty(example, "example must not be null");
         Validate.isTrue(order >= 0, "order must be greater than or equal to 0");
@@ -49,4 +50,20 @@ public class DictionaryEntrySenseExample {
         this.example = example;
         this.order = order;
     }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof DictionaryEntrySenseExample)) {
+            return false;
+        }
+
+        DictionaryEntrySenseExample other = (DictionaryEntrySenseExample) obj;
+        return this.id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return this.id.hashCode();
+    }
+
 }

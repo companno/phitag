@@ -1,0 +1,92 @@
+package de.garrafao.phitag.application.dictionary.dictionary;
+
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import de.garrafao.phitag.application.common.CommonService;
+import de.garrafao.phitag.application.dictionary.dictionary.data.PagedDictionaryDto;
+import de.garrafao.phitag.application.validation.ValidationService;
+import de.garrafao.phitag.domain.dictionary.dictionary.Dictionary;
+import de.garrafao.phitag.domain.dictionary.dictionary.DictionaryId;
+import de.garrafao.phitag.domain.dictionary.dictionary.DictionaryRepository;
+import de.garrafao.phitag.domain.user.User;
+
+@Service
+public class DictionaryApplicationService {
+
+    // Repository
+
+    private final DictionaryRepository dictionaryRepository;
+
+    // Common services
+
+    private final CommonService commonService;
+
+    private final ValidationService validationService;
+
+    // Other
+
+    @Autowired
+    public DictionaryApplicationService(
+            final DictionaryRepository dictionaryRepository,
+
+            final CommonService commonService,
+            final ValidationService validationService) {
+        this.dictionaryRepository = dictionaryRepository;
+
+        this.commonService = commonService;
+        this.validationService = validationService;
+
+    }
+
+    /**
+     * Returns all dictionaries for the given user.
+     * 
+     * @param authenticationToken The authentication token of the requesting user
+     * @param uname               The user to get the dictionaries for (optional,
+     *                            defaults currently to requesting user)
+     * @param page                The page to get (optional, defaults to 0)
+     * @return
+     */
+    public PagedDictionaryDto all(final String authenticationToken, final String uname, final int page) {
+        final User requester = this.commonService.getUserByAuthenticationToken(authenticationToken);
+
+        return PagedDictionaryDto.from(
+                this.dictionaryRepository.findAllByIdUname(requester.getUsername(),
+                        PageRequest.of(page, 50)));
+
+    }
+
+    /**
+     * Create a new dictionary.
+     * If the file is not null, it will be parsed and the dictionary will be created
+     * from it.
+     * TODO: Need to extend this and give a selection of formats to parse from
+     * 
+     * @param authenticationToken The authentication token of the requesting user
+     * @param name                The name of the dictionary
+     * @param description         The description of the dictionary
+     * @param file                The file of the dictionary (optional)
+     */
+    @Transactional
+    public void create(final String authenticationToken, final String name, final String description,
+            final MultipartFile file) {
+        if (file != null) {
+            throw new UnsupportedOperationException("Parsing from file is not yet supported");
+        }
+
+        final User requester = this.commonService.getUserByAuthenticationToken(authenticationToken);
+
+        // Check if dictionary with name already exists
+        if (this.dictionaryRepository.findById(new DictionaryId(name, requester.getUsername())).isPresent()) {
+            throw new IllegalArgumentException("Dictionary with name already exists");
+        }
+
+        this.dictionaryRepository.save(new Dictionary(name, requester, description));
+    }
+
+}

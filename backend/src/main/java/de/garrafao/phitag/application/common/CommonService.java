@@ -27,6 +27,22 @@ import de.garrafao.phitag.domain.annotator.error.AnnotatorNotFoundException;
 import de.garrafao.phitag.domain.annotator.query.AnnotatorQueryBuilder;
 import de.garrafao.phitag.domain.core.PageRequestWraper;
 import de.garrafao.phitag.domain.core.Query;
+import de.garrafao.phitag.domain.dictionary.dictionary.Dictionary;
+import de.garrafao.phitag.domain.dictionary.dictionary.DictionaryId;
+import de.garrafao.phitag.domain.dictionary.dictionary.DictionaryRepository;
+import de.garrafao.phitag.domain.dictionary.dictionary.error.DictionaryException;
+import de.garrafao.phitag.domain.dictionary.entry.DictionaryEntry;
+import de.garrafao.phitag.domain.dictionary.entry.DictionaryEntryId;
+import de.garrafao.phitag.domain.dictionary.entry.DictionaryEntryRepository;
+import de.garrafao.phitag.domain.dictionary.entry.error.DictionaryEntryException;
+import de.garrafao.phitag.domain.dictionary.example.DictionaryEntrySenseExample;
+import de.garrafao.phitag.domain.dictionary.example.DictionaryEntrySenseExampleId;
+import de.garrafao.phitag.domain.dictionary.example.DictionaryEntrySenseExampleRepository;
+import de.garrafao.phitag.domain.dictionary.example.error.DictionaryEntrySenseExampleException;
+import de.garrafao.phitag.domain.dictionary.sense.DictionaryEntrySense;
+import de.garrafao.phitag.domain.dictionary.sense.DictionaryEntrySenseId;
+import de.garrafao.phitag.domain.dictionary.sense.DictionaryEntrySenseRepository;
+import de.garrafao.phitag.domain.dictionary.sense.error.DictionaryEntrySenseException;
 import de.garrafao.phitag.domain.entitlement.Entitlement;
 import de.garrafao.phitag.domain.entitlement.EntitlementRepository;
 import de.garrafao.phitag.domain.entitlement.error.EntitlementNotFoundException;
@@ -93,6 +109,16 @@ public class CommonService {
 
     private final NotificationRepository notificationRepository;
 
+    // Dictionary repository dependencies
+
+    private final DictionaryRepository dictionaryRepository;
+
+    private final DictionaryEntryRepository dictionaryEntryRepository;
+
+    private final DictionaryEntrySenseRepository dictionaryEntrySenseRepository;
+
+    private final DictionaryEntrySenseExampleRepository dictionaryEntrySenseExampleRepository;
+
     // "Static" repository dependencies
 
     private final RoleRepository roleRepository;
@@ -148,6 +174,11 @@ public class CommonService {
             final PhaseRepository phaseRepository,
             final NotificationRepository notificationRepository,
 
+            final DictionaryRepository dictionaryRepository,
+            final DictionaryEntryRepository dictionaryEntryRepository,
+            final DictionaryEntrySenseRepository dictionaryEntrySenseRepository,
+            final DictionaryEntrySenseExampleRepository dictionaryEntrySenseExampleRepository,
+
             final RoleRepository roleRepository,
             final VisibilityRepository visibilityRepository,
             final LanguageRepository languageRepository,
@@ -174,6 +205,11 @@ public class CommonService {
         this.annotatorRepository = annotatorRepository;
         this.phaseRepository = phaseRepository;
         this.notificationRepository = notificationRepository;
+
+        this.dictionaryRepository = dictionaryRepository;
+        this.dictionaryEntryRepository = dictionaryEntryRepository;
+        this.dictionaryEntrySenseRepository = dictionaryEntrySenseRepository;
+        this.dictionaryEntrySenseExampleRepository = dictionaryEntrySenseExampleRepository;
 
         this.roleRepository = roleRepository;
         this.visibilityRepository = visibilityRepository;
@@ -656,7 +692,67 @@ public class CommonService {
         this.notificationRepository.save(notification);
     }
 
-    // Getters
+    /**
+     * Get a dictionary by its name.
+     * 
+     * @param dname
+     * @param uname
+     * @return The dictionary.
+     */
+    public Dictionary getDictionary(final String dname, final String uname) {
+        final DictionaryId id = new DictionaryId(dname, uname);
+        return this.dictionaryRepository.findById(id)
+                .orElseThrow(() -> new DictionaryException("Dictionary not found."));
+    }
+
+    /**
+     * Get an entry by its id.
+     * 
+     * @param entryId
+     * @param dname
+     * @param uname
+     * @return The entry.
+     */
+    public DictionaryEntry getEntry(final String entryId, final String dname, final String uname) {
+        final DictionaryEntryId id = new DictionaryEntryId(entryId, new DictionaryId(dname, uname));
+        return this.dictionaryEntryRepository.findById(id)
+                .orElseThrow(() -> new DictionaryEntryException("Entry not found."));
+    }
+
+    /**
+     * Get a sense entry by its id.
+     * 
+     * @param senseId The sense id.
+     * @param entryId The entry id.
+     * @param dname   The dictionary name.
+     * @param uname   The user name.
+     * @return The sense entry.
+     */
+    public DictionaryEntrySense getSenseEntry(final String senseId, final String entryId, final String dname,
+            final String uname) {
+        final DictionaryEntrySenseId id = new DictionaryEntrySenseId(senseId,
+                new DictionaryEntryId(entryId, new DictionaryId(dname, uname)));
+        return this.dictionaryEntrySenseRepository.findById(id)
+                .orElseThrow(() -> new DictionaryEntrySenseException("Sense not found."));
+    }
+
+    /**
+     * Get all sense examples for a given sense entry.
+     * 
+     * @param exampleId The example id.
+     * @param senseId   The sense id.
+     * @param entryId   The entry id.
+     * @param dname     The dictionary name.
+     * @param uname     The user name.
+     * @return The example.
+     */
+    public DictionaryEntrySenseExample getSenseExample(final String exampleId, final String senseId,
+            final String entryId, final String dname, final String uname) {
+        final DictionaryEntrySenseExampleId id = new DictionaryEntrySenseExampleId(exampleId,
+                new DictionaryEntrySenseId(senseId, new DictionaryEntryId(entryId, new DictionaryId(dname, uname))));
+        return this.dictionaryEntrySenseExampleRepository.findById(id)
+                .orElseThrow(() -> new DictionaryEntrySenseExampleException("Example not found."));
+    }
 
     public Role getRole(final String role) {
         return this.roleRepository.findByName(role).orElseThrow(RoleNotFoundException::new);
