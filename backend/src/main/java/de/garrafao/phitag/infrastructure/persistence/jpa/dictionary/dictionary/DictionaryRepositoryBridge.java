@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import de.garrafao.phitag.domain.dictionary.dictionary.Dictionary;
@@ -22,12 +22,12 @@ public class DictionaryRepositoryBridge implements DictionaryRepository {
     }
 
     @Override
-    public Page<Dictionary> findAllByIdName(String name, PageRequest pagerequest) {
-        return dictionaryRepositoryJpa.findAllByIdName(name, pagerequest);
+    public Page<Dictionary> findAllByIdDname(String name, Pageable pagerequest) {
+        return dictionaryRepositoryJpa.findAllByIdDname(name, pagerequest);
     }
 
     @Override
-    public Page<Dictionary> findAllByIdUname(String uname, PageRequest pagerequest) {
+    public Page<Dictionary> findAllByIdUname(String uname, Pageable pagerequest) {
         return dictionaryRepositoryJpa.findAllByIdUname(uname, pagerequest);
     }
 

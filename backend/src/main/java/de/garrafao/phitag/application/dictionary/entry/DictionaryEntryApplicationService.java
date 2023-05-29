@@ -3,6 +3,7 @@ package de.garrafao.phitag.application.dictionary.entry;
 import javax.transaction.Transactional;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -62,13 +63,13 @@ public class DictionaryEntryApplicationService {
         final User requester = this.commonService.getUserByAuthenticationToken(authenticationToken);
 
         final Query query = new DictionaryEntryQueryBuilder()
-                .withDictionaryName(dname)
+                .withDictionaryname(dname)
                 .withOwner(requester.getUsername())
                 .withHeadword(headword)
                 .withPartOfSpeach(partOfSpeech)
                 .build();
 
-        Page<DictionaryEntry> entries = this.dictionaryEntryRepository.findAllByQuery(query, PageRequest.of(page, 10));
+        Page<DictionaryEntry> entries = this.dictionaryEntryRepository.findAllByQuery(query, PageRequest.of(page, 7, Sort.by("headword").ascending()));
 
         return PagedDictionaryEntryDto.from(entries);
     }

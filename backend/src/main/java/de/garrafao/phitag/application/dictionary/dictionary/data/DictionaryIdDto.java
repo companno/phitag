@@ -15,7 +15,7 @@ public class DictionaryIdDto {
     }
 
     public static DictionaryIdDto from(final DictionaryId dictionaryId) {
-        return new DictionaryIdDto(dictionaryId.getName(), dictionaryId.getUname());
+        return new DictionaryIdDto(dictionaryId.getDname(), dictionaryId.getUname());
     }
 
     

@@ -13,22 +13,22 @@
                     primaryKeyName="PK_phitagdictionaryentrysenseexample" />
             </column>
 
-            <column name="dictionaryname" type="varchar">
+            <column name="dname" type="varchar">
                 <constraints primaryKey="true" nullable="false"
                     primaryKeyName="PK_phitagdictionaryentrysenseexample" />
             </column>
 
-            <column name="dictionaryentryid" type="string">
+            <column name="entryid" type="varchar">
                 <constraints primaryKey="true" nullable="false"
                     primaryKeyName="PK_phitagdictionaryentrysenseexample" />
             </column>
 
-            <column name="dictionaryentrysenseid" type="string">
+            <column name="senseid" type="varchar">
                 <constraints primaryKey="true" nullable="false"
                     primaryKeyName="PK_phitagdictionaryentrysenseexample" />
             </column>
 
-            <column name="id" type="string">
+            <column name="exampleid" type="varchar">
                 <constraints primaryKey="true" nullable="false"
                     primaryKeyName="PK_phitagdictionaryentrysenseexample" />
             </column>
@@ -45,10 +45,10 @@
 
         <addForeignKeyConstraint
             baseTableName="phitagdictionaryentrysenseexample"
-            baseColumnNames="uname,dictionaryname,dictionaryentryid,dictionaryentrysenseid"
+            baseColumnNames="uname,dname,entryid,senseid"
             constraintName="FK_phitagdictionaryentrysenseexample_phitagdictionaryentrysense"
             referencedTableName="phitagdictionaryentrysense"
-            referencedColumnNames="uname,dictionaryname,dictionaryentryid,id"
+            referencedColumnNames="uname,dname,entryid,senseid"
             onDelete="CASCADE"
             onUpdate="CASCADE"
         />

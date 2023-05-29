@@ -2,13 +2,7 @@ package de.garrafao.phitag.domain.dictionary.sense;
 
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.apache.commons.lang3.Validate;
 
@@ -29,6 +23,11 @@ public class DictionaryEntrySense {
 
     @MapsId("dictionaryentryid")
     @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "entryid", referencedColumnName = "entryid"),
+            @JoinColumn(name = "dname", referencedColumnName = "dname"),
+            @JoinColumn(name = "uname", referencedColumnName = "uname")
+    })
     private DictionaryEntry dictionaryentry;
 
     @Setter

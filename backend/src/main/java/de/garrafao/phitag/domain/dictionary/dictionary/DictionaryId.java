@@ -15,16 +15,16 @@ import lombok.ToString;
 @ToString
 public class DictionaryId implements Serializable {
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "dname")
+    private String dname;
 
     private String uname;
 
     public DictionaryId() {
     }
 
-    public DictionaryId(final String name, final String uname) {
-        this.name = name;
+    public DictionaryId(final String dname, final String uname) {
+        this.dname = dname;
         this.uname = uname;
     }
 

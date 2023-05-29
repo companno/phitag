@@ -13,17 +13,17 @@
                     primaryKeyName="PK_phitagdictionaryentrysense" />
             </column>
 
-            <column name="dictionaryname" type="varchar">
+            <column name="dname" type="varchar">
                 <constraints primaryKey="true" nullable="false"
                     primaryKeyName="PK_phitagdictionaryentrysense" />
             </column>
 
-            <column name="dictionaryentryid" type="string">
+            <column name="entryid" type="varchar">
                 <constraints primaryKey="true" nullable="false"
                     primaryKeyName="PK_phitagdictionaryentrysense" />
             </column>
 
-            <column name="id" type="string">
+            <column name="senseid" type="varchar">
                 <constraints primaryKey="true" nullable="false"
                     primaryKeyName="PK_phitagdictionaryentrysense" />
             </column>
@@ -40,10 +40,10 @@
 
         <addForeignKeyConstraint
             baseTableName="phitagdictionaryentrysense"
-            baseColumnNames="uname,dictionaryname,dictionaryentryid"
+            baseColumnNames="uname,dname,entryid"
             constraintName="FK_phitagdictionaryentrysense_phitagdictionaryentry"
             referencedTableName="phitagdictionaryentry"
-            referencedColumnNames="uname,dictionaryname,id"
+            referencedColumnNames="uname,dname,entryid"
             onDelete="CASCADE"
             onUpdate="CASCADE"
         />

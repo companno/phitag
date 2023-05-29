@@ -23,10 +23,10 @@ public class DictionaryEntrySenseExampleIdDto {
 
     public static DictionaryEntrySenseExampleIdDto from(final DictionaryEntrySenseExampleId id) {
         return new DictionaryEntrySenseExampleIdDto(
-                id.getId(),
-                id.getDictionaryentrysenseid().getId(),
-                id.getDictionaryentrysenseid().getDictionaryentryid().getId(),
-                id.getDictionaryentrysenseid().getDictionaryentryid().getDictionaryid().getName(),
+                id.getExampleid(),
+                id.getDictionaryentrysenseid().getSenseid(),
+                id.getDictionaryentrysenseid().getDictionaryentryid().getEntryid(),
+                id.getDictionaryentrysenseid().getDictionaryentryid().getDictionaryid().getDname(),
                 id.getDictionaryentrysenseid().getDictionaryentryid().getDictionaryid().getUname());
     }
 

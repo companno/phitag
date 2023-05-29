@@ -18,8 +18,8 @@ public class DictionaryEntryIdDto {
 
     public static DictionaryEntryIdDto from(final DictionaryEntryId dictionaryEntryId) {
         return new DictionaryEntryIdDto(
-                dictionaryEntryId.getId(),
-                dictionaryEntryId.getDictionaryid().getName(),
+                dictionaryEntryId.getEntryid(),
+                dictionaryEntryId.getDictionaryid().getDname(),
                 dictionaryEntryId.getDictionaryid().getUname());
     }
 

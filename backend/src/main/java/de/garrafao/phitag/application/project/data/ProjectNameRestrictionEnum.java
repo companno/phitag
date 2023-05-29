@@ -1,7 +1,10 @@
 package de.garrafao.phitag.application.project.data;
 
+import de.garrafao.phitag.domain.dictionary.dictionary.Dictionary;
+
 public enum ProjectNameRestrictionEnum {
-    INDEX("index");
+    INDEX("index"),
+    DICTIONARY("dictionary");
 
     private final String name;
 

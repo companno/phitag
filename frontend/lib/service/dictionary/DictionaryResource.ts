@@ -6,7 +6,7 @@ import useSWR from "swr";
 import PagedGenericDto from "../../model/interfaces/PagedGenericDto";
 import DictionaryDto from "../../model/dictionary/dictionary/dto/DictionaryDto";
 
-export function useFetchDictionaries(page: number, fetch: boolean = true) {
+export function useFetchDictionaries(uname: string, page: number, fetch: boolean = true) {
     const { get } = useStorage();
     const token = get('JWT') ?? '';
 
@@ -17,7 +17,7 @@ export function useFetchDictionaries(page: number, fetch: boolean = true) {
     }).then(res => res.data)
 
 
-    const { data, error, mutate } = useSWR(fetch ? `${BACKENDROUTES.DICTIONARY}?uname=${""}&page=${page}` : null, dictionaryDataFetcher)
+    const { data, error, mutate } = useSWR(fetch ? `${BACKENDROUTES.DICTIONARY}?uname=${uname}&page=${page}` : null, dictionaryDataFetcher)
 
     return {
         data: data ? PagedDictionary.fromDto(data) : PagedDictionary.empty(),
@@ -27,11 +27,12 @@ export function useFetchDictionaries(page: number, fetch: boolean = true) {
     }
 }
 
-export function createDictionary(name: string, description: string, file: File | null, get: Function = () => { }) {
+export function createDictionary(uname: string, dname: string, description: string, file: File | null, get: Function = () => { }) {
     const token = get('JWT') ?? '';
 
     const formData = new FormData();
-    formData.append('name', name);
+    formData.append('uname', uname);
+    formData.append('dname', dname);
     formData.append('description', description);
     if (file) {
         formData.append('file', file);

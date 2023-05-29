@@ -4,11 +4,11 @@ import de.garrafao.phitag.domain.core.QueryComponent;
 import lombok.Getter;
 
 @Getter
-public class DictionaryNameQueryComponent implements QueryComponent {
+public class DictionarynameQueryComponent implements QueryComponent {
 
     private final String name;
 
-    public DictionaryNameQueryComponent(String name) {
+    public DictionarynameQueryComponent(String name) {
         this.name = name;
     }
     

@@ -7,7 +7,7 @@
     <changeSet id="202305231654" author="serge">
 
         <createTable tableName="phitagdictionary">
-            <column name="name" type="varchar">
+            <column name="dname" type="varchar">
                 <constraints primaryKey="true" nullable="false" primaryKeyName="PK_phitagdictionary" />
             </column>
 

@@ -38,11 +38,11 @@ public class DictionaryEntryQueryBuilder {
         return this;
     }
 
-    public DictionaryEntryQueryBuilder withDictionaryName(final String dictionaryName) {
-        if (dictionaryName == null || dictionaryName.isEmpty() || dictionaryName.isBlank()) {
+    public DictionaryEntryQueryBuilder withDictionaryname(final String dictionaryname) {
+        if (dictionaryname == null || dictionaryname.isEmpty() || dictionaryname.isBlank()) {
             return this;
         }
-        this.queryComponents.add(new DictionaryNameQueryComponent(dictionaryName));
+        this.queryComponents.add(new DictionarynameQueryComponent(dictionaryname));
         return this;
     }
 

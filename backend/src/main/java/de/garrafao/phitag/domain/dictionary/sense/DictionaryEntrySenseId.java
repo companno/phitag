@@ -17,8 +17,8 @@ import lombok.ToString;
 @ToString
 public class DictionaryEntrySenseId implements Serializable {
 
-    @Column(name = "id")
-    private String id;
+    @Column(name = "senseid")
+    private String senseid;
 
     private DictionaryEntryId dictionaryentryid;
 
@@ -26,12 +26,12 @@ public class DictionaryEntrySenseId implements Serializable {
     }
 
     public DictionaryEntrySenseId(final DictionaryEntryId dictionaryentryid) {
-        this.id = UUID.randomUUID().toString();
+        this.senseid = UUID.randomUUID().toString();
         this.dictionaryentryid = dictionaryentryid;
     }
 
-    public DictionaryEntrySenseId(final String id, final DictionaryEntryId dictionaryentryid) {
-        this.id = id;
+    public DictionaryEntrySenseId(final String senseid, final DictionaryEntryId dictionaryentryid) {
+        this.senseid = senseid;
         this.dictionaryentryid = dictionaryentryid;
     }
     

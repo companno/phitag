@@ -30,7 +30,7 @@ public class DictionaryEntryResource {
      * @param dname The name of the dictionary
      * @param uname The username of the dictionary owner (currently will be ignored and replaced by the requesting user)
      * @param headword The headword of the dictionary entry (optional)
-     * @param partOfSpeech The part of speech of the dictionary entry (optional)
+     * @param partofspeech The part of speech of the dictionary entry (optional)
      * @param page The page number (optional) default: 0
      * @return A paginated list of dictionary entries
      */
@@ -40,9 +40,9 @@ public class DictionaryEntryResource {
             @RequestParam(value = "dname") final String dname,
             @RequestParam(value = "uname") final String uname,
             @RequestParam(value = "headword", required = false) final String headword,
-            @RequestParam(value = "partOfSpeech", required = false) final String partOfSpeech,
+            @RequestParam(value = "partofspeech", required = false) final String partofspeech,
             @RequestParam(value = "page", required = false, defaultValue = "0") final Integer page) {
-        return dictionaryEntryApplicationService.byDictionary(authenticationToken, dname, uname, headword, partOfSpeech, page);
+        return dictionaryEntryApplicationService.byDictionary(authenticationToken, dname, uname, headword, partofspeech, page);
     }
 
     /**
@@ -52,7 +52,7 @@ public class DictionaryEntryResource {
      * @param dname The name of the dictionary
      * @param uname The username of the dictionary owner (currently will be ignored and replaced by the requesting user)
      * @param headword The headword of the dictionary entry
-     * @param partOfSpeech The part of speech of the dictionary entry (optional)
+     * @param partofspeech The part of speech of the dictionary entry (optional)
      */
     @PostMapping("/create")
     public void create(
@@ -60,8 +60,8 @@ public class DictionaryEntryResource {
             @RequestParam(value = "dname") final String dname,
             @RequestParam(value = "uname") final String uname,
             @RequestParam(value = "headword") final String headword,
-            @RequestParam(value = "partOfSpeech", required = false) final String partOfSpeech) {
-        dictionaryEntryApplicationService.create(authenticationToken, dname, uname, headword, partOfSpeech);
+            @RequestParam(value = "partofspeech", required = false) final String partofspeech) {
+        dictionaryEntryApplicationService.create(authenticationToken, dname, uname, headword, partofspeech);
     }
 
     /**
@@ -72,7 +72,7 @@ public class DictionaryEntryResource {
      * @param uname The username of the dictionary owner (currently will be ignored and replaced by the requesting user)
      * @param dname The name of the dictionary
      * @param headword The headword of the dictionary entry (optional)
-     * @param partOfSpeech The part of speech of the dictionary entry (optional)
+     * @param partofspeech The part of speech of the dictionary entry (optional)
      */
     @PostMapping("/update")
     public void update(
@@ -81,8 +81,8 @@ public class DictionaryEntryResource {
             @RequestParam(value = "dname") final String dname,
             @RequestParam(value = "uname") final String uname,
             @RequestParam(value = "headword", required = false) final String headword,
-            @RequestParam(value = "partOfSpeech", required = false) final String partOfSpeech) {
-        dictionaryEntryApplicationService.update(authenticationToken, id, dname, uname, headword, partOfSpeech);
+            @RequestParam(value = "partofspeech", required = false) final String partofspeech) {
+        dictionaryEntryApplicationService.update(authenticationToken, id, dname, uname, headword, partofspeech);
     }
 
     /**

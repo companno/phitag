@@ -20,9 +20,9 @@ public class DictionaryEntrySenseIdDto {
 
     public static DictionaryEntrySenseIdDto from(final DictionaryEntrySenseId dictionaryEntrySenseId) {
         return new DictionaryEntrySenseIdDto(
-                dictionaryEntrySenseId.getId(),
-                dictionaryEntrySenseId.getDictionaryentryid().getId(),
-                dictionaryEntrySenseId.getDictionaryentryid().getDictionaryid().getName(),
+                dictionaryEntrySenseId.getSenseid(),
+                dictionaryEntrySenseId.getDictionaryentryid().getEntryid(),
+                dictionaryEntrySenseId.getDictionaryentryid().getDictionaryid().getDname(),
                 dictionaryEntrySenseId.getDictionaryentryid().getDictionaryid().getUname());
     }
 

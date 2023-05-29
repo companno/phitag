@@ -49,7 +49,7 @@ public class DictionaryEntrySenseResource {
      * Update a sense for a dictionary entry.
      * 
      * @param authenticationToken The authentication token of the requesting user
-     * @param senseId             The id of the sense
+     * @param senseid             The id of the sense
      * @param entryid             The id of the dictionary entry
      * @param uname               The username of the dictionary owner (currently
      *                            will be ignored and replaced by the requesting
@@ -62,13 +62,13 @@ public class DictionaryEntrySenseResource {
     @PostMapping("/update")
     public void update(
             @RequestHeader("Authorization") String authenticationToken,
-            @RequestParam(value = "senseId") final String senseId,
+            @RequestParam(value = "senseid") final String senseid,
             @RequestParam(value = "entryid") final String entryid,
             @RequestParam(value = "dname") final String dname,
             @RequestParam(value = "uname") final String uname,
             @RequestParam(value = "definition") final String definition,
             @RequestParam(value = "order") final Integer order) {
-        dictionaryEntrySenseApplicationService.update(authenticationToken, senseId, entryid, dname, uname, definition,
+        dictionaryEntrySenseApplicationService.update(authenticationToken, senseid, entryid, dname, uname, definition,
                 order);
     }
 
@@ -76,7 +76,7 @@ public class DictionaryEntrySenseResource {
      * Delete a sense for a dictionary entry.
      * 
      * @param authenticationToken The authentication token of the requesting user
-     * @param senseId             The id of the sense
+     * @param senseid             The id of the sense
      * @param id                  The id of the dictionary entry
      * @param uname               The username of the dictionary owner (currently
      *                            will be ignored and replaced by the requesting
@@ -86,11 +86,11 @@ public class DictionaryEntrySenseResource {
     @PostMapping("/delete")
     public void delete(
             @RequestHeader("Authorization") String authenticationToken,
-            @RequestParam(value = "senseId") final String senseId,
+            @RequestParam(value = "senseid") final String senseid,
             @RequestParam(value = "entryid") final String entryid,
             @RequestParam(value = "dname") final String dname,
             @RequestParam(value = "uname") final String uname) {
-        dictionaryEntrySenseApplicationService.delete(authenticationToken, senseId, entryid, dname, uname);
+        dictionaryEntrySenseApplicationService.delete(authenticationToken, senseid, entryid, dname, uname);
     }
 
 }

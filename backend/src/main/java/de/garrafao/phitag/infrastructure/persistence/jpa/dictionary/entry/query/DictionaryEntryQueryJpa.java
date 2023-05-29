@@ -33,8 +33,8 @@ public class DictionaryEntryQueryJpa implements Specification<DictionaryEntry> {
                 specifications.add(new HeadwordQueryComponentSpecification(((HeadwordQueryComponent) component).getHeadword()));
             } else if (component instanceof PartOfSpeachQueryComponent) {
                 specifications.add(new PartOfSpeachQueryComponentSpecification(((PartOfSpeachQueryComponent) component).getPartOfSpeach()));
-            } else if (component instanceof DictionaryNameQueryComponent) {
-                specifications.add(new DictionaryNameQueryComponentSpecification(((DictionaryNameQueryComponent) component).getName()));
+            } else if (component instanceof DictionarynameQueryComponent) {
+                specifications.add(new DictionarynameQueryComponentSpecification(((DictionarynameQueryComponent) component).getName()));
             } else if (component instanceof DictionaryEntryIdQueryComponent) {
                 specifications.add(new DictionaryEntryIdQueryComponentSpecification(((DictionaryEntryIdQueryComponent) component).getId()));
             } else if (component instanceof DictionaryOwnerQueryComponent) {

@@ -4,6 +4,8 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -55,9 +57,10 @@ public class DictionaryApplicationService {
     public PagedDictionaryDto all(final String authenticationToken, final String uname, final int page) {
         final User requester = this.commonService.getUserByAuthenticationToken(authenticationToken);
 
+        final Pageable pageable = PageRequest.of(page, 50, Sort.by("id.uname").ascending());
+
         return PagedDictionaryDto.from(
-                this.dictionaryRepository.findAllByIdUname(requester.getUsername(),
-                        PageRequest.of(page, 50)));
+                this.dictionaryRepository.findAllByIdUname(requester.getUsername(), pageable));
 
     }
 

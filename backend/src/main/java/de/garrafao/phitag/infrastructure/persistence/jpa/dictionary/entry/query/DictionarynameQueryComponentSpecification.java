@@ -9,17 +9,17 @@ import org.springframework.data.jpa.domain.Specification;
 
 import de.garrafao.phitag.domain.dictionary.entry.DictionaryEntry;
 
-public class DictionaryNameQueryComponentSpecification implements Specification<DictionaryEntry> {
+public class DictionarynameQueryComponentSpecification implements Specification<DictionaryEntry> {
     
     private final String name;
 
-    public DictionaryNameQueryComponentSpecification(final String name) {
+    public DictionarynameQueryComponentSpecification(final String name) {
         this.name = name;
     }
 
     @Override
     public Predicate toPredicate(Root<DictionaryEntry> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-        return criteriaBuilder.equal(root.get("id").get("dictionaryid").get("name"), name);
+        return criteriaBuilder.equal(root.get("id").get("dictionaryid").get("dname"), name);
     }
 
 }

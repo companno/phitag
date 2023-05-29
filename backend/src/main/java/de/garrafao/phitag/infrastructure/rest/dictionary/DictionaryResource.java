@@ -44,17 +44,17 @@ public class DictionaryResource {
      * Create a new dictionary.
      * 
      * @param authenticationToken The authentication token of the requesting user
-     * @param name                The name of the dictionary
+     * @param dname                The name of the dictionary
      * @param description         The description of the dictionary
      * @param file                The file of the dictionary (optional)
      */
     @PostMapping(value = "/create")
     public void create(
             @RequestHeader("Authorization") String authenticationToken,
-            @RequestParam(value = "name") final String name,
+            @RequestParam(value = "dname") final String dname,
             @RequestParam(value = "description") final String description,
             @RequestParam(value = "file", required = false) final MultipartFile file) {
-        dictionaryApplicationService.create(authenticationToken, name, description, file);
+        dictionaryApplicationService.create(authenticationToken, dname, description, file);
     }
 
 }

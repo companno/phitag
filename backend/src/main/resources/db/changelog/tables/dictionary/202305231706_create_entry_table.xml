@@ -13,12 +13,12 @@
                     primaryKeyName="PK_phitagdictionaryentry" />
             </column>
 
-            <column name="dictionaryname" type="varchar">
+            <column name="dname" type="varchar">
                 <constraints primaryKey="true" nullable="false"
                     primaryKeyName="PK_phitagdictionaryentry" />
             </column>
 
-            <column name="id" type="string">
+            <column name="entryid" type="varchar">
                 <constraints primaryKey="true" nullable="false"
                     primaryKeyName="PK_phitagdictionaryentry" />
             </column>
@@ -33,10 +33,10 @@
 
         <addForeignKeyConstraint
             baseTableName="phitagdictionaryentry"
-            baseColumnNames="uname,dictionaryname"
+            baseColumnNames="uname,dname"
             constraintName="FK_phitagdictionaryentry_phitagdictionary"
             referencedTableName="phitagdictionary"
-            referencedColumnNames="uname,name"
+            referencedColumnNames="uname,dname"
             onDelete="CASCADE"
             onUpdate="CASCADE"
         />
