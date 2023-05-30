@@ -37,7 +37,7 @@
                 <constraints nullable="false" />
             </column>
 
-            <column name="order" type="int">
+            <column name="exampleorder" type="int">
                 <constraints nullable="false" />
             </column>
 

@@ -31,7 +31,7 @@ public class DictionaryEntrySenseDto {
         return new DictionaryEntrySenseDto(
                 DictionaryEntrySenseIdDto.from(sense.getId()),
                 sense.getDefinition(),
-                sense.getOrder(),
+                sense.getSenseorder(),
                 sense.getExamples().stream().map(DictionaryEntrySenseExampleDto::from).toList());
     }
 

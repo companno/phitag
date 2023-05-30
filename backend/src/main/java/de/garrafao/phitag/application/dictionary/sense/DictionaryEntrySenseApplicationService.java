@@ -57,7 +57,7 @@ public class DictionaryEntrySenseApplicationService {
         final User requester = this.commonService.getUserByAuthenticationToken(authenticationToken);
         final DictionaryEntry entry = this.commonService.getEntry(entryid, dname, requester.getUsername());
 
-        final DictionaryEntrySense senseEntity = new DictionaryEntrySense(entry, definition, order);
+        final DictionaryEntrySense senseEntity = new DictionaryEntrySense(entry, definition, order < 0 ? entry.getSenses().size() : order);
 
         this.repository.save(senseEntity);
     }
@@ -84,7 +84,7 @@ public class DictionaryEntrySenseApplicationService {
                 requester.getUsername());
 
         sense.setDefinition(definition);
-        sense.setOrder(order);
+        sense.setSenseorder(order);
 
         this.repository.save(sense);
     }

@@ -1,7 +1,7 @@
 import Router, { useRouter } from "next/router";
 import useAuthenticated from "../../../../lib/hook/useAuthenticated";
 import { useEffect, useState } from "react";
-import { createDictionaryEntry, deleteDictionaryEntry, useFetchDictionaryEntries } from "../../../../lib/service/dictionary/DictionaryEntryResource";
+import { createDictionaryEntry, updateDictionaryEntry, deleteDictionaryEntry, useFetchDictionaryEntries } from "../../../../lib/service/dictionary/DictionaryEntryResource";
 import { toast } from "react-toastify";
 import Layout from "../../../../components/generic/layout/layout";
 import Head from "next/head";
@@ -9,7 +9,10 @@ import { FiCheck, FiEdit2, FiPlus, FiSearch, FiTrash, FiX } from "react-icons/fi
 import useStorage from "../../../../lib/hook/useStorage";
 import HelpButton from "../../../../components/generic/button/helpbutton";
 import DictionaryEntry from "../../../../lib/model/dictionary/entry/model/DictionaryEntry";
-import { updateDictionaryEntry } from "../../../../lib/service/dictionary/DictionaryEntryResource";
+import DictionaryEntrySense from "../../../../lib/model/dictionary/sense/model/DictionaryEntrySense";
+import { createDictionaryEntrySense, updateDictionaryEntrySense, deleteDictionaryEntrySense } from "../../../../lib/service/dictionary/DictionaryEntrySenseResource";
+import DictionaryEntrySenseExample from "../../../../lib/model/dictionary/example/model/DictionaryEntrySenseExample";
+import { createDictionaryEntrySenseExample, deleteDictionaryEntrySenseExample, updateDictionaryEntrySenseExample } from "../../../../lib/service/dictionary/DictionaryEntrySenseExampleResource";
 
 const DictionaryPage = () => {
     // Data & Hooks
@@ -125,7 +128,7 @@ const DictionaryEntriesListView = ({ entries, selectedEntry, onClick }: { entrie
         <div className="flex flex-col">
             {entries.map((entry) => (
                 <div key={entry.id.id} onClick={() => onClick(entry.id.id)}
-                    className={`flex border-b-2 border-white hover:border-base16-green transition-all duration-700 cursor-pointer py-2 px-3 my-4` + (entry.id.id === selectedEntry ? " border-base16-green" : "")}>
+                    className={`flex border-b-2 hover:border-base16-green transition-all duration-700 cursor-pointer py-2 px-3 my-4 ` + (entry.id.id === selectedEntry ? " border-base16-gray-900" : "")}>
                     <div className="flex flex-auto font-dm-mono-medium font-bold text-xl">
                         {entry.headword}
                         <span className="font-dm-mono-regular font-bold text-base ml-4 text-base16-gray-500 self-center">
@@ -142,18 +145,7 @@ const DictionaryEntriesListView = ({ entries, selectedEntry, onClick }: { entrie
 
 const DictionaryEntryFullView = ({ entry, mutateCallback }: { entry: DictionaryEntry | null, mutateCallback: () => void }) => {
 
-    const onDelete = async ({ entry }: { entry: DictionaryEntry }) => {
-        deleteDictionaryEntry(entry.id.id, entry.id.dname, entry.id.uname, useStorage().get)
-            .then(() => {
-                toast.success("Entry deleted successfully.");
-                mutateCallback();
-            })
-            .catch((err) => {
-                toast.error("Failed to delete entry.");
-                console.error(err);
-            })
-    }
-
+    const [options, setOptions] = useState<boolean>(false);
 
     // This presents the entry in full with all the information.
     if (!entry) {
@@ -168,26 +160,19 @@ const DictionaryEntryFullView = ({ entry, mutateCallback }: { entry: DictionaryE
 
     return (
         <div key={entry.id.id} className="flex flex-col h-full">
-            <DictionaryEntryHeaderView entry={entry} mutateCallback={mutateCallback} />
-
-            <div className="mt-auto self-end flex w-12 h-12 justify-center items-center rounded-full shadow-md cursor-pointer hover:bg-base16-red transition-all duration-500"
-                onClick={() => onDelete({ entry })}>
-                <FiTrash className="h-6 w-6" />
-            </div>
+            <DictionaryEntryHeaderView entry={entry} openOptionsCallback={() => setOptions(true)} mutateCallback={mutateCallback} />
+            <DictionaryEntryBodyView entry={entry} newSense={options} closeNewSenseCallback={() => setOptions(false)} mutateCallback={mutateCallback} />
         </div>
     )
 }
 
-const DictionaryEntryHeaderView = ({ entry, mutateCallback }: { entry: DictionaryEntry, mutateCallback: () => void }) => {
+const DictionaryEntryHeaderView = ({ entry, openOptionsCallback, mutateCallback }: { entry: DictionaryEntry, openOptionsCallback: () => void, mutateCallback: () => void }) => {
 
     const [edit, setEdit] = useState<boolean>(false);
-    const [newentry, setNewentry] = useState({
-        headword: "",
-        partofspeech: "",
-    });
+    const [newentry, setNewentry] = useState(entry.shallowAnnonymizedCopy());
 
-    const onSubmit = async () => {
-        updateDictionaryEntry(entry.id.id, entry.id.dname, entry.id.uname, newentry.headword || entry.headword, newentry.partofspeech || entry.partofspeech, useStorage().get)
+    const onSubmit = () => {
+        updateDictionaryEntry(newentry.id.id, newentry.id.dname, newentry.id.uname, newentry.headword, newentry.partofspeech, useStorage().get)
             .then(() => {
                 setEdit(false);
                 mutateCallback();
@@ -198,48 +183,59 @@ const DictionaryEntryHeaderView = ({ entry, mutateCallback }: { entry: Dictionar
             })
     }
 
+
+    const onDelete = () => {
+        deleteDictionaryEntry(entry.id.id, entry.id.dname, entry.id.uname, useStorage().get)
+            .then(() => {
+                toast.success("Entry deleted successfully.");
+                mutateCallback();
+            })
+            .catch((err) => {
+                toast.error("Failed to delete entry.");
+                console.error(err);
+            })
+    }
+
+    const openEdit = () => {
+        setNewentry(entry.shallowAnnonymizedCopy());
+        setEdit(true);
+    }
+
     if (edit) {
         return (
             <div className="flex flex-row items-center justify-between">
-                <div className="flex flex-col items-start space-y-4">
-                    <div className="flex flex-row items-end">
-                        <span className="font-dm-mono-medium font-bold text-2xl pr-3">
-                            Headword:
-                        </span>
-                        <input
-                            className="outline-none border-b-2 font-dm-mono-medium font-black text-4xl"
-                            placeholder="Headword"
-                            type={"text"}
-                            value={newentry.headword || entry.headword}
-                            onChange={(e) => setNewentry({
-                                ...entry,
-                                headword: e.target.value
-                            })} />
-                    </div>
-                    <div className="flex flex-row">
-                        <span className="font-dm-mono-medium font-bold text-2xl pr-3">
-                            Part of Speech:
-                        </span>
-                        <input
-                            className="outline-none border-b-2 font-dm-mono-regular font-bold text-2xl text-base16-gray-500"
-                            placeholder="Part of speech"
-                            type={"text"}
-                            value={newentry.partofspeech || entry.partofspeech}
-                            onChange={(e) => setNewentry({
-                                ...entry,
-                                partofspeech: e.target.value
-                            })} />
-                    </div>
+                <div className="flex items-end">
+                    <input
+                        className="outline-none border-b-2 font-dm-mono-medium font-black text-4xl"
+                        placeholder="Headword"
+                        type={"text"}
+                        value={newentry.headword}
+                        onChange={(e) => setNewentry({
+                            ...newentry,
+                            headword: e.target.value
+                        })
+                        } />
+                    <input
+                        className="outline-none border-b-2 font-dm-mono-regular font-bold text-2xl ml-4 text-base16-gray-500"
+                        placeholder="Part of speech"
+                        type={"text"}
+                        value={newentry.partofspeech || entry.partofspeech}
+                        onChange={(e) => setNewentry({
+                            ...newentry,
+                            partofspeech: e.target.value
+                        })
+                        } />
                 </div>
 
                 <div className="flex flex-row space-x-4">
-                    <div className="flex w-12 h-12 justify-center items-center rounded-full shadow-md cursor-pointer hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-200"
-                        onClick={onSubmit}>
-                        <FiCheck className="h-6 w-6" />
+                    <div className="flex w-8 h-8 justify-center items-center rounded-full shadow-md cursor-pointer hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-500"
+                        onClick={() => onSubmit()}>
+                        <FiCheck className="h-4 w-4" />
                     </div>
-                    <div className="flex w-12 h-12 justify-center items-center rounded-full shadow-md cursor-pointer hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-200"
+
+                    <div className="flex w-8 h-8 justify-center items-center rounded-full shadow-md cursor-pointer hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-500"
                         onClick={() => setEdit(false)}>
-                        <FiX className="h-6 w-6" />
+                        <FiX className="h-4 w-4" />
                     </div>
                 </div>
 
@@ -249,7 +245,7 @@ const DictionaryEntryHeaderView = ({ entry, mutateCallback }: { entry: Dictionar
     }
 
     return (
-        <div className="flex flex-row items-center justify-between">
+        <div className="flex flex-row items-center justify-between group">
             <div className="flex items-end">
                 <div className="font-dm-mono-medium font-black text-4xl">
                     {entry.headword}
@@ -259,13 +255,414 @@ const DictionaryEntryHeaderView = ({ entry, mutateCallback }: { entry: Dictionar
                 </span>
             </div>
 
-            <div className="flex w-12 h-12 justify-center items-center rounded-full shadow-md cursor-pointer hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-200"
-                onClick={() => setEdit(true)}>
-                <FiEdit2 className="h-6 w-6" />
+            <div className="flex flex-row space-x-4">
+                <div className="flex w-8 h-8 justify-center items-center rounded-full shadow-md cursor-pointer 
+                    hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-500 opacity-0 group-hover:opacity-100"
+                    onClick={() => openEdit()}>
+                    <FiEdit2 className="h-4 w-4" />
+                </div>
+
+
+                <div className="flex flex-row items-center justify-end group">
+                    <div className="flex w-8 h-8 justify-center items-center rounded-full shadow-md cursor-pointer 
+                        hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-500 opacity-0 group-hover:opacity-100"
+                        onClick={() => openOptionsCallback()}>
+                        <FiPlus className="h-4 w-4" />
+                    </div>
+                </div>
+
+                <div className="mt-auto self-end flex w-8 h-8 justify-center items-center rounded-full shadow-md cursor-pointer 
+                    hover:bg-base16-red transition-all duration-500 opacity-0 group-hover:opacity-100"
+                    onClick={() => onDelete()}>
+                    <FiTrash className="h-4 w-4" />
+                </div>
             </div>
 
         </div>
     )
+}
+
+const DictionaryEntryBodyView = ({ entry, newSense, closeNewSenseCallback, mutateCallback }: { entry: DictionaryEntry, newSense: boolean, closeNewSenseCallback: () => void, mutateCallback: () => void }) => {
+
+    return (
+        // Currently, the body is just a list of all senses in the entry.
+
+        <div className="flex flex-col mt-4 ml-8 space-y-4">
+            {entry.senses.map((sense, i) => (
+                <DictionaryEntrySenseView key={sense.id.id} sense={sense} mutateCallback={mutateCallback} />
+            ))}
+
+            <DictionaryEntrySenseViewNew entry={entry} open={newSense} closeCallback={closeNewSenseCallback} mutateCallback={mutateCallback} />
+
+        </div>
+    )
+
+
+}
+
+const DictionaryEntrySenseView = ({ sense, mutateCallback }: { sense: DictionaryEntrySense, mutateCallback: () => void }) => {
+
+    const [edit, setEdit] = useState(false);
+    const [newExample, setNewExample] = useState(false);
+
+    const [newsense, setNewsense] = useState(sense.shallowAnnonymizedCopy());
+
+    const onSubmit = () => {
+        updateDictionaryEntrySense(newsense.id.id, newsense.id.entryId, newsense.id.dname, newsense.id.uname, newsense.definition, newsense.order, useStorage().get)
+            .then(() => {
+                setEdit(false);
+                mutateCallback();
+                toast.success("Sense updated successfully!");
+            })
+            .catch((err) => {
+                toast.error("Failed to update sense!");
+            })
+    }
+
+    const onDelete = () => {
+        deleteDictionaryEntrySense(newsense.id.id, newsense.id.entryId, newsense.id.dname, newsense.id.uname, useStorage().get)
+            .then(() => {
+                toast.success("Sense deleted successfully.");
+                mutateCallback();
+            })
+            .catch((err) => {
+                toast.error("Failed to delete sense.");
+                console.error(err);
+            })
+    }
+
+    const openEdit = () => {
+        setNewsense(sense.shallowAnnonymizedCopy());
+        setEdit(true);
+    }
+
+    return (
+        <div className="flex flex-col">
+            {
+                edit ? (
+                    <div className="flex flex-row items-center justify-between group">
+                        <div className="flex items-end">
+                            <span className="font-dm-mono-regular font-bold text-md mr-2 text-base16-gray-500">
+                                {sense.order}.
+                            </span>
+                            <input
+                                className="outline-none border-b-2 font-dm-mono-medium font-black text-xl"
+                                placeholder="Definition"
+                                type={"text"}
+                                value={newsense.definition}
+                                onChange={(e) => setNewsense({
+                                    ...newsense,
+                                    definition: e.target.value
+                                })
+                                } />
+                        </div>
+
+                        <div className="flex flex-row space-x-4">
+                            <div className="flex w-8 h-8 justify-center items-center rounded-full shadow-md cursor-pointer hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-500"
+                                onClick={() => onSubmit()}>
+                                <FiCheck className="h-4 w-4" />
+                            </div>
+                            <div className="flex w-8 h-8 justify-center items-center rounded-full shadow-md cursor-pointer hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-500"
+                                onClick={() => setEdit(false)}>
+                                <FiX className="h-4 w-4" />
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="flex flex-row items-center justify-between group">
+                        <div className="flex items-end">
+                            <span className="font-dm-mono-regular font-bold text-md mr-2 text-base16-gray-500">
+                                {sense.order}.
+                            </span>
+                            <span className=" font-dm-mono-medium font-black text-xl">
+                                {sense.definition}
+                            </span>
+                        </div>
+
+                        <div className="flex flex-row space-x-4">
+                            <div className="flex w-8 h-8 justify-center items-center rounded-full shadow-md cursor-pointer
+                                hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-500 opacity-0 group-hover:opacity-100"
+                                onClick={() => openEdit()}>
+                                <FiEdit2 className="h-4 w-4" />
+                            </div>
+
+                            <div className="flex flex-row items-center justify-end group">
+                                <div className="flex w-8 h-8 justify-center items-center rounded-full shadow-md cursor-pointer 
+                                    hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-500 opacity-0 group-hover:opacity-100"
+                                    onClick={() => setNewExample(true)}>
+                                    <FiPlus className="h-4 w-4" />
+                                </div>
+                            </div>
+
+                            <div className="flex w-8 h-8 justify-center items-center rounded-full shadow-md cursor-pointer
+                                hover:bg-base16-red transition-all duration-500 opacity-0 group-hover:opacity-100"
+                                onClick={() => onDelete()}>
+                                <FiTrash className="h-4 w-4" />
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+
+            <div className="flex flex-col mt-4 ml-8 space-y-4">
+                {sense.examples.map((example, i) => (
+                    <DictionaryEntrySenseBodyView key={example.id.id} example={example} mutateCallback={mutateCallback} />
+                ))}
+
+                <DictionaryEntrySenseBodyViewNew sense={sense} open={newExample} closeCallback={() => setNewExample(false)} mutateCallback={mutateCallback} />
+
+            </div>
+
+        </div>
+    );
+
+}
+
+const DictionaryEntrySenseViewNew = ({ entry, open, closeCallback, mutateCallback }: { entry: DictionaryEntry, open: boolean, closeCallback: () => void, mutateCallback: () => void }) => {
+
+    const [newSense, setNewSense] = useState({
+        definition: "",
+        order: -1,
+
+        show: false,
+    })
+
+    const onSubmit = () => {
+        createDictionaryEntrySense(entry.id.id, entry.id.dname, entry.id.uname, newSense.definition, newSense.order, useStorage().get)
+            .then(() => {
+                toast.success("Sense created!");
+                mutateCallback();
+                cleanUp();
+            }).catch((err) => {
+                toast.error("Failed to create sense!");
+            });
+
+    }
+
+    const onCancel = () => {
+        cleanUp();
+    }
+
+    const cleanUp = () => {
+        setNewSense({
+            ...newSense,
+            definition: "",
+            order: -1,
+        })
+        closeCallback();
+    }
+
+    if (open) {
+
+        return (
+            <div className="flex flex-row items-center justify-between group">
+
+                <div className="flex items-end">
+                    <span className="font-dm-mono-regular font-bold text-md mr-2 text-base16-gray-500">
+                        {entry.senses.length}.
+                    </span>
+                    <input
+                        className="outline-none border-b-2 font-dm-mono-medium font-black text-xl"
+                        placeholder="Definition"
+                        type={"text"}
+                        value={newSense.definition}
+                        onChange={(e) => setNewSense({
+                            ...newSense,
+                            definition: e.target.value
+                        })
+                        } />
+                </div>
+
+                <div className="flex flex-row self-center space-x-4">
+                    <div className="flex w-8 h-8 justify-center items-center rounded-full shadow-md cursor-pointer
+                        hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-500"
+                        onClick={() => onSubmit()}>
+                        <FiCheck className="h-4 w-4" />
+                    </div>
+                    <div className="flex w-8 h-8 justify-center items-center rounded-full shadow-md cursor-pointer hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-500"
+                        onClick={() => onCancel()}>
+                        <FiX className="h-4 w-4" />
+                    </div>
+                </div>
+
+            </div>
+        )
+
+    }
+
+    return (
+        <div />
+    )
+
+}
+
+const DictionaryEntrySenseBodyView = ({ example, mutateCallback }: { example: DictionaryEntrySenseExample, mutateCallback: () => void }) => {
+
+    const [edit, setEdit] = useState(false);
+
+    const [newExample, setNewExample] = useState(example.shallowAnnonymizedCopy());
+
+    const onDelete = () => {
+        deleteDictionaryEntrySenseExample(example.id.id, example.id.senseId, example.id.entryId, example.id.dname, example.id.uname, useStorage().get)
+            .then(() => {
+                toast.success("Example deleted!");
+                mutateCallback();
+            }).catch((err) => {
+                toast.error("Failed to delete example!");
+            });
+    }
+
+    const onSubmit = () => {
+        updateDictionaryEntrySenseExample(example.id.id, example.id.senseId, example.id.entryId, example.id.dname, example.id.uname, newExample.example, newExample.order, useStorage().get)
+            .then(() => {
+                toast.success("Example updated!");
+                mutateCallback();
+                cleanUp();
+            }).catch((err) => {
+                toast.error("Failed to update example!");
+            });
+    }
+
+    const onCancel = () => {
+        cleanUp();
+    }
+
+    const cleanUp = () => {
+        setEdit(false);
+        setNewExample(example.shallowAnnonymizedCopy());
+    }
+
+    const onEdit = () => {
+        setNewExample(example.shallowAnnonymizedCopy());
+        setEdit(true);
+    }
+
+    if (edit) {
+        return (
+            <div className="flex flex-row items-center justify-between group">
+                <div className="flex flex-row border-l-2 items-end">
+                    <div className="mx-2" />
+                    <input
+                        className="outline-none border-b-2 font-dm-mono-italic text-base16-gray-500"
+                        placeholder="Example"
+                        value={newExample.example}
+                        onChange={(e) => setNewExample({
+                            ...newExample,
+                            example: e.target.value
+                        })} />
+                </div>
+
+                <div className="flex flex-row self-center space-x-4">
+                    <div className="flex w-8 h-8 justify-center items-center rounded-full shadow-md cursor-pointer
+                    hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-500"
+                        onClick={() => onSubmit()}>
+                        <FiCheck className="h-4 w-4" />
+                    </div>
+                    <div className="flex w-8 h-8 justify-center items-center rounded-full shadow-md cursor-pointer hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-500"
+                        onClick={() => onCancel()}>
+                        <FiX className="h-4 w-4" />
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    return (
+
+        <div className="flex flex-row items-center justify-between group">
+            <div className="flex flex-row border-l-2 items-end">
+                <div className="mx-2" />
+                <span className="font-dm-mono-italic text-base16-gray-500">
+                    {example.example}
+                </span>
+            </div>
+
+            <div className="flex flex-row space-x-4">
+                <div className="flex w-8 h-8 justify-center items-center rounded-full shadow-md cursor-pointer
+                    hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-500 opacity-0 group-hover:opacity-100"
+                    onClick={() => onEdit()}>
+                    <FiEdit2 className="h-4 w-4" />
+                </div>
+
+                <div className="flex w-8 h-8 justify-center items-center rounded-full shadow-md cursor-pointer
+                    hover:bg-base16-red transition-all duration-500 opacity-0 group-hover:opacity-100"
+                    onClick={() => onDelete()}>
+                    <FiTrash className="h-4 w-4" />
+                </div>
+            </div>
+        </div>
+    );
+
+}
+
+const DictionaryEntrySenseBodyViewNew = ({ sense, open, closeCallback, mutateCallback }: { sense: DictionaryEntrySense, open: boolean, closeCallback: () => void, mutateCallback: () => void }) => {
+
+    const [newExample, setNewExample] = useState({
+        example: "",
+        order: 0,
+    });
+
+    const onSubmit = () => {
+        createDictionaryEntrySenseExample(sense.id.id, sense.id.entryId, sense.id.dname, sense.id.uname, newExample.example, newExample.order, useStorage().get)
+            .then(() => {
+                toast.success("Example created!");
+                mutateCallback();
+                cleanUp();
+            }).catch((err) => {
+                toast.error("Failed to create example!");
+            });
+    }
+
+    const onCancel = () => {
+        cleanUp();
+    }
+
+    const cleanUp = () => {
+        setNewExample({
+            example: "",
+            order: 0,
+        });
+        closeCallback();
+    }
+
+    if (open) {
+
+        return (
+            <div className="flex flex-col space-y-4">
+                <div className="flex flex-row items-center group">
+                    <div className="flex flex-row grow border-l-2 items-end">
+                        <div className="mx-2" />
+                        <input
+                            className="outline-none border-b-2 font-dm-mono-italic text-base16-gray-500"
+                            placeholder="New Example"
+                            value={newExample.example}
+                            onChange={(e) => setNewExample({
+                                ...newExample,
+                                example: e.target.value
+                            })} />
+                    </div>
+
+                    <div className="flex flex-row self-center space-x-4">
+                        <div className="flex w-8 h-8 justify-center items-center rounded-full shadow-md cursor-pointer
+                    hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-500"
+                            onClick={() => onSubmit()}>
+                            <FiCheck className="h-4 w-4" />
+                        </div>
+                        <div className="flex w-8 h-8 justify-center items-center rounded-full shadow-md cursor-pointer hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-500"
+                            onClick={() => onCancel()}>
+                            <FiX className="h-4 w-4" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div />
+    );
+
+
 }
 
 const CreateDictionaryEntryModal = ({ closeCallback, mutateCallback }: { closeCallback: () => void, mutateCallback: () => void }) => {
@@ -290,7 +687,6 @@ const CreateDictionaryEntryModal = ({ closeCallback, mutateCallback }: { closeCa
     }
 
     const onCancel = () => {
-        toast.info("Cancelled creating dictionary entry.");
         cleanUp();
     }
 

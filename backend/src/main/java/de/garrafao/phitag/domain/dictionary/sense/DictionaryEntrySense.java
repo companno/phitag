@@ -35,8 +35,8 @@ public class DictionaryEntrySense {
     private String definition;
 
     @Setter
-    @Column(name = "order", nullable = false)
-    private int order;
+    @Column(name = "senseorder", nullable = false)
+    private int senseorder;
 
     @OneToMany(mappedBy = "dictionaryentrysense")
     private List<DictionaryEntrySenseExample> examples;
@@ -53,7 +53,7 @@ public class DictionaryEntrySense {
         this.dictionaryentry = dictionaryentry;
 
         this.definition = definition;
-        this.order = order;
+        this.senseorder = order;
     }
 
     @Override

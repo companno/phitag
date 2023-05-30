@@ -88,7 +88,7 @@ public class DictionaryEntrySenseExampleApplicationService {
                 entryId, dname, requester.getUsername());
 
         exampleEntity.setExample(example);
-        exampleEntity.setOrder(order);
+        exampleEntity.setExampleorder(order);
 
         this.repository.save(exampleEntity);
 

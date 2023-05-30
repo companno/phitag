@@ -14,6 +14,32 @@ export default class DictionaryEntrySenseExample {
         this.order = order;
     }
 
+    public copy(): DictionaryEntrySenseExample {
+        return new DictionaryEntrySenseExample(
+            this.id.copy(),
+            this.example,
+            this.order
+        );
+    }
+
+    public shallowAnnonymizedCopy(): {
+        id: {
+            id: string,
+            senseId: string,
+            entryId: string,
+            dname: string,
+            uname: string,
+        },
+        example: string,
+        order: number,
+    } {
+        return {
+            id: this.id.shallowAnnonymizedCopy(),
+            example: this.example,
+            order: this.order,
+        };
+    }
+
     public static fromDto(dto: DictionaryEntrySenseExampleDto) {
         return new DictionaryEntrySenseExample(
             DictionaryEntrySenseExampleId.fromDto(dto.id),

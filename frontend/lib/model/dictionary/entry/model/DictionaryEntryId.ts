@@ -12,6 +12,26 @@ export default class DictionaryEntryId {
         this.uname = uname;
     }
 
+    public copy(): DictionaryEntryId {
+        return new DictionaryEntryId(
+            this.id,
+            this.dname,
+            this.uname
+        );
+    }
+
+    public shallowAnnonymizedCopy(): {
+        id: string,
+        dname: string,
+        uname: string,
+    } {
+        return {
+            id: this.id,
+            dname: this.dname,
+            uname: this.uname,
+        };
+    }
+
     static fromDto(dto: DictionaryEntryIdDto) {
         return new DictionaryEntryId(
             dto.id,

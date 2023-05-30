@@ -22,7 +22,7 @@ public class DictionaryEntrySenseExampleDto {
         return new DictionaryEntrySenseExampleDto(
                 DictionaryEntrySenseExampleIdDto.from(example.getId()),
                 example.getExample(),
-                example.getOrder());
+                example.getExampleorder());
     }
 
 }

@@ -32,7 +32,7 @@
                 <constraints nullable="false" />
             </column>
 
-            <column name="order" type="int">
+            <column name="senseorder" type="int">
                 <constraints nullable="false" />
             </column>
 

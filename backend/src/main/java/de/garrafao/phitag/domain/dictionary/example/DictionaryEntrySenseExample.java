@@ -20,6 +20,12 @@ public class DictionaryEntrySenseExample {
 
     @MapsId("dictionaryentrysenseid")
     @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "senseid", referencedColumnName = "senseid"),
+            @JoinColumn(name = "entryid", referencedColumnName = "entryid"),
+            @JoinColumn(name = "dname", referencedColumnName = "dname"),
+            @JoinColumn(name = "uname", referencedColumnName = "uname")
+    })
     private DictionaryEntrySense dictionaryentrysense;
 
     @Setter
@@ -27,8 +33,8 @@ public class DictionaryEntrySenseExample {
     private String example;
 
     @Setter
-    @Column(name = "order", nullable = false)
-    private Integer order;
+    @Column(name = "exampleorder", nullable = false)
+    private Integer exampleorder;
 
     DictionaryEntrySenseExample() {
     }
@@ -43,7 +49,7 @@ public class DictionaryEntrySenseExample {
         this.dictionaryentrysense = dictionaryentrysense;
 
         this.example = example;
-        this.order = order;
+        this.exampleorder = order;
     }
 
     @Override

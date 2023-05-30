@@ -18,6 +18,32 @@ export default class DictionaryEntrySense {
         this.examples = examples;
     }
 
+    public copy(): DictionaryEntrySense {
+        return new DictionaryEntrySense(
+            this.id.copy(),
+            this.definition,
+            this.order,
+            this.examples.map(example => example.copy())
+        );
+    }
+
+    public shallowAnnonymizedCopy(): {
+        id: {
+            id: string,
+            entryId: string,
+            dname: string,
+            uname: string,
+        },
+        definition: string,
+        order: number,
+    } {
+        return {
+            id: this.id.shallowAnnonymizedCopy(),
+            definition: this.definition,
+            order: this.order,
+        };
+    }
+
     public static fromDto(dto: DictionaryEntrySenseDto) {
         return new DictionaryEntrySense(
             DictionaryEntrySenseId.fromDto(dto.id),
@@ -26,4 +52,5 @@ export default class DictionaryEntrySense {
             dto.examples.map(DictionaryEntrySenseExample.fromDto)
         );
     }
+
 }

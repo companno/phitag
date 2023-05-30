@@ -6,8 +6,8 @@ export default class DictionaryEntry {
 
     readonly id: DictionaryEntryId;
 
-    readonly headword: string;
-    readonly partofspeech: string;
+    headword: string;
+    partofspeech: string;
 
     readonly senses: Array<DictionaryEntrySense>;
 
@@ -16,6 +16,31 @@ export default class DictionaryEntry {
         this.headword = headword;
         this.partofspeech = partofspeech;
         this.senses = senses;
+    }
+
+    public copy(): DictionaryEntry {
+        return new DictionaryEntry(
+            this.id.copy(),
+            this.headword,
+            this.partofspeech,
+            this.senses.map(sense => sense.copy())
+        );
+    }
+
+    public shallowAnnonymizedCopy(): {
+        id: {
+            id: string,
+            dname: string,
+            uname: string,
+        },
+        headword: string,
+        partofspeech: string,
+    } {
+        return {
+            id: this.id.shallowAnnonymizedCopy(),
+            headword: this.headword,
+            partofspeech: this.partofspeech,
+        };
     }
 
     public static fromDto(dto: DictionaryEntryDto) {
