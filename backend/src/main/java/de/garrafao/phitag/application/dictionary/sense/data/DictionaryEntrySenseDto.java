@@ -24,7 +24,12 @@ public class DictionaryEntrySenseDto {
         this.definition = definition;
         this.order = order;
 
-        this.examples = examples;
+        // examples should be sorted by example number, TODO: hacky?
+        List<DictionaryEntrySenseExampleDto> sortedExamples = examples.stream()
+                .sorted((e1, e2) -> e1.getOrder().compareTo(e2.getOrder()))
+                .toList();
+        this.examples = sortedExamples;
+
     }
 
     public static DictionaryEntrySenseDto from(final DictionaryEntrySense sense) {

@@ -24,7 +24,11 @@ public class DictionaryEntryDto {
         this.headword = headword;
         this.partofspeech = partofspeech;
 
-        this.senses = senses;
+        // senses should be sorted by sense number, TODO: hacky?
+        List<DictionaryEntrySenseDto> sortedSenses = senses.stream()
+                .sorted((s1, s2) -> s1.getOrder().compareTo(s2.getOrder()))
+                .toList();
+        this.senses = sortedSenses;
     }
 
     public static DictionaryEntryDto from(final DictionaryEntry entry) {

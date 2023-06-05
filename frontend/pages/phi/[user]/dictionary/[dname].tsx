@@ -342,9 +342,16 @@ const DictionaryEntrySenseView = ({ sense, mutateCallback }: { sense: Dictionary
                 edit ? (
                     <div className="flex flex-row items-center justify-between group">
                         <div className="flex items-end">
-                            <span className="font-dm-mono-regular font-bold text-md mr-2 text-base16-gray-500">
-                                {sense.order}.
-                            </span>
+                            <input
+                                className="outline-none border-b-2 font-dm-mono-regular font-bold text-md mr-2 text-base16-gray-500 flex w-8 "
+                                placeholder="Order"
+                                type={"text"}
+                                value={newsense.order}
+                                onChange={(e) => setNewsense({
+                                    ...newsense,
+                                    order: parseInt(e.target.value)
+                                })
+                                } />
                             <input
                                 className="outline-none border-b-2 font-dm-mono-medium font-black text-xl"
                                 placeholder="Definition"
@@ -542,6 +549,16 @@ const DictionaryEntrySenseBodyView = ({ example, mutateCallback }: { example: Di
             <div className="flex flex-row items-center justify-between group">
                 <div className="flex flex-row border-l-2 items-end">
                     <div className="mx-2" />
+                    <input
+                        className="outline-none border-b-2 font-dm-mono-regular font-bold text-md mr-2 text-base16-gray-500 flex w-8 "
+                        placeholder="Order"
+                        type={"text"}
+                        value={newExample.order}
+                        onChange={(e) => setNewExample({
+                            ...newExample,
+                            order: parseInt(e.target.value)
+                        })
+                        } />
                     <input
                         className="outline-none border-b-2 font-dm-mono-italic text-base16-gray-500"
                         placeholder="Example"
