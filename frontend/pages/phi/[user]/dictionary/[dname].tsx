@@ -168,11 +168,13 @@ const DictionaryEntryFullView = ({ entry, mutateCallback }: { entry: DictionaryE
 
 const DictionaryEntryHeaderView = ({ entry, openOptionsCallback, mutateCallback }: { entry: DictionaryEntry, openOptionsCallback: () => void, mutateCallback: () => void }) => {
 
+    const { get } = useStorage();
+
     const [edit, setEdit] = useState<boolean>(false);
     const [newentry, setNewentry] = useState(entry.shallowAnnonymizedCopy());
 
     const onSubmit = () => {
-        updateDictionaryEntry(newentry.id.id, newentry.id.dname, newentry.id.uname, newentry.headword, newentry.partofspeech, useStorage().get)
+        updateDictionaryEntry(newentry.id.id, newentry.id.dname, newentry.id.uname, newentry.headword, newentry.partofspeech, get)
             .then(() => {
                 setEdit(false);
                 mutateCallback();
@@ -185,7 +187,7 @@ const DictionaryEntryHeaderView = ({ entry, openOptionsCallback, mutateCallback 
 
 
     const onDelete = () => {
-        deleteDictionaryEntry(entry.id.id, entry.id.dname, entry.id.uname, useStorage().get)
+        deleteDictionaryEntry(entry.id.id, entry.id.dname, entry.id.uname, get)
             .then(() => {
                 toast.success("Entry deleted successfully.");
                 mutateCallback();
@@ -302,13 +304,15 @@ const DictionaryEntryBodyView = ({ entry, newSense, closeNewSenseCallback, mutat
 
 const DictionaryEntrySenseView = ({ sense, mutateCallback }: { sense: DictionaryEntrySense, mutateCallback: () => void }) => {
 
+    const { get } = useStorage();
+
     const [edit, setEdit] = useState(false);
     const [newExample, setNewExample] = useState(false);
 
     const [newsense, setNewsense] = useState(sense.shallowAnnonymizedCopy());
 
     const onSubmit = () => {
-        updateDictionaryEntrySense(newsense.id.id, newsense.id.entryId, newsense.id.dname, newsense.id.uname, newsense.definition, newsense.order, useStorage().get)
+        updateDictionaryEntrySense(newsense.id.id, newsense.id.entryId, newsense.id.dname, newsense.id.uname, newsense.definition, newsense.order, get)
             .then(() => {
                 setEdit(false);
                 mutateCallback();
@@ -320,7 +324,7 @@ const DictionaryEntrySenseView = ({ sense, mutateCallback }: { sense: Dictionary
     }
 
     const onDelete = () => {
-        deleteDictionaryEntrySense(newsense.id.id, newsense.id.entryId, newsense.id.dname, newsense.id.uname, useStorage().get)
+        deleteDictionaryEntrySense(newsense.id.id, newsense.id.entryId, newsense.id.dname, newsense.id.uname, get)
             .then(() => {
                 toast.success("Sense deleted successfully.");
                 mutateCallback();
@@ -427,6 +431,8 @@ const DictionaryEntrySenseView = ({ sense, mutateCallback }: { sense: Dictionary
 
 const DictionaryEntrySenseViewNew = ({ entry, open, closeCallback, mutateCallback }: { entry: DictionaryEntry, open: boolean, closeCallback: () => void, mutateCallback: () => void }) => {
 
+    const { get } = useStorage();
+
     const [newSense, setNewSense] = useState({
         definition: "",
         order: -1,
@@ -435,7 +441,7 @@ const DictionaryEntrySenseViewNew = ({ entry, open, closeCallback, mutateCallbac
     })
 
     const onSubmit = () => {
-        createDictionaryEntrySense(entry.id.id, entry.id.dname, entry.id.uname, newSense.definition, newSense.order, useStorage().get)
+        createDictionaryEntrySense(entry.id.id, entry.id.dname, entry.id.uname, newSense.definition, newSense.order, get)
             .then(() => {
                 toast.success("Sense created!");
                 mutateCallback();
@@ -505,12 +511,14 @@ const DictionaryEntrySenseViewNew = ({ entry, open, closeCallback, mutateCallbac
 
 const DictionaryEntrySenseBodyView = ({ example, mutateCallback }: { example: DictionaryEntrySenseExample, mutateCallback: () => void }) => {
 
+    const { get } = useStorage();
+
     const [edit, setEdit] = useState(false);
 
     const [newExample, setNewExample] = useState(example.shallowAnnonymizedCopy());
 
     const onDelete = () => {
-        deleteDictionaryEntrySenseExample(example.id.id, example.id.senseId, example.id.entryId, example.id.dname, example.id.uname, useStorage().get)
+        deleteDictionaryEntrySenseExample(example.id.id, example.id.senseId, example.id.entryId, example.id.dname, example.id.uname, get)
             .then(() => {
                 toast.success("Example deleted!");
                 mutateCallback();
@@ -520,7 +528,7 @@ const DictionaryEntrySenseBodyView = ({ example, mutateCallback }: { example: Di
     }
 
     const onSubmit = () => {
-        updateDictionaryEntrySenseExample(example.id.id, example.id.senseId, example.id.entryId, example.id.dname, example.id.uname, newExample.example, newExample.order, useStorage().get)
+        updateDictionaryEntrySenseExample(example.id.id, example.id.senseId, example.id.entryId, example.id.dname, example.id.uname, newExample.example, newExample.order, get)
             .then(() => {
                 toast.success("Example updated!");
                 mutateCallback();
@@ -614,13 +622,15 @@ const DictionaryEntrySenseBodyView = ({ example, mutateCallback }: { example: Di
 
 const DictionaryEntrySenseBodyViewNew = ({ sense, open, closeCallback, mutateCallback }: { sense: DictionaryEntrySense, open: boolean, closeCallback: () => void, mutateCallback: () => void }) => {
 
+    const { get } = useStorage();
+
     const [newExample, setNewExample] = useState({
         example: "",
         order: 0,
     });
 
     const onSubmit = () => {
-        createDictionaryEntrySenseExample(sense.id.id, sense.id.entryId, sense.id.dname, sense.id.uname, newExample.example, newExample.order, useStorage().get)
+        createDictionaryEntrySenseExample(sense.id.id, sense.id.entryId, sense.id.dname, sense.id.uname, newExample.example, newExample.order, get)
             .then(() => {
                 toast.success("Example created!");
                 mutateCallback();
@@ -684,6 +694,8 @@ const DictionaryEntrySenseBodyViewNew = ({ sense, open, closeCallback, mutateCal
 
 const CreateDictionaryEntryModal = ({ closeCallback, mutateCallback }: { closeCallback: () => void, mutateCallback: () => void }) => {
 
+    const { get } = useStorage();
+
     const router = useRouter();
     const { user: uname, dname } = router.query as { user: string, dname: string };
 
@@ -693,7 +705,7 @@ const CreateDictionaryEntryModal = ({ closeCallback, mutateCallback }: { closeCa
     });
 
     const onSubmit = () => {
-        createDictionaryEntry(dname, uname, entry.headword, entry.pos, useStorage().get)
+        createDictionaryEntry(dname, uname, entry.headword, entry.pos, get)
             .then(() => {
                 toast.success("Entry created!");
                 mutateCallback();

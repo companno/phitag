@@ -112,6 +112,8 @@ const DictionaryCard = ({ dictionary }: { dictionary: Dictionary }) => {
 
 const CreateDictionaryModal = ({ uname, closeCallback, mutateCallback }: { uname: string, closeCallback: () => void, mutateCallback: () => void }) => {
 
+    const { get } = useStorage();
+
     const [dictionary, setDictionary] = useState({
         dname: "",
         description: "",
@@ -119,7 +121,7 @@ const CreateDictionaryModal = ({ uname, closeCallback, mutateCallback }: { uname
     });
 
     const onSubmit = async () => {
-        createDictionary(uname, dictionary.dname, dictionary.description, null, useStorage().get)
+        createDictionary(uname, dictionary.dname, dictionary.description, null, get)
             .then(() => {
                 toast.success("Dictionary created!");
                 mutateCallback();
