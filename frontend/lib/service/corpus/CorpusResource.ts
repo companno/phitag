@@ -10,6 +10,7 @@ import AddUsagesFromCorpusCommand from "../../model/corpus/command/AddUsagesFrom
 export function useFetchByQuery(
     lemma: string,
     pos: string,
+    corpus: string,
     context: boolean,
     from: number,
     to: number,
@@ -28,7 +29,7 @@ export function useFetchByQuery(
     }).then(res => res.data);
 
     const { data, error } = useSWR(fetch ?
-        `${BACKENDROUTES.CORPUS}?lemma=${lemma}&pos=${pos}&context=${context}&from=${from}&to=${to}&page=${page}&size=${size}`
+        `${BACKENDROUTES.CORPUS}?lemma=${lemma}&pos=${pos}&corpus=${corpus.toLocaleLowerCase()}&context=${context}&from=${from}&to=${to}&page=${page}&size=${size}`
         : null, queryCorpus, {
         revalidateIfStale: false,
         revalidateOnFocus: false,
@@ -100,6 +101,26 @@ export function useFetchPossibleToken(
     }).then(res => res.data);
 
     const { data, error } = useSWR(fetch ? `${BACKENDROUTES.CORPUS}/lemma/token?lemma=${lemma}` : null, queryLemma);
+
+    return {
+        data: data ? data : [] as unknown as string[],
+        error
+    };
+}
+
+export function useFetchCorpusnamesShort(
+    fetch: boolean = true
+) {
+    const { get } = useStorage();
+    const token = get('JWT') ?? '';
+
+    const queryCorpusnames = (url: string) => axios.get<string[]>(url, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(res => res.data);
+
+    const { data, error } = useSWR(fetch ? `${BACKENDROUTES.CORPUS}/corpus/names/short` : null, queryCorpusnames);
 
     return {
         data: data ? data : [] as unknown as string[],

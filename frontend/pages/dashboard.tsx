@@ -93,7 +93,7 @@ const Dashboard: NextPage = () => {
                                 title="Help: Pool Section"
                                 tooltip="Help: Pool Section"
                                 text="The pool section is a quick access to the different pools, i.e. the human annotator pool, the computational annotator pool, the corpus and the joblisting pool."
-                                reference="guide/explained-dashboard"
+                                reference="/guide/explained-dashboard"
                             />
                         </div>
                     </div>
@@ -140,7 +140,7 @@ const Dashboard: NextPage = () => {
                                 title="Help: Guide Section"
                                 tooltip="Help: Guide Section"
                                 text="The guides section is a quick access to important guides, which will help you to use this tool effectively."
-                                reference="guide/explained-dashboard"
+                                reference="/guide/explained-dashboard"
                             />
                         </div>
                     </div>
@@ -150,21 +150,21 @@ const Dashboard: NextPage = () => {
                             <DashboardCard
                                 title="Introduction"
                                 description="This guide will give you the core idea of Phitag."
-                                link="guide/introduction" />
+                                link="/guide/introduction" />
                         </div>
 
                         <div className="col-span-1 row-span-1 aspect-square">
                             <DashboardCard
                                 title="Supported Tasks"
                                 description="Current overview of Phitag's supported annotation tasks."
-                                link="guide/supported-tasks" />
+                                link="/guide/supported-tasks" />
                         </div>
 
                         <div className="col-span-1 row-span-1 aspect-square">
                             <DashboardCard
                                 title="Browse Guides"
                                 description="Browse all available guides"
-                                link="guide" />
+                                link="/guide" />
                         </div>
 
 {/* 

@@ -138,7 +138,7 @@ public class UserStatisticApplicationService {
 
         // update user statistic
         Map<String, Integer> annotationTypeCountMap = userStatistic.getAnnotationTypeCountMap();
-        annotationTypeCountMap.put(phase.getAnnotationType().getVisiblename(),
+        annotationTypeCountMap.put(phase.getAnnotationType().getName(),
                 annotationTypeCountMap.getOrDefault(phase.getAnnotationType().getName(), 0) + 1);
 
         // save user statistic

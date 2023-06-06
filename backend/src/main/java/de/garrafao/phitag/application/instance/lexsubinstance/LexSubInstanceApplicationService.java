@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import javax.transaction.Transactional;
 
@@ -30,6 +31,7 @@ import de.garrafao.phitag.domain.core.PageRequestWraper;
 import de.garrafao.phitag.domain.core.Query;
 import de.garrafao.phitag.domain.error.CsvParseException;
 import de.garrafao.phitag.domain.instance.lexsub.LexSubInstance;
+import de.garrafao.phitag.domain.instance.lexsub.LexSubInstanceFactory;
 import de.garrafao.phitag.domain.instance.lexsub.LexSubInstanceRepository;
 import de.garrafao.phitag.domain.instance.lexsub.error.LexSubInstanceException;
 import de.garrafao.phitag.domain.instance.lexsub.query.LexSubInstanceQueryBuilder;
@@ -164,6 +166,33 @@ public class LexSubInstanceApplicationService {
         });
 
         this.generateSamplingTasks(phase);
+    }
+
+    /**
+     * Generate instances for a given phase
+     * 
+     * @param phase the phase
+     */
+    @Transactional
+    public void generateInstances(Phase phase) {
+        // fetch all data ids for the project
+        List<String> dataIds = this.usageRepository.findAllDataIdsByProjectnameAndOwnername(
+                phase.getId().getProjectid().getName(),
+                phase.getId().getProjectid().getOwnername());
+
+        // create instances for each data id
+        LexSubInstanceFactory factory = new LexSubInstanceFactory();
+        factory.withPhase(phase).withLabelSet("").withNonLabel("-");
+
+        for (String dataId : dataIds) {
+            factory.withInstanceId(UUID.randomUUID().toString())
+                    .withUsage(this.usageRepository
+                            .findByIdDataidAndIdProjectidNameAndIdProjectidOwnername(dataId,
+                                    phase.getId().getProjectid().getName(), phase.getId().getProjectid().getOwnername())
+                            .orElseThrow(UsageNotFoundException::new));
+            this.lexSubInstanceRepository.save(factory.build());
+        }
+
     }
 
     // Parser
@@ -373,14 +402,14 @@ public class LexSubInstanceApplicationService {
 
         String queryId = annotationProcessInformation.next();
 
-        // If sampling index is null, return null
-        if (queryId == null) {
-            return null;
-        }
-
         if (phase.getSampling().getName().equals(SamplingEnum.SAMPLING_RANDOM_WITH_REPLACEMENT.name())) {
             queryId = annotationProcessInformation.getOrder()
                     .get((int) (Math.random() * annotationProcessInformation.getOrder().size()));
+        }
+
+        // If sampling index is null, return null
+        if (queryId == null) {
+            return null;
         }
 
         final Query query = new LexSubInstanceQueryBuilder()

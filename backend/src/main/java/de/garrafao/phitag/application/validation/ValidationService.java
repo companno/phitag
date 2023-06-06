@@ -313,4 +313,9 @@ public class ValidationService {
         return this;
     }
 
+    public ValidationService validateSenseExists(String dname, String uname, String entryId, String senseId) {
+        this.commonService.getSenseEntry(senseId, entryId, dname, uname);
+        return this;
+    }
+
 }

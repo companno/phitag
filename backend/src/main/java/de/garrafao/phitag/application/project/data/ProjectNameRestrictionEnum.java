@@ -1,7 +1,8 @@
 package de.garrafao.phitag.application.project.data;
 
 public enum ProjectNameRestrictionEnum {
-    INDEX("index");
+    INDEX("index"),
+    DICTIONARY("dictionary");
 
     private final String name;
 

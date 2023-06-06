@@ -9,6 +9,9 @@ export default class CorpusInformation {
     private readonly language: string;
     private readonly resource: string;
 
+    private readonly corpusnameFull: string;
+    private readonly corpusnameShort: string;
+
     constructor(
         id: string,
 
@@ -16,7 +19,10 @@ export default class CorpusInformation {
         author: string,
         date: number,
         language: string,
-        resource: string
+        resource: string,
+
+        corpusnameFull: string,
+        corpusnameShort: string
     ) {
         this.id = id;
 
@@ -25,6 +31,9 @@ export default class CorpusInformation {
         this.date = date;
         this.language = language;
         this.resource = resource;
+
+        this.corpusnameFull = corpusnameFull;
+        this.corpusnameShort = corpusnameShort;
     }
 
     public getId(): string {
@@ -51,6 +60,14 @@ export default class CorpusInformation {
         return this.resource;
     }
 
+    public getCorpusnameFull(): string {
+        return this.corpusnameFull;
+    }
+
+    public getCorpusnameShort(): string {
+        return this.corpusnameShort;
+    }
+
     static fromDto(dto: CorpusInformationDto): CorpusInformation {
         return new CorpusInformation(
             dto.id,
@@ -59,7 +76,10 @@ export default class CorpusInformation {
             dto.author,
             dto.date,
             dto.language,
-            dto.resource
+            dto.resource,
+
+            dto.corpusnameFull,
+            dto.corpusnameShort
         );
     }
 
