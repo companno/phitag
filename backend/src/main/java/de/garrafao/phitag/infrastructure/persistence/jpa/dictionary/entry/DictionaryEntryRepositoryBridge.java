@@ -1,5 +1,6 @@
 package de.garrafao.phitag.infrastructure.persistence.jpa.dictionary.entry;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,11 @@ public class DictionaryEntryRepositoryBridge implements DictionaryEntryRepositor
     }
 
     @Override
+    public void saveAll(Iterable<DictionaryEntry> dictionaryEntries) {
+        repository.saveAll(dictionaryEntries);
+    }
+
+    @Override
     public void delete(DictionaryEntry dictionaryEntry) {
         repository.delete(dictionaryEntry);
     }
@@ -50,5 +56,10 @@ public class DictionaryEntryRepositoryBridge implements DictionaryEntryRepositor
         return repository.findById(id);
     }
 
-    
+    @Override
+    public List<DictionaryEntry> findAllByIdDictionaryidDnameAndIdDictionaryidUname(String dictionaryDname,
+            String dictionaryUname) {
+        return repository.findAllByIdDictionaryidDnameAndIdDictionaryidUname(dictionaryDname, dictionaryUname);
+    }
+
 }

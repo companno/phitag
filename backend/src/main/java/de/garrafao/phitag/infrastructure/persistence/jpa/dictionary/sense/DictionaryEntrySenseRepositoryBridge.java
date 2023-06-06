@@ -25,6 +25,11 @@ public class DictionaryEntrySenseRepositoryBridge implements DictionaryEntrySens
     }
 
     @Override
+    public void saveAll(Iterable<DictionaryEntrySense> dictionaryEntrySenses) {
+        repository.saveAll(dictionaryEntrySenses);
+    }
+
+    @Override
     public void delete(DictionaryEntrySense sense) {
         repository.delete(sense);
     }

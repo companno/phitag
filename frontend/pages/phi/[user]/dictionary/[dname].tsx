@@ -5,7 +5,7 @@ import { createDictionaryEntry, updateDictionaryEntry, deleteDictionaryEntry, us
 import { toast } from "react-toastify";
 import Layout from "../../../../components/generic/layout/layout";
 import Head from "next/head";
-import { FiCheck, FiEdit2, FiPlus, FiSearch, FiTrash, FiX } from "react-icons/fi";
+import { FiCheck, FiDownload, FiEdit2, FiFile, FiPlus, FiSearch, FiTrash, FiX } from "react-icons/fi";
 import useStorage from "../../../../lib/hook/useStorage";
 import HelpButton from "../../../../components/generic/button/helpbutton";
 import DictionaryEntry from "../../../../lib/model/dictionary/entry/model/DictionaryEntry";
@@ -13,8 +13,15 @@ import DictionaryEntrySense from "../../../../lib/model/dictionary/sense/model/D
 import { createDictionaryEntrySense, updateDictionaryEntrySense, deleteDictionaryEntrySense } from "../../../../lib/service/dictionary/DictionaryEntrySenseResource";
 import DictionaryEntrySenseExample from "../../../../lib/model/dictionary/example/model/DictionaryEntrySenseExample";
 import { createDictionaryEntrySenseExample, deleteDictionaryEntrySenseExample, updateDictionaryEntrySenseExample } from "../../../../lib/service/dictionary/DictionaryEntrySenseExampleResource";
+import IconButtonOnClick from "../../../../components/generic/button/iconbuttononclick";
+import { exportDictionary } from "../../../../lib/service/dictionary/DictionaryResource";
+import DummySelectable from "../../../../lib/model/dummy/DummySelectable";
+import DropdownSelect from "../../../../components/generic/dropdown/dropdownselect";
 
 const DictionaryPage = () => {
+
+    const { get } = useStorage();
+
     // Data & Hooks
     const authenticated = useAuthenticated();
     const router = useRouter();
@@ -23,6 +30,7 @@ const DictionaryPage = () => {
     const [searchField, setSearchField] = useState({
         headword: "",
         addModal: false,
+        exportModal: false
     });
 
     const dictionaries = useFetchDictionaryEntries(dname, uname, searchField.headword, "", 0, router.isReady);
@@ -33,7 +41,6 @@ const DictionaryPage = () => {
             Router.push("/");
         }
     }, [authenticated]);
-
 
     return (
         <Layout>
@@ -72,6 +79,16 @@ const DictionaryPage = () => {
                                 reference="/guides/help-dictionary"
                             />
                         </div>
+
+
+                        <div className="flex items-center my-4 ml-4">
+                            <IconButtonOnClick
+                                icon={<FiDownload className="basic-svg " />}
+                                tooltip="Download"
+                                onClick={() => setSearchField({ ...searchField, exportModal: true })}
+                            />
+                        </div>
+
                     </div>
                 </div>
 
@@ -87,6 +104,10 @@ const DictionaryPage = () => {
 
             {searchField.addModal && (
                 <CreateDictionaryEntryModal closeCallback={() => setSearchField({ ...searchField, addModal: false })} mutateCallback={() => dictionaries.mutate()} />
+            )}
+
+            {searchField.exportModal && (
+                <ExportDictionaryModal closeCallback={() => setSearchField({ ...searchField, exportModal: false })} />
             )}
 
         </Layout>
@@ -381,8 +402,8 @@ const DictionaryEntrySenseView = ({ sense, mutateCallback }: { sense: Dictionary
                     </div>
                 ) : (
                     <div className="flex flex-row items-center justify-between group">
-                        <div className="flex items-end">
-                            <span className="font-dm-mono-regular font-bold text-md mr-2 text-base16-gray-500">
+                        <div className="flex">
+                            <span className="font-dm-mono-regular font-bold text-md mr-2 text-base16-gray-500 self-center">
                                 {sense.order}.
                             </span>
                             <span className=" font-dm-mono-medium font-black text-xl">
@@ -780,6 +801,78 @@ const CreateDictionaryEntryModal = ({ closeCallback, mutateCallback }: { closeCa
                                                 setEntry({ ...entry, pos: e.target.value });
                                             }}
                                         />
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div className="flex flex-row divide-x-8">
+                            <button type="button" className="block w-full mt-8 py-2 bg-base16-gray-900 text-base16-gray-100 " onClick={() => onCancel()}>Cancel</button>
+                            <button type="button" className="block w-full mt-8 py-2 bg-base16-gray-900 text-base16-gray-100 " onClick={onSubmit}>Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+const ExportDictionaryModal = ({ closeCallback }: { closeCallback: () => void }) => {
+
+    const { get } = useStorage();
+    const router = useRouter();
+    const { user: uname, dname } = router.query as { user: string, dname: string };
+
+    const filetypes = [
+        new DummySelectable("Custom-XML"),
+        new DummySelectable("Custom-JSON"),
+    ];
+
+    const [selected, setSelected] = useState(filetypes[0]);
+
+    const onSubmit = () => {
+        exportDictionary(uname, dname, selected.getName(), get)
+            .then(() => {
+                toast.success("Dictionary exported!");
+                closeCallback();
+            }).catch((err) => {
+                toast.error("Failed to export dictionary!");
+            });
+    }
+
+    const onCancel = () => {
+        closeCallback();
+    }
+
+    return (
+        <div className="relative z-10 font-dm-mono-medium" onClick={() => onCancel()}>
+            <div className="fixed inset-0 bg-base16-gray-500 bg-opacity-75" />
+
+            <div className="fixed z-10 inset-0 overflow-y-auto">
+                <div className="flex items-center justify-center min-h-full">
+                    <div className="relative bg-white overflow-hidden shadow-md py-4 px-8  max-w-xl w-full" onClick={(e: any) => e.stopPropagation()}>
+                        <div className="mx-4">
+                            <div className="flex flex-col items-left mt-6">
+                                <div className="font-black text-xl">
+                                    Export Dictionary
+                                </div>
+                                <div className="font-dm-mono-regular my-2">
+                                    Export your dictionary to a file format of your choice.
+                                </div>
+
+                                <div className="flex flex-col items-left my-6">
+                                    <div className="font-bold text-lg">
+                                        Select File Type
+                                    </div>
+                                    <div className="flex items-center border-b-2 py-2 px-3 mt-2">
+                                        <DropdownSelect
+                                            icon={<FiFile className="basic-svg" />}
+                                            items={filetypes}
+                                            selected={[selected]}
+                                            onSelectFunction={(item) => {
+                                                setSelected(item);
+                                            }}
+                                            message={selected.getName()} />
                                     </div>
                                 </div>
 

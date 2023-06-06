@@ -10,4 +10,6 @@ public interface DictionaryEntrySenseExampleRepository {
 
     void delete(DictionaryEntrySenseExample sense);
 
+    void saveAll(Iterable<DictionaryEntrySenseExample> dictionaryEntrySenseExamples);
+
 }

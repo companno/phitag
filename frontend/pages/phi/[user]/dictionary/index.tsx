@@ -9,9 +9,11 @@ import Head from "next/head";
 import ContentLayout from "../../../../components/generic/layout/contentlayout";
 import LoadingComponent from "../../../../components/generic/loadingcomponent";
 import Dictionary from "../../../../lib/model/dictionary/dictionary/model/Dictionary";
-import { FiEdit, FiEdit2, FiPlus } from "react-icons/fi";
+import { FiEdit, FiEdit2, FiFile, FiFileText, FiPlus } from "react-icons/fi";
 import useStorage from "../../../../lib/hook/useStorage";
 import Link from "next/link";
+import DummySelectable from "../../../../lib/model/dummy/DummySelectable";
+import DropdownSelect from "../../../../components/generic/dropdown/dropdownselect";
 
 const DictionaryOverviewPage: NextPage = () => {
 
@@ -70,11 +72,11 @@ const DictionaryOverviewPage: NextPage = () => {
                 onClick={() => setSearchField({ ...searchField, addModal: true })}>
                 <FiPlus className="h-8 w-8" />
             </div>
-            
+
             {searchField.addModal && (
                 <CreateDictionaryModal uname={uname} closeCallback={() => setSearchField({ ...searchField, addModal: false })} mutateCallback={() => dictionaries.mutate()} />
             )}
-            
+
         </Layout>
 
     );
@@ -114,14 +116,20 @@ const CreateDictionaryModal = ({ uname, closeCallback, mutateCallback }: { uname
 
     const { get } = useStorage();
 
+    const filetypes = [
+        new DummySelectable("Custom-XML"),
+        new DummySelectable("Custom-JSON"),
+    ];
+
     const [dictionary, setDictionary] = useState({
         dname: "",
         description: "",
+        filetype: filetypes[0],
         file: null
     });
 
     const onSubmit = async () => {
-        createDictionary(uname, dictionary.dname, dictionary.description, null, get)
+        createDictionary(uname, dictionary.dname, dictionary.description, dictionary.filetype.getName(), dictionary.file, get)
             .then(() => {
                 toast.success("Dictionary created!");
                 mutateCallback();
@@ -141,6 +149,7 @@ const CreateDictionaryModal = ({ uname, closeCallback, mutateCallback }: { uname
         setDictionary({
             dname: "",
             description: "",
+            filetype: filetypes[0],
             file: null
         });
         closeCallback();
@@ -199,6 +208,45 @@ const CreateDictionaryModal = ({ uname, closeCallback, mutateCallback }: { uname
                                                 setDictionary({ ...dictionary, description: e.target.value });
                                             }}
                                         />
+                                    </div>
+                                </div>
+
+                                <div className="font-dm-mono-regular my-2">
+                                    This is optional. If you don't want to upload a file, you can create an empty dictionary.
+                                </div>
+
+                                <div className="flex flex-col items-left my-6">
+                                    <div className="font-bold text-lg">
+                                        Select File Type
+                                    </div>
+                                    <div className="flex items-center border-b-2 py-2 px-3 mt-2">
+                                        <DropdownSelect
+                                            icon={<FiFile className="basic-svg" />}
+                                            items={filetypes}
+                                            selected={[dictionary.filetype]}
+                                            onSelectFunction={(item) => {
+                                                setDictionary({
+                                                    ...dictionary,
+                                                    filetype: item,
+                                                });
+                                            }}
+                                            message={dictionary.filetype.getName()} />
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col items-left my-6">
+                                    <div className="font-bold text-lg">
+                                        File
+                                    </div>
+                                    <div className="flex items-center border-b-2 py-2 px-3 mt-2">
+                                        <FiFileText className='basic-svg' />
+                                        <input
+                                            type="file"
+                                            className="hide-upload-button pl-3 flex flex-auto outline-none border-none text-sm"
+                                            onChange={(e: any) => setDictionary({
+                                                ...dictionary,
+                                                file: e.target.files[0],
+                                            })} />
                                     </div>
                                 </div>
 

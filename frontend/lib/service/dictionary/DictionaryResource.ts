@@ -5,6 +5,7 @@ import useStorage from "../../hook/useStorage";
 import useSWR from "swr";
 import PagedGenericDto from "../../model/interfaces/PagedGenericDto";
 import DictionaryDto from "../../model/dictionary/dictionary/dto/DictionaryDto";
+import fileDownload from "js-file-download";
 
 export function useFetchDictionaries(uname: string, page: number, fetch: boolean = true) {
     const { get } = useStorage();
@@ -27,13 +28,14 @@ export function useFetchDictionaries(uname: string, page: number, fetch: boolean
     }
 }
 
-export function createDictionary(uname: string, dname: string, description: string, file: File | null, get: Function = () => { }) {
+export function createDictionary(uname: string, dname: string, description: string, filetype: string, file: File | null, get: Function = () => { }) {
     const token = get('JWT') ?? '';
 
     const formData = new FormData();
     formData.append('uname', uname);
     formData.append('dname', dname);
     formData.append('description', description);
+    formData.append('filetype', filetype);
     if (file) {
         formData.append('file', file);
     }
@@ -46,4 +48,25 @@ export function createDictionary(uname: string, dname: string, description: stri
             }
         }
     ).then(res => res.data);
+}
+
+export function exportDictionary(
+    uname: string,
+    dname: string,
+    filetype: string,
+    get: Function = () => { }
+) {
+    const token = get('JWT') ?? '';
+
+
+    return axios.get(`${BACKENDROUTES.DICTIONARY}/export?dname=${dname}&filetype=${filetype}`,
+        {
+            responseType: 'blob',
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        }
+    ).then(res => {
+        fileDownload(res.data, 'dictionary.xml');
+    });
 }

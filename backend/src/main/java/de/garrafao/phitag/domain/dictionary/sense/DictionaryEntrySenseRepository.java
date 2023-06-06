@@ -8,6 +8,8 @@ public interface DictionaryEntrySenseRepository {
 
     DictionaryEntrySense save(DictionaryEntrySense sense);
 
+    void saveAll(Iterable<DictionaryEntrySense> dictionaryEntrySenses);
+
     void delete(DictionaryEntrySense sense);
 
 }
