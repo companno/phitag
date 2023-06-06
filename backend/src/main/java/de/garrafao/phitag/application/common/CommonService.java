@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import de.garrafao.phitag.application.annotationtype.data.AnnotationTypeEnum;
 import de.garrafao.phitag.application.authentication.AuthenticationApplicationService;
+import de.garrafao.phitag.application.judgement.lexsubjudgement.LexSubJudgementApplicationService;
 import de.garrafao.phitag.application.judgement.usepairjudgement.UsePairJudgementApplicationService;
 import de.garrafao.phitag.application.judgement.wssimjudgement.WSSIMJudgementApplicationService;
 import de.garrafao.phitag.domain.annotationprocessinformation.AnnotationProcessInformation;
@@ -24,11 +25,31 @@ import de.garrafao.phitag.domain.annotator.Annotator;
 import de.garrafao.phitag.domain.annotator.AnnotatorRepository;
 import de.garrafao.phitag.domain.annotator.error.AnnotatorNotFoundException;
 import de.garrafao.phitag.domain.annotator.query.AnnotatorQueryBuilder;
+import de.garrafao.phitag.domain.core.PageRequestWraper;
 import de.garrafao.phitag.domain.core.Query;
+import de.garrafao.phitag.domain.dictionary.dictionary.Dictionary;
+import de.garrafao.phitag.domain.dictionary.dictionary.DictionaryId;
+import de.garrafao.phitag.domain.dictionary.dictionary.DictionaryRepository;
+import de.garrafao.phitag.domain.dictionary.dictionary.error.DictionaryException;
+import de.garrafao.phitag.domain.dictionary.entry.DictionaryEntry;
+import de.garrafao.phitag.domain.dictionary.entry.DictionaryEntryId;
+import de.garrafao.phitag.domain.dictionary.entry.DictionaryEntryRepository;
+import de.garrafao.phitag.domain.dictionary.entry.error.DictionaryEntryException;
+import de.garrafao.phitag.domain.dictionary.example.DictionaryEntrySenseExample;
+import de.garrafao.phitag.domain.dictionary.example.DictionaryEntrySenseExampleId;
+import de.garrafao.phitag.domain.dictionary.example.DictionaryEntrySenseExampleRepository;
+import de.garrafao.phitag.domain.dictionary.example.error.DictionaryEntrySenseExampleException;
+import de.garrafao.phitag.domain.dictionary.sense.DictionaryEntrySense;
+import de.garrafao.phitag.domain.dictionary.sense.DictionaryEntrySenseId;
+import de.garrafao.phitag.domain.dictionary.sense.DictionaryEntrySenseRepository;
+import de.garrafao.phitag.domain.dictionary.sense.error.DictionaryEntrySenseException;
 import de.garrafao.phitag.domain.entitlement.Entitlement;
 import de.garrafao.phitag.domain.entitlement.EntitlementRepository;
 import de.garrafao.phitag.domain.entitlement.error.EntitlementNotFoundException;
 import de.garrafao.phitag.domain.instance.IInstance;
+import de.garrafao.phitag.domain.instance.lexsub.LexSubInstance;
+import de.garrafao.phitag.domain.instance.lexsub.LexSubInstanceRepository;
+import de.garrafao.phitag.domain.instance.lexsub.query.LexSubInstanceQueryBuilder;
 import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstance;
 import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstanceRepository;
 import de.garrafao.phitag.domain.instance.usepairinstance.query.UsePairInstanceQueryBuilder;
@@ -59,6 +80,9 @@ import de.garrafao.phitag.domain.sampling.error.SamplingNotFoundException;
 import de.garrafao.phitag.domain.status.Status;
 import de.garrafao.phitag.domain.status.StatusRepository;
 import de.garrafao.phitag.domain.status.error.StatusNotFoundException;
+import de.garrafao.phitag.domain.usecase.Usecase;
+import de.garrafao.phitag.domain.usecase.UsecaseRepository;
+import de.garrafao.phitag.domain.usecase.error.UsecaseException;
 import de.garrafao.phitag.domain.user.User;
 import de.garrafao.phitag.domain.user.UserRepository;
 import de.garrafao.phitag.domain.user.error.UserNotExistsException;
@@ -85,6 +109,16 @@ public class CommonService {
 
     private final NotificationRepository notificationRepository;
 
+    // Dictionary repository dependencies
+
+    private final DictionaryRepository dictionaryRepository;
+
+    private final DictionaryEntryRepository dictionaryEntryRepository;
+
+    private final DictionaryEntrySenseRepository dictionaryEntrySenseRepository;
+
+    private final DictionaryEntrySenseExampleRepository dictionaryEntrySenseExampleRepository;
+
     // "Static" repository dependencies
 
     private final RoleRepository roleRepository;
@@ -101,6 +135,8 @@ public class CommonService {
 
     private final SamplingRepository samplingRepository;
 
+    private final UsecaseRepository usecaseRepository;
+
     // Application service dependencies
 
     // Instance repository
@@ -111,6 +147,8 @@ public class CommonService {
 
     private final WSSIMInstanceRepository wssimInstanceRepository;
 
+    private final LexSubInstanceRepository lexSubInstanceRepository;
+
     // Instance information repository
 
     private final AnnotationProcessInformationRepository annotationProcessInformationRepository;
@@ -120,6 +158,8 @@ public class CommonService {
     private final UsePairJudgementApplicationService usePairJudgementApplicationService;
 
     private final WSSIMJudgementApplicationService wssimJudgementApplicationService;
+
+    private final LexSubJudgementApplicationService lexSubJudgementApplicationService;
 
     // Authentication application service
 
@@ -134,6 +174,11 @@ public class CommonService {
             final PhaseRepository phaseRepository,
             final NotificationRepository notificationRepository,
 
+            final DictionaryRepository dictionaryRepository,
+            final DictionaryEntryRepository dictionaryEntryRepository,
+            final DictionaryEntrySenseRepository dictionaryEntrySenseRepository,
+            final DictionaryEntrySenseExampleRepository dictionaryEntrySenseExampleRepository,
+
             final RoleRepository roleRepository,
             final VisibilityRepository visibilityRepository,
             final LanguageRepository languageRepository,
@@ -141,15 +186,18 @@ public class CommonService {
             final AnnotationTypeRepository annotationTypeRepository,
             final StatusRepository statusRepository,
             final SamplingRepository samplingRepository,
+            final UsecaseRepository usecaseRepository,
 
             final UsePairInstanceRepository usePairInstanceRepository,
             final WSSIMTagRepository wssimTagRepository,
             final WSSIMInstanceRepository wssimInstanceRepository,
+            final LexSubInstanceRepository lexSubInstanceRepository,
 
             final AnnotationProcessInformationRepository annotationProcessInformationRepository,
 
             final UsePairJudgementApplicationService usePairJudgementApplicationService,
             final WSSIMJudgementApplicationService wssimJudgementApplicationService,
+            final LexSubJudgementApplicationService lexSubJudgementApplicationService,
 
             final AuthenticationApplicationService authenticationApplicationService) {
         this.userRepository = userRepository;
@@ -158,6 +206,11 @@ public class CommonService {
         this.phaseRepository = phaseRepository;
         this.notificationRepository = notificationRepository;
 
+        this.dictionaryRepository = dictionaryRepository;
+        this.dictionaryEntryRepository = dictionaryEntryRepository;
+        this.dictionaryEntrySenseRepository = dictionaryEntrySenseRepository;
+        this.dictionaryEntrySenseExampleRepository = dictionaryEntrySenseExampleRepository;
+
         this.roleRepository = roleRepository;
         this.visibilityRepository = visibilityRepository;
         this.languageRepository = languageRepository;
@@ -165,15 +218,18 @@ public class CommonService {
         this.annotationTypeRepository = annotationTypeRepository;
         this.statusRepository = statusRepository;
         this.samplingRepository = samplingRepository;
+        this.usecaseRepository = usecaseRepository;
 
         this.usePairInstanceRepository = usePairInstanceRepository;
         this.wssimTagRepository = wssimTagRepository;
         this.wssimInstanceRepository = wssimInstanceRepository;
+        this.lexSubInstanceRepository = lexSubInstanceRepository;
 
         this.annotationProcessInformationRepository = annotationProcessInformationRepository;
 
         this.usePairJudgementApplicationService = usePairJudgementApplicationService;
         this.wssimJudgementApplicationService = wssimJudgementApplicationService;
+        this.lexSubJudgementApplicationService = lexSubJudgementApplicationService;
 
         this.authenticationApplicationService = authenticationApplicationService;
     }
@@ -422,8 +478,36 @@ public class CommonService {
                 return this.findWSSIMTagByPhase(phase).stream()
                         .map(IInstance.class::cast).collect(Collectors.toList());
         }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            return this.findLexSubInstanceByPhase(phase).stream()
+                    .map(IInstance.class::cast).collect(Collectors.toList());
+        }
 
         return new ArrayList<>();
+    }
+
+    /**
+     * Get the number of instances for a given phase.
+     * 
+     * @param phase      the phase
+     * @param additional if additional instances should be included
+     * @return the number of {@IInstance} for the given phase
+     */
+    public long countInstancesOfPhase(final Phase phase, final boolean additional) {
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
+            return this.countUsePairInstanceByPhase(phase);
+        }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
+            if (!additional)
+                return this.countWSSIMInstanceByPhase(phase);
+            else
+                return this.countWSSIMTagByPhase(phase);
+        }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            return this.countLexSubInstanceByPhase(phase);
+        }
+
+        return 0;
     }
 
     /**
@@ -442,6 +526,22 @@ public class CommonService {
     }
 
     /**
+     * Get number of use pair instances for a given phase.
+     * 
+     * @param phase The phase.
+     * @return The number of {@link UsePairInstance} for the given phase.
+     */
+    public long countUsePairInstanceByPhase(final Phase phase) {
+        final Query query = new UsePairInstanceQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+        return this.usePairInstanceRepository.findByQueryPaged(query, new PageRequestWraper(1, 0, null))
+                .getTotalElements();
+    }
+
+    /**
      * Get all WSSIM instances for a given phase.
      * 
      * @param phase the phase
@@ -454,6 +554,22 @@ public class CommonService {
                 .withPhase(phase.getId().getName())
                 .build();
         return this.wssimInstanceRepository.findByQuery(query);
+    }
+
+    /**
+     * Get number of WSSIM instances for a given phase.
+     * 
+     * @param phase The phase.
+     * @return The number of {@link WSSIMInstance} for the given phase.
+     */
+    public long countWSSIMInstanceByPhase(final Phase phase) {
+        final Query query = new WSSIMInstanceQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+        return this.wssimInstanceRepository.findByQueryPaged(query, new PageRequestWraper(1, 0, null))
+                .getTotalElements();
     }
 
     /**
@@ -472,6 +588,55 @@ public class CommonService {
     }
 
     /**
+     * Get number of WSSIMTags for a given phase.
+     * 
+     * @param phase The phase.
+     * @return The number of {@link WSSIMTag} for the given phase.
+     */
+    public long countWSSIMTagByPhase(final Phase phase) {
+        final Query query = new WSSIMTagQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+        return this.wssimTagRepository.findByQueryPaged(query, new PageRequestWraper(1, 0, null))
+                .getTotalElements();
+    }
+
+    /**
+     * Get all LexSub instances for a given phase.
+     * 
+     * @param phase The phase.
+     * @return A list of all {@link LexSubInstance} for the given phase.
+     */
+    public List<LexSubInstance> findLexSubInstanceByPhase(final Phase phase) {
+        final Query query = new LexSubInstanceQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+
+        return this.lexSubInstanceRepository.findByQuery(query);
+    }
+
+    /**
+     * Get number of LexSub instances for a given phase.
+     * 
+     * @param phase The phase.
+     * @return The number of {@link LexSubInstance} for the given phase.
+     */
+    public long countLexSubInstanceByPhase(final Phase phase) {
+        final Query query = new LexSubInstanceQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+
+        return this.lexSubInstanceRepository.findByQueryPaged(query, new PageRequestWraper(1, 0, null))
+                .getTotalElements();
+    }
+
+    /**
      * Get all judgements for a given phase.
      * 
      * @param phase The phase.
@@ -486,8 +651,32 @@ public class CommonService {
             return this.wssimJudgementApplicationService.findByPhase(phase).stream()
                     .map(IJudgement.class::cast).collect(Collectors.toList());
         }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            return this.lexSubJudgementApplicationService.findByPhase(phase).stream()
+                    .map(IJudgement.class::cast).collect(Collectors.toList());
+        }
 
         return new ArrayList<>();
+    }
+
+    /**
+     * Get number of judgements for a given phase.
+     * 
+     * @param phase The phase.
+     * @return The number of {@link Judgement} for the given phase.
+     */
+    public long countJudgementsOfPhase(final Phase phase) {
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
+            return this.usePairJudgementApplicationService.findByPhase(phase, 1, 0, null).getTotalElements();
+        }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
+            return this.wssimJudgementApplicationService.findByPhase(phase, 1, 0, null).getTotalElements();
+        }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            return this.lexSubJudgementApplicationService.findByPhase(phase, 0, 0, null).getTotalElements();
+        }
+
+        return 0;
     }
 
     /**
@@ -503,7 +692,67 @@ public class CommonService {
         this.notificationRepository.save(notification);
     }
 
-    // Getters
+    /**
+     * Get a dictionary by its name.
+     * 
+     * @param dname
+     * @param uname
+     * @return The dictionary.
+     */
+    public Dictionary getDictionary(final String dname, final String uname) {
+        final DictionaryId id = new DictionaryId(dname, uname);
+        return this.dictionaryRepository.findById(id)
+                .orElseThrow(() -> new DictionaryException("Dictionary not found."));
+    }
+
+    /**
+     * Get an entry by its id.
+     * 
+     * @param entryId
+     * @param dname
+     * @param uname
+     * @return The entry.
+     */
+    public DictionaryEntry getEntry(final String entryId, final String dname, final String uname) {
+        final DictionaryEntryId id = new DictionaryEntryId(entryId, new DictionaryId(dname, uname));
+        return this.dictionaryEntryRepository.findById(id)
+                .orElseThrow(() -> new DictionaryEntryException("Entry not found."));
+    }
+
+    /**
+     * Get a sense entry by its id.
+     * 
+     * @param senseId The sense id.
+     * @param entryId The entry id.
+     * @param dname   The dictionary name.
+     * @param uname   The user name.
+     * @return The sense entry.
+     */
+    public DictionaryEntrySense getSenseEntry(final String senseId, final String entryId, final String dname,
+            final String uname) {
+        final DictionaryEntrySenseId id = new DictionaryEntrySenseId(senseId,
+                new DictionaryEntryId(entryId, new DictionaryId(dname, uname)));
+        return this.dictionaryEntrySenseRepository.findById(id)
+                .orElseThrow(() -> new DictionaryEntrySenseException("Sense not found."));
+    }
+
+    /**
+     * Get all sense examples for a given sense entry.
+     * 
+     * @param exampleId The example id.
+     * @param senseId   The sense id.
+     * @param entryId   The entry id.
+     * @param dname     The dictionary name.
+     * @param uname     The user name.
+     * @return The example.
+     */
+    public DictionaryEntrySenseExample getSenseExample(final String exampleId, final String senseId,
+            final String entryId, final String dname, final String uname) {
+        final DictionaryEntrySenseExampleId id = new DictionaryEntrySenseExampleId(exampleId,
+                new DictionaryEntrySenseId(senseId, new DictionaryEntryId(entryId, new DictionaryId(dname, uname))));
+        return this.dictionaryEntrySenseExampleRepository.findById(id)
+                .orElseThrow(() -> new DictionaryEntrySenseExampleException("Example not found."));
+    }
 
     public Role getRole(final String role) {
         return this.roleRepository.findByName(role).orElseThrow(RoleNotFoundException::new);
@@ -534,4 +783,7 @@ public class CommonService {
         return this.samplingRepository.findByName(sampling).orElseThrow(SamplingNotFoundException::new);
     }
 
+    public Usecase getUsecase(final String usecase) {
+        return this.usecaseRepository.findByName(usecase).orElseThrow(() -> new UsecaseException("Usecase not found"));
+    }
 }

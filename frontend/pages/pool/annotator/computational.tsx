@@ -27,6 +27,7 @@ import ContentLayout from "../../../components/generic/layout/contentlayout";
 import UserCard from '../../../components/generic/card/usercard';
 import AddUserToProjectModal from '../../../components/specific/modal/addusertoprojectmodal';
 import LoadingComponent from '../../../components/generic/loadingcomponent';
+import HelpButton from '../../../components/generic/button/helpbutton';
 
 const HumanPool: NextPage = () => {
 
@@ -106,6 +107,18 @@ const HumanPool: NextPage = () => {
                                     })}>
                                         <FiList className='basic-svg' />
                                     </button>}
+                            </div>
+                            <div className="flex items-center my-4 ml-4">
+                                <HelpButton
+                                    title="Help: Computational Annotators"
+                                    tooltip="Help: Computational Annotators"
+                                    text="
+                                        Here you can find all Computational annotators that are currently registered in the system.
+                                        These users can be added to your project as annotators, which can then be used to annotate your data.
+                                        You can add them to your project by clicking on the plus icon on the user card and filter for specific computational users by typing in the search field.
+                                    "
+                                    reference="/guide/explained-pools"
+                                />
                             </div>
                         </div>
                     </div>

@@ -16,6 +16,8 @@ import de.garrafao.phitag.application.annotationtype.data.AnnotationTypeEnum;
 import de.garrafao.phitag.application.common.CommonService;
 import de.garrafao.phitag.application.instance.data.IInstanceDto;
 import de.garrafao.phitag.application.instance.data.PagedInstanceDto;
+import de.garrafao.phitag.application.instance.lexsubinstance.LexSubInstanceApplicationService;
+import de.garrafao.phitag.application.instance.lexsubinstance.data.LexSubInstanceDto;
 import de.garrafao.phitag.application.instance.usepairinstance.UsePairInstanceApplicationService;
 import de.garrafao.phitag.application.instance.usepairinstance.data.UsePairInstanceDto;
 import de.garrafao.phitag.application.instance.wssiminstance.WSSIMInstanceApplicationService;
@@ -25,6 +27,7 @@ import de.garrafao.phitag.application.instance.wssimtag.data.WSSIMTagDto;
 import de.garrafao.phitag.application.validation.ValidationService;
 import de.garrafao.phitag.domain.annotationtype.error.AnnotationTypeNotFoundException;
 import de.garrafao.phitag.domain.annotator.Annotator;
+import de.garrafao.phitag.domain.instance.lexsub.LexSubInstance;
 import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstance;
 import de.garrafao.phitag.domain.instance.wssiminstance.WSSIMInstance;
 import de.garrafao.phitag.domain.instance.wssimtag.WSSIMTag;
@@ -48,6 +51,8 @@ public class InstanceApplicationService {
 
     private final WSSIMTagApplicationService wssimTagApplicationService;
 
+    private final LexSubInstanceApplicationService lexSubInstanceApplicationService;
+
     // Other
 
     @Autowired
@@ -57,13 +62,15 @@ public class InstanceApplicationService {
 
             final UsePairInstanceApplicationService usePairInstanceApplicationService,
             final WSSIMInstanceApplicationService wssimInstanceApplicationService,
-            final WSSIMTagApplicationService wssimTagApplicationService) {
+            final WSSIMTagApplicationService wssimTagApplicationService,
+            final LexSubInstanceApplicationService lexSubInstanceApplicationService) {
         this.commonService = commonService;
         this.validationService = validationService;
 
         this.usePairInstanceApplicationService = usePairInstanceApplicationService;
         this.wssimInstanceApplicationService = wssimInstanceApplicationService;
         this.wssimTagApplicationService = wssimTagApplicationService;
+        this.lexSubInstanceApplicationService = lexSubInstanceApplicationService;
     }
 
     // Getters
@@ -99,6 +106,10 @@ public class InstanceApplicationService {
                 this.wssimInstanceApplicationService.findByPhase(phaseEntity)
                         .forEach(wssimInstance -> instanceDtos.add(WSSIMInstanceDto.from(wssimInstance)));
             }
+        }
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            this.lexSubInstanceApplicationService.findByPhase(phaseEntity)
+                    .forEach(lexSubInstance -> instanceDtos.add(LexSubInstanceDto.from(lexSubInstance)));
         }
 
         return instanceDtos;
@@ -159,6 +170,16 @@ public class InstanceApplicationService {
                         pagedInstance.getTotalElements(),
                         pagedInstance.getTotalPages());
             }
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            Page<LexSubInstance> pagedInstance = this.lexSubInstanceApplicationService.findByPhasePaged(phaseEntity,
+                    size, page, order);
+
+            pagedInstanceDto = new PagedInstanceDto(
+                    pagedInstance.getContent().stream().map(LexSubInstanceDto::from).collect(Collectors.toList()),
+                    pagedInstance.getNumber(),
+                    pagedInstance.getSize(),
+                    pagedInstance.getTotalElements(),
+                    pagedInstance.getTotalPages());
         } else {
             pagedInstanceDto = new PagedInstanceDto();
         }
@@ -210,6 +231,11 @@ public class InstanceApplicationService {
                     .from(this.wssimInstanceApplicationService.getAnnotationInstance(phaseEntity, annotator));
         }
 
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            return LexSubInstanceDto
+                    .from(this.lexSubInstanceApplicationService.getAnnotationInstance(phaseEntity, annotator));
+        }
+
         return null;
     }
 
@@ -233,11 +259,17 @@ public class InstanceApplicationService {
 
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             return this.usePairInstanceApplicationService.exportUsePairInstance(phaseEntity);
-        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
+        }
+
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             if (additional) {
                 return this.wssimTagApplicationService.exportWSSIMTag(phaseEntity);
             }
             return this.wssimInstanceApplicationService.exportWSSIMInstance(phaseEntity);
+        }
+
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            return this.lexSubInstanceApplicationService.exportInstance(phaseEntity);
         }
 
         throw new AnnotationTypeNotFoundException();
@@ -268,7 +300,9 @@ public class InstanceApplicationService {
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             this.usePairInstanceApplicationService.save(phaseEntity, file);
             return;
-        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
+        }
+
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             if (additional) {
                 this.wssimTagApplicationService.save(phaseEntity, file);
                 return;
@@ -277,8 +311,63 @@ public class InstanceApplicationService {
             return;
         }
 
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            this.lexSubInstanceApplicationService.save(phaseEntity, file);
+            return;
+        }
+
         throw new AnnotationTypeNotFoundException();
 
+    }
+
+    /**
+     * Generate instance data for a phase from usages associated with the project.
+     * 
+     * @param authenticationToken
+     *                            The authentication token of the requesting user
+     * @param owner
+     *                            The owner of the project
+     * @param project
+     *                            The name of the project
+     * @param phase
+     *                            The name of the phase
+     * @param additional
+     *                            Additional Data (e.g. WSSIM -> sense)
+     * @param file
+     *                            The instancedata to add
+     */
+    @Transactional
+    public void generateInstances(
+            final String authenticationToken,
+            final String owner, final String project, final String phase,
+            final List<String> labels, final String nonLabel, 
+            final MultipartFile file) {
+
+        final User requester = this.commonService.getUserByAuthenticationToken(authenticationToken);
+        final Phase phaseEntity = this.commonService.getPhase(owner, project, phase);
+
+        this.validationService.projectAdminAccess(requester, phaseEntity.getProject());
+
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
+            this.usePairInstanceApplicationService.generateInstances(phaseEntity, labels, nonLabel);
+            return;
+        }
+
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
+            if (file.isEmpty()) {
+                throw new AnnotationTypeNotFoundException();
+            }
+            this.wssimTagApplicationService.save(phaseEntity, file);
+            this.wssimInstanceApplicationService.generateInstances(phaseEntity, labels, nonLabel);
+            return;
+        }
+
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            this.lexSubInstanceApplicationService.generateInstances(phaseEntity);
+            return;
+        }
+
+        throw new AnnotationTypeNotFoundException();
     }
 
     /**

@@ -7,4 +7,7 @@ export default interface CorpusInformationDto {
     readonly language: string;
     readonly resource: string;
 
+    readonly corpusnameFull: string;
+    readonly corpusnameShort: string;
+
 }

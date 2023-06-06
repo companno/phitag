@@ -98,11 +98,17 @@ const PhaseCarousel: React.FC<{ project: Project }> = ({ project }) => {
                         onClick={() => { setCreatePhaseModalState({ ...createPhaseModalState, createPhaseModal: true }) }}
                         tooltip="Add Phase"
                         hide={!(project?.isActive() && entitlement.entitlement === ENTITLEMENTS.ADMIN)} />
+
                     <HelpButton
-                        tooltip="How To Phases"
-                        reference="/"
                         title="What are Phases"
-                        text="Phases in a project are described by their instance data, hence what and how your project data should be annotated." />
+                        tooltip="Help: Phases"
+                        text="Phases in a project are used to divide the project into different parts. 
+                        Each phase has its own annotation types, sampling strategy and annotation requirements.
+                        You can add a phase by clicking on the plus button.
+                        You can also add tutorial phases, which are used to teach annotators how to annotate a specific annotation type and validate the annotators ability to annotate."
+                        reference="/guide/how-to-annotation-project"
+
+                    />
                 </div>
             </div>
 

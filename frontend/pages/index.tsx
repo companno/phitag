@@ -9,7 +9,10 @@ import ContentLayout from '../components/generic/layout/contentlayout'
 
 export default function Home({ staticData }: { staticData: Array<any> }) {
 
-    const warning: string = "Please note, this is an early version of the finished app, hence there will be frequent changes to API-structure and how data is handled. This might lead to data loss and leaks. Hence, we <b>strongly</b> advice against using <b>sensitive</b> data at this moment of time.";
+    const warning: string = " Please note, this is an early version of the finished app, " +
+        "hence there will be frequent changes to API-structure and how data is handled. " +
+        "In some cases, this might lead to data loss. " +
+        "We do daily backups of the database, so if you experience any data loss, please contact us. ";
 
     return (
         <BasicLayout>

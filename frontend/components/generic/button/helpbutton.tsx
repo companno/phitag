@@ -4,19 +4,20 @@ import { useState } from "react";
 import { FiChevronsRight, FiHelpCircle } from "react-icons/fi";
 
 interface IProps {
-    reference: string;
     tooltip: string;
     title: string;
     text: string;
+    reference: string;
     buttontext?: string;
+    linkage?: boolean;
 }
 
-const HelpButton: React.FC<IProps> = ({ reference, tooltip, title, text, buttontext }) => {
+const HelpButton: React.FC<IProps> = ({ reference, tooltip, title, text, buttontext, linkage }) => {
 
     const [showTooltipBox, setShowTooltipBox] = useState<boolean>(false);
 
     return (
-        <button className="icon-button group">
+        <div className="icon-button group cursor-pointer">
             {/* <Link href={reference ? reference : ""}> */}
             <div onClick={() => setShowTooltipBox(true)}>
                 <FiHelpCircle className="basic-svg" />
@@ -28,8 +29,8 @@ const HelpButton: React.FC<IProps> = ({ reference, tooltip, title, text, buttont
                 </div>
             </div>
 
-            <HelpButtonTooltipBox show={showTooltipBox} onCancel={() => setShowTooltipBox(false)} reference={reference} title={title} text={text} buttontext={buttontext} />
-        </button>
+            <HelpButtonTooltipBox show={showTooltipBox} onCancel={() => setShowTooltipBox(false)} reference={reference} title={title} text={text} buttontext={buttontext} linkage={linkage} />
+        </div>
     );
 
 };
@@ -43,9 +44,10 @@ interface HelpButtonTooltipBoxProps {
     title: string;
     text: string;
     buttontext?: string;
+    linkage?: boolean;
 }
 
-const HelpButtonTooltipBox = ({ show, onCancel, reference, title, text, buttontext }: HelpButtonTooltipBoxProps) => {
+const HelpButtonTooltipBox = ({ show, onCancel, reference, title, text, buttontext, linkage = true }: HelpButtonTooltipBoxProps) => {
     if (!show) return null;
 
     return (
@@ -65,7 +67,7 @@ const HelpButtonTooltipBox = ({ show, onCancel, reference, title, text, buttonte
                                 </div>
                             </div>
                         </div>
-                        <div className="">
+                        <div className={linkage ? "" : "hidden"}>
                             <Link href={reference} passHref>
                                 <div className="flex flex-row divide-x-8">
                                     <button type="button" className="w-full flex flex-row justify-center items-center font-dm-mono-medium text-lg bg-base16-gray-900 text-base16-gray-100 py-2 px-10" onClick={onCancel}>

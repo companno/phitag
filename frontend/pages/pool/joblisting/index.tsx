@@ -30,6 +30,7 @@ import JoblistingCard from "../../../components/generic/card/joblistingcard";
 // Layout
 import Layout from "../../../components/generic/layout/layout";
 import ContentLayout from "../../../components/generic/layout/contentlayout";
+import HelpButton from "../../../components/generic/button/helpbutton";
 
 const JoblistingPage: NextPage = () => {
 
@@ -103,7 +104,7 @@ const JoblistingPage: NextPage = () => {
                             </div>
 
 
-                            
+
                             <div className="flex items-center my-4 ml-4">
                                 {searchField.openListing ?
                                     <IconButtonOnClick
@@ -129,6 +130,20 @@ const JoblistingPage: NextPage = () => {
                                     icon={<FiClipboard className="basic-svg" />}
                                     tooltip={"See Personal Joblisting"}
                                     reference={"/pool/joblisting/personal"} />
+                            </div>
+
+                            <div className="flex items-center my-4 ml-4">
+                                <HelpButton
+                                    title="Help: Joblistings"
+                                    tooltip="Help: Joblistings"
+                                    text="
+                                        A joblisting allows you to join a project as an annotator. 
+                                        You can either join an open joblisting or join a joblisting with a waitinglist. 
+                                        If you join a joblisting with a waitinglist, you will be added to the waitinglist and will be notified if you are accepted. 
+                                        If you join an open joblisting, you will be added to the project as an annotator immediately.
+                                        You can see your personal joblistings on the 'Personal Joblistings' page."
+                                    reference="/guide/explained-pools"
+                                />
                             </div>
 
                         </div>

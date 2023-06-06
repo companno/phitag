@@ -29,6 +29,7 @@ import LoadingComponent from "../../../components/generic/loadingcomponent";
 import IconButtonOnClick from "../../../components/generic/button/iconbuttononclick";
 import CreateJoblistingModal from "../../../components/specific/modal/createjoblistingmodal";
 import AddUserFromWaitingListModal from "../../../components/specific/modal/adduserfromwaitinglist";
+import HelpButton from "../../../components/generic/button/helpbutton";
 
 const PersonalJoblistingPage: NextPage = () => {
 
@@ -148,6 +149,18 @@ const PersonalJoblistingPage: NextPage = () => {
                                     icon={<FiPlus className="basic-svg" />}
                                     onClick={() => { setCreateModalState({ isOpen: true }) }}
                                     tooltip={"Create new Joblisting"} />
+                            </div>
+
+                            <div className="flex items-center my-4 ml-4">
+                                <HelpButton
+                                    title="Help: Personal Joblistings"
+                                    tooltip="Help: Personal Joblistings"
+                                    text="
+                                        Here you can see all your personal joblistings. You can create new joblistings by clicking on the plus button.
+                                        You can also add users from the waiting list to the joblisting by clicking on the add button.
+                                        "
+                                    reference="/guide/explained-pools"
+                                />
                             </div>
                         </div>
                     </div>

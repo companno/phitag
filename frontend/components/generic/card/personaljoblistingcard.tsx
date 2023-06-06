@@ -50,7 +50,7 @@ const PersonalJoblistingCard: React.FC<IJoblistingCardProps> = ({ joblisting, on
                 </p>
 
                 {joblisting.isOpen() ? <div /> :
-                    <button type="button" className="block w-full mt-8 py-2 font-dm-mono-medium bg-base16-gray-900 text-base16-gray-100 " onClick={() => onClick()}>
+                    <button type="button" className="block w-full mt-auto py-2 font-dm-mono-medium bg-base16-gray-900 text-base16-gray-100 " onClick={() => onClick()}>
                         Waitinglist
                     </button>
                 }

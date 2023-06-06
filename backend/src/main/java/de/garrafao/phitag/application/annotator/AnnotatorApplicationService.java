@@ -1,6 +1,7 @@
 package de.garrafao.phitag.application.annotator;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -19,7 +20,6 @@ import de.garrafao.phitag.application.validation.ValidationService;
 import de.garrafao.phitag.domain.annotator.Annotator;
 import de.garrafao.phitag.domain.annotator.AnnotatorRepository;
 import de.garrafao.phitag.domain.annotator.error.AnnotatorExistException;
-import de.garrafao.phitag.domain.annotator.error.AnnotatorNotFoundException;
 import de.garrafao.phitag.domain.annotator.query.AnnotatorQueryBuilder;
 import de.garrafao.phitag.domain.core.Query;
 import de.garrafao.phitag.domain.entitlement.Entitlement;
@@ -115,12 +115,15 @@ public class AnnotatorApplicationService {
 
         this.validationService.projectAccess(requester, projectEntity);
 
-        final Annotator annotator = this.annotatorRepository
+        final Optional<Annotator> annotator = this.annotatorRepository
                 .findByIdUsernameAndIdProjectidNameAndIdProjectidOwnername(requester.getUsername(),
-                        projectEntity.getId().getName(), projectEntity.getId().getOwnername())
-                .orElseThrow(AnnotatorNotFoundException::new);
+                        projectEntity.getId().getName(), projectEntity.getId().getOwnername());
 
-        return annotator.getEntitlement().toString();
+        if (!annotator.isPresent()) {
+            return "NONE";
+        }
+
+        return annotator.get().getEntitlement().toString();
     }
 
     // Setter

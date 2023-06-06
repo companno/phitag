@@ -15,6 +15,9 @@ public class CorpusQueryCommand {
     private final String lemma;
     private final String pos;
 
+    // Corpus
+    private final String corpus;
+
     // Context
     private Boolean context;
 
@@ -25,6 +28,7 @@ public class CorpusQueryCommand {
     public CorpusQueryCommand(
             Integer page, Integer size,
             String lemma, String pos,
+            String corpus,
             Boolean context,
             Integer from, Integer to) {
         Validate.inclusiveBetween(0, 50, size, "size must be between 0 and 50");
@@ -34,6 +38,8 @@ public class CorpusQueryCommand {
 
         this.lemma = lemma;
         this.pos = pos;
+
+        this.corpus = corpus;
 
         this.context = context;
 

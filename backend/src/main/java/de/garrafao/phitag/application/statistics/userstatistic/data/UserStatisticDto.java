@@ -2,6 +2,7 @@ package de.garrafao.phitag.application.statistics.userstatistic.data;
 
 import java.util.Map;
 
+import de.garrafao.phitag.application.common.CommonService;
 import de.garrafao.phitag.domain.statistic.userstatistic.UserStatistic;
 import lombok.Getter;
 
@@ -26,6 +27,11 @@ public class UserStatisticDto {
         this.languageCountMap = languageCountMap;
         this.annotationTypeCountMap = annotationTypeCountMap;
         this.pojectAnnotationCountMap = pojectAnnotationCountMap;
+    }
+
+    public void setAnnotationTypeCountMap(Map<String, Integer> annotationTypeCountMap) {
+        this.annotationTypeCountMap.clear();
+        this.annotationTypeCountMap.putAll(annotationTypeCountMap);
     }
 
     public static UserStatisticDto from(UserStatistic userStatistic) {

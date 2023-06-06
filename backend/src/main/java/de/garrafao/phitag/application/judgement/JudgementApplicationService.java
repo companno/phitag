@@ -20,6 +20,11 @@ import de.garrafao.phitag.application.judgement.data.IDeleteJudgementCommand;
 import de.garrafao.phitag.application.judgement.data.IEditJudgementCommand;
 import de.garrafao.phitag.application.judgement.data.IJudgementDto;
 import de.garrafao.phitag.application.judgement.data.PagedJudgementDto;
+import de.garrafao.phitag.application.judgement.lexsubjudgement.LexSubJudgementApplicationService;
+import de.garrafao.phitag.application.judgement.lexsubjudgement.data.AddLexSubJudgementCommand;
+import de.garrafao.phitag.application.judgement.lexsubjudgement.data.DeleteLexSubJudgementCommand;
+import de.garrafao.phitag.application.judgement.lexsubjudgement.data.EditLexSubJudgementCommand;
+import de.garrafao.phitag.application.judgement.lexsubjudgement.data.LexJudgementDto;
 import de.garrafao.phitag.application.judgement.usepairjudgement.UsePairJudgementApplicationService;
 import de.garrafao.phitag.application.judgement.usepairjudgement.data.AddUsePairJudgementCommand;
 import de.garrafao.phitag.application.judgement.usepairjudgement.data.DeleteUsePairJudgementCommand;
@@ -35,6 +40,7 @@ import de.garrafao.phitag.domain.annotationprocessinformation.AnnotationProcessI
 import de.garrafao.phitag.domain.annotationtype.error.AnnotationTypeNotFoundException;
 import de.garrafao.phitag.domain.annotator.Annotator;
 import de.garrafao.phitag.domain.authentication.error.AccessDenidedException;
+import de.garrafao.phitag.domain.judgement.lexsubjudgement.LexSubJudgement;
 import de.garrafao.phitag.domain.judgement.usepairjudgement.UsePairJudgement;
 import de.garrafao.phitag.domain.judgement.wssimjudgement.WSSIMJudgement;
 import de.garrafao.phitag.domain.phase.Phase;
@@ -55,6 +61,8 @@ public class JudgementApplicationService {
 
     private final WSSIMJudgementApplicationService wssimJudgementApplicationService;
 
+    private final LexSubJudgementApplicationService lexSubJudgementApplicationService;
+
     // Other
 
     @Autowired
@@ -63,12 +71,14 @@ public class JudgementApplicationService {
             final ValidationService validationService,
 
             final UsePairJudgementApplicationService usePairJudgementApplicationService,
-            final WSSIMJudgementApplicationService wssimJudgementApplicationService) {
+            final WSSIMJudgementApplicationService wssimJudgementApplicationService,
+            final LexSubJudgementApplicationService lexSubJudgementApplicationService) {
         this.commonService = commonService;
         this.validationService = validationService;
 
         this.usePairJudgementApplicationService = usePairJudgementApplicationService;
         this.wssimJudgementApplicationService = wssimJudgementApplicationService;
+        this.lexSubJudgementApplicationService = lexSubJudgementApplicationService;
     }
 
     // Getters
@@ -112,6 +122,11 @@ public class JudgementApplicationService {
             this.wssimJudgementApplicationService.findByPhase(phaseEntity).forEach(
                     wssimJudgement -> {
                         judgementDtos.add(WSSIMJudgementDto.from(wssimJudgement));
+                    });
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            this.lexSubJudgementApplicationService.findByPhase(phaseEntity).forEach(
+                    lexSubJudgement -> {
+                        judgementDtos.add(LexJudgementDto.from(lexSubJudgement));
                     });
         }
 
@@ -178,6 +193,16 @@ public class JudgementApplicationService {
                     wssimJudgements.getSize(),
                     wssimJudgements.getTotalElements(),
                     wssimJudgements.getTotalPages());
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            Page<LexSubJudgement> lexSubJudgements = this.lexSubJudgementApplicationService.findByPhase(phaseEntity,
+                    size, page, sort);
+
+            pagedJudgementDto = new PagedJudgementDto(
+                    lexSubJudgements.getContent().stream().map(LexJudgementDto::from).collect(Collectors.toList()),
+                    lexSubJudgements.getNumber(),
+                    lexSubJudgements.getSize(),
+                    lexSubJudgements.getTotalElements(),
+                    lexSubJudgements.getTotalPages());
         } else {
             pagedJudgementDto = null;
         }
@@ -215,6 +240,9 @@ public class JudgementApplicationService {
         } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             this.wssimJudgementApplicationService.getHistory(phaseEntity, annotator)
                     .forEach(wssimJudgement -> judgementDtos.add(WSSIMJudgementDto.from(wssimJudgement)));
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            this.lexSubJudgementApplicationService.getHistory(phaseEntity, annotator)
+                    .forEach(lexSubJudgement -> judgementDtos.add(LexJudgementDto.from(lexSubJudgement)));
         }
 
         return judgementDtos;
@@ -274,6 +302,16 @@ public class JudgementApplicationService {
                     wssimJudgements.getSize(),
                     wssimJudgements.getTotalElements(),
                     wssimJudgements.getTotalPages());
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            Page<LexSubJudgement> lexSubJudgements = this.lexSubJudgementApplicationService.getHistory(
+                    phaseEntity, annotator, size, page, sort);
+
+            pagedJudgementDto = new PagedJudgementDto(
+                    lexSubJudgements.getContent().stream().map(LexJudgementDto::from).collect(Collectors.toList()),
+                    lexSubJudgements.getNumber(),
+                    lexSubJudgements.getSize(),
+                    lexSubJudgements.getTotalElements(),
+                    lexSubJudgements.getTotalPages());
         } else {
             pagedJudgementDto = null;
         }
@@ -302,6 +340,8 @@ public class JudgementApplicationService {
             return this.usePairJudgementApplicationService.exportUsePairJudgement(phaseEntity);
         } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             return this.wssimJudgementApplicationService.exportWSSIMJudgement(phaseEntity);
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            return this.lexSubJudgementApplicationService.exportJudgement(phaseEntity);
         }
 
         throw new AnnotationTypeNotFoundException();
@@ -357,6 +397,9 @@ public class JudgementApplicationService {
         } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             this.wssimJudgementApplicationService.save(phaseEntity, annotator, file);
             return;
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            this.lexSubJudgementApplicationService.save(phaseEntity, annotator, file);
+            return;
         }
 
         throw new AnnotationTypeNotFoundException();
@@ -384,6 +427,9 @@ public class JudgementApplicationService {
             return;
         } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             this.wssimJudgementApplicationService.edit(phaseEntity, annotator, (EditWSSIMJudgementCommand) command);
+            return;
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            this.lexSubJudgementApplicationService.edit(phaseEntity, annotator, (EditLexSubJudgementCommand) command);
             return;
         }
 
@@ -413,6 +459,10 @@ public class JudgementApplicationService {
             return;
         } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             this.wssimJudgementApplicationService.delete(phaseEntity, annotator, (DeleteWSSIMJudgementCommand) command);
+            return;
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            this.lexSubJudgementApplicationService.delete(phaseEntity, annotator,
+                    (DeleteLexSubJudgementCommand) command);
             return;
         }
 
@@ -448,7 +498,6 @@ public class JudgementApplicationService {
                 this.usePairJudgementApplicationService.annotate(phaseEntity, annotator,
                         (AddUsePairJudgementCommand) command);
                 annotationProcessInformation.setIndex(annotationProcessInformation.getIndex() + 1);
-
             } catch (ClassCastException e) {
                 throw new AnnotationTypeNotFoundException();
             }
@@ -457,6 +506,16 @@ public class JudgementApplicationService {
             try {
                 this.wssimJudgementApplicationService.annotate(phaseEntity, annotator,
                         (AddWSSIMJudgementCommand) command);
+                annotationProcessInformation.setIndex(annotationProcessInformation.getIndex() + 1);
+
+            } catch (ClassCastException e) {
+                throw new AnnotationTypeNotFoundException();
+            }
+            return;
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            try {
+                this.lexSubJudgementApplicationService.annotate(phaseEntity, annotator,
+                        (AddLexSubJudgementCommand) command);
                 annotationProcessInformation.setIndex(annotationProcessInformation.getIndex() + 1);
 
             } catch (ClassCastException e) {
@@ -504,6 +563,14 @@ public class JudgementApplicationService {
             try {
                 this.wssimJudgementApplicationService.annotateBulk(phaseEntity, annotator,
                         commands.stream().map(AddWSSIMJudgementCommand.class::cast).collect(Collectors.toList()));
+            } catch (ClassCastException e) {
+                throw new AnnotationTypeNotFoundException();
+            }
+            return;
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
+            try {
+                this.lexSubJudgementApplicationService.annotateBulk(phaseEntity, annotator,
+                        commands.stream().map(AddLexSubJudgementCommand.class::cast).collect(Collectors.toList()));
             } catch (ClassCastException e) {
                 throw new AnnotationTypeNotFoundException();
             }

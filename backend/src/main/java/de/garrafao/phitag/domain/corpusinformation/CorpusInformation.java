@@ -32,10 +32,19 @@ public class CorpusInformation {
     @Column(name = "resource")
     private String resource;
 
+    @Column(name = "corpusnamefull")
+    private String corpusnamefull;
+
+    @Column(name = "corpusnameshort")
+    private String corpusnameshort;
+
     public CorpusInformation() {
     }
 
-    public CorpusInformation(String id, String title, String author, int date, String language, String resource) {
+    public CorpusInformation(
+            final String id, final String title, final String author,
+            final int date, final String language, final String resource,
+            final String corpusnameFull, final String corpusnameShort) {
         Validate.notBlank(id, "id must not be blank");
         this.id = id;
 
@@ -44,6 +53,9 @@ public class CorpusInformation {
         this.date = date;
         this.language = language;
         this.resource = resource;
+
+        this.corpusnamefull = corpusnameFull;
+        this.corpusnameshort = corpusnameShort;
     }
 
     @Override

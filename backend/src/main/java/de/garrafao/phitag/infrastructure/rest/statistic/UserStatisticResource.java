@@ -2,6 +2,7 @@ package de.garrafao.phitag.infrastructure.rest.statistic;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,7 +29,8 @@ public class UserStatisticResource {
      */
     @GetMapping()
     public UserStatisticDto getUserStatistic(
+            @RequestHeader("Authorization") final String authenticationToken,
             @RequestParam(value = "user") final String username) {
-        return userStatisticApplicationService.getUserStatistic(username);
+        return userStatisticApplicationService.getUserStatistic(authenticationToken, username);
     }
 }

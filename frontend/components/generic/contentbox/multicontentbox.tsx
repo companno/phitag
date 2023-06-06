@@ -12,7 +12,7 @@ const MultiContentBox: React.FC<IProps> = ({ data }) => {
                     {data.title}
                 </div>
                 <div className="my-2 sm:mx-4 mx-2 font-uni-corporate-regular text-base16-gray-900">
-                    <div className="" dangerouslySetInnerHTML={{ __html: data.content }} />
+                    <div className="prose-a:underline" dangerouslySetInnerHTML={{ __html: data.content }} />
                 </div>
             </div>
         </div>

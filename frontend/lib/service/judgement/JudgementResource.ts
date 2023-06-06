@@ -20,6 +20,8 @@ import PagedUsePairJudgement from "../../model/judgement/usepairjudgement/model/
 import WSSIMJudgementDto from "../../model/judgement/wssimjudgement/dto/WSSIMJudgementDto";
 import PagedWSSIMJudgement from "../../model/judgement/wssimjudgement/model/PagedWSSIMJudgement";
 import UsePairJudgementDto from "../../model/judgement/usepairjudgement/dto/UsePairJudgementDto";
+import LexSubJudgementDto from "../../model/judgement/lexsubjudgement/dto/LexSubJudgementDto";
+import PagedLexSubJudgement from "../../model/judgement/lexsubjudgement/model/PagedLexSubJudgement";
 
 /** 
  * Fetches all judgements of a phase
@@ -105,6 +107,36 @@ export function useFetchPagedWSSIMJudgements(owner: string, project: string, pha
 
     return {
         data: data ? PagedWSSIMJudgement.fromDto(data) : PagedWSSIMJudgement.empty(),
+        isLoading: !error && !data,
+        isError: error,
+        mutate: mutate
+    }
+}
+
+/**
+ * Fetch all lexsub judgements of a phase paged
+ * 
+ * @param owner owner of the project
+ * @param project project name
+ * @param phase phase name in the project
+ * @param page page number
+ * @param fetch if data should be fetched
+ * @returns list of all judgements
+ */
+export function useFetchPagedLexSubJudgements(owner: string, project: string, phase: string, page: number, fetch: boolean = true) {
+    const { get } = useStorage();
+    const token = get('JWT') ?? '';
+
+    const queryPhaseDataFetcher = (url: string) => axios.get<PagedGenericDto<LexSubJudgementDto>>(url, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(res => res.data);
+
+    const { data, error, mutate } = useSWR(fetch ? `${BACKENDROUTES.JUDGEMENT}/paged?owner=${owner}&project=${project}&phase=${phase}&page=${page}` : null, queryPhaseDataFetcher)
+
+    return {
+        data: data ? PagedLexSubJudgement.fromDto(data) : PagedLexSubJudgement.empty(),
         isLoading: !error && !data,
         isError: error,
         mutate: mutate
@@ -203,6 +235,37 @@ export function useFetchPagedHistoryWSSIMJudgements(owner: string, project: stri
     }
 }
 
+/**
+ * Fetches all lexsub judgements of a user paged
+ * 
+ * @param owner owner of the project
+ * @param project project name
+ * @param phase phase name in the project
+ * 
+ * @param page page number
+ * @param fetch if data should be fetched
+ * @returns list of all judgements
+ */
+export function useFetchPagedHistoryLexSubJudgements(owner: string, project: string, phase: string, page: number, fetch: boolean = true) {
+    const { get } = useStorage();
+    const token = get('JWT') ?? '';
+
+    const queryPhaseDataFetcher = (url: string) => axios.get<PagedGenericDto<LexSubJudgementDto>>(url, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(res => res.data);
+
+    const { data, error, mutate } = useSWR(fetch ? `${BACKENDROUTES.JUDGEMENT}/history/personal/paged?owner=${owner}&project=${project}&phase=${phase}&page=${page}` : null, queryPhaseDataFetcher)
+
+    return {
+        data: data ? PagedLexSubJudgement.fromDto(data) : PagedLexSubJudgement.empty(),
+        isLoading: !error && !data,
+        isError: error,
+        mutate: mutate
+    }
+}
+
 
 /**
  * Fetches all judgements of a phase as a csv file
@@ -291,6 +354,24 @@ export function editWssim(command: IEditJudgementCommand, get: Function = () => 
 }
 
 /**
+ * Edit LexSub judgement
+ * 
+ * @param command command containing the judgement
+ * @param get storage hook
+ * 
+ * @returns Promise
+ */
+export function editLexSub(command: IEditJudgementCommand, get: Function = () => { }) {
+    const token = get('JWT') ?? '';
+
+    return axios.post(`${BACKENDROUTES.JUDGEMENT}/edit/lexsub`, command,
+        {
+            headers: { "Authorization": `Bearer ${token}` },
+        }
+    ).then(res => res.data);
+}
+
+/**
  * Delete Use Pair judgement
  * 
  * @param command command containing the judgement
@@ -322,6 +403,23 @@ export function deleteWssim(command: IDeleteJudgementCommand, get: Function = ()
     ).then(res => res.data);
 }
 
+/**
+ * Delete LexSub judgement
+ * 
+ * @param command command containing the judgement
+ * @param get storage hook
+ * 
+ * @returns Promise
+ */
+export function deleteLexSub(command: IDeleteJudgementCommand, get: Function = () => { }) {
+    const token = get('JWT') ?? '';
+
+    return axios.post(`${BACKENDROUTES.JUDGEMENT}/delete/lexsub`, command,
+        {
+            headers: { "Authorization": `Bearer ${token}` },
+        }
+    ).then(res => res.data);
+}
 
 
 /** 
@@ -383,4 +481,38 @@ export function bulkAnnotateWSSIM(commands: IAddJudgementCommand[], get: Functio
     ).then(res => res.data);
 }
 
+/**
+ * Add a judgement to the phase where Task is LexSub
+ * 
+ * @param command command containing the judgement
+ * @returns Promise
+ * 
+ * @returns Promise
+ */
+export function annotateLexSub(command: IAddJudgementCommand, get: Function = () => { }) {
+    const token = get('JWT') ?? '';
 
+    return axios.post(`${BACKENDROUTES.JUDGEMENT}/annotate/lexsub`, command,
+        {
+            headers: { "Authorization": `Bearer ${token}` },
+        }
+    ).then(res => res.data);
+}
+
+/**
+ * Add a bulk of judgements to phase of task type LexSub
+ * 
+ * @param commands commands containing the judgements
+ * @param get storage hook
+ * 
+ * @returns Promise
+ */
+export function bulkAnnotateLexSub(commands: IAddJudgementCommand[], get: Function = () => { }) {
+    const token = get('JWT') ?? '';
+
+    return axios.post(`${BACKENDROUTES.JUDGEMENT}/annotate/lexsub/bulk`, commands,
+        {
+            headers: { "Authorization": `Bearer ${token}` },
+        }
+    ).then(res => res.data);
+}

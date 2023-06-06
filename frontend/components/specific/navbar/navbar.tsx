@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 // Icons
-import { FiBox, FiFolder, FiHelpCircle, FiLogOut, FiMenu, FiMessageSquare, FiSettings, FiShare2, FiUser } from 'react-icons/fi'
+import { FiAlertCircle, FiBox, FiFolder, FiHelpCircle, FiLogOut, FiMenu, FiMessageSquare, FiSettings, FiShare2, FiUser } from 'react-icons/fi'
 
 // Custom Hooks
 import useStorage from "../../../lib/hook/useStorage";
@@ -34,7 +34,7 @@ const Navbar: React.FC<{}> = () => {
 
             <div className="my-2 mx-4 flex flex-row self-end space-x-4">
                 <IconButtonOnClickBottom
-                    icon={<FiHelpCircle className="basic-svg" />}
+                    icon={<FiAlertCircle className="basic-svg" />}
                     onClick={() => setShowAddReportModal(true)}
                     tooltip="Report a Problem"
                     />

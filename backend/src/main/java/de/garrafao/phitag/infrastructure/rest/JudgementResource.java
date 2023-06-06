@@ -22,6 +22,9 @@ import de.garrafao.phitag.application.judgement.JudgementApplicationService;
 import de.garrafao.phitag.application.judgement.data.IAddJudgementCommand;
 import de.garrafao.phitag.application.judgement.data.IJudgementDto;
 import de.garrafao.phitag.application.judgement.data.PagedJudgementDto;
+import de.garrafao.phitag.application.judgement.lexsubjudgement.data.AddLexSubJudgementCommand;
+import de.garrafao.phitag.application.judgement.lexsubjudgement.data.DeleteLexSubJudgementCommand;
+import de.garrafao.phitag.application.judgement.lexsubjudgement.data.EditLexSubJudgementCommand;
 import de.garrafao.phitag.application.judgement.usepairjudgement.data.AddUsePairJudgementCommand;
 import de.garrafao.phitag.application.judgement.usepairjudgement.data.DeleteUsePairJudgementCommand;
 import de.garrafao.phitag.application.judgement.usepairjudgement.data.EditUsePairJudgementCommand;
@@ -237,6 +240,19 @@ public class JudgementResource {
     }
 
     /**
+     * Edit LexSubJudgement data
+     * 
+     * @param authenticationToken
+     * @param command
+     */
+    @PostMapping(value = "/edit/lexsub")
+    public void editLexSubJudgement(
+            @RequestHeader("Authorization") String authenticationToken,
+            @RequestBody final EditLexSubJudgementCommand command) {
+        this.judgementApplicationService.edit(authenticationToken, command);
+    }
+
+    /**
      * Delete UsePairJudgement data
      * 
      * @param authenticationToken
@@ -259,6 +275,19 @@ public class JudgementResource {
     public void deleteWSSIMJudgement(
             @RequestHeader("Authorization") String authenticationToken,
             @RequestBody final DeleteWSSIMJudgementCommand command) {
+        this.judgementApplicationService.delete(authenticationToken, command);
+    }
+
+    /**
+     * Delete LexSubJudgement data
+     * 
+     * @param authenticationToken
+     * @param command
+     */
+    @PostMapping(value = "/delete/lexsub")
+    public void deleteLexSubJudgement(
+            @RequestHeader("Authorization") String authenticationToken,
+            @RequestBody final DeleteLexSubJudgementCommand command) {
         this.judgementApplicationService.delete(authenticationToken, command);
     }
 
@@ -343,4 +372,43 @@ public class JudgementResource {
                 commands.stream().map(c -> (IAddJudgementCommand) c).collect(Collectors.toList()));
     }
 
+    /**
+     * Annote a specific instance of a phase for LexSub
+     * 
+     * The requesting user must fulfill the following conditions:
+     * - Be an annotator in the project, and
+     * - Project must be active
+     * - Phase must not be a tutorial
+     * 
+     * @param authenticationToken
+     *                            The authentication token of the requesting user
+     * @param command
+     */
+    @PostMapping(value = "/annotate/lexsub")
+    public void annotateLexSub(
+            @RequestHeader("Authorization") String authenticationToken,
+            @RequestBody final AddLexSubJudgementCommand command) {
+        this.judgementApplicationService.annotate(authenticationToken, command);
+    }
+
+    /**
+     * Annotate bulk of instances of a phase for lexsub
+     * 
+     * The requesting user must fulfill the following conditions:
+     * - Be an annotator in the project
+     * - Project must be active
+     * - If phase is a tutorial, the annotation is only checked for correctness
+     * 
+     * @param authenticationToken
+     *                            The authentication token of the requesting
+     *                            user
+     * @param commands
+     */
+    @PostMapping(value = "/annotate/lexsub/bulk")
+    public void annotateBulkLexSub(
+            @RequestHeader("Authorization") String authenticationToken,
+            @RequestBody final List<AddLexSubJudgementCommand> commands) {
+        this.judgementApplicationService.annotateBulk(authenticationToken,
+                commands.stream().map(c -> (IAddJudgementCommand) c).collect(Collectors.toList()));
+    }
 }

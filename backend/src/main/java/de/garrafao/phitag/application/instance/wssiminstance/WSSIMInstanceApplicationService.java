@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import javax.transaction.Transactional;
 
@@ -30,6 +31,7 @@ import de.garrafao.phitag.domain.annotator.Annotator;
 import de.garrafao.phitag.domain.core.Query;
 import de.garrafao.phitag.domain.error.CsvParseException;
 import de.garrafao.phitag.domain.instance.wssiminstance.WSSIMInstance;
+import de.garrafao.phitag.domain.instance.wssiminstance.WSSIMInstanceFactory;
 import de.garrafao.phitag.domain.instance.wssiminstance.WSSIMInstanceRepository;
 import de.garrafao.phitag.domain.instance.wssiminstance.error.WSSIMInstanceAlreadyExistsException;
 import de.garrafao.phitag.domain.instance.wssiminstance.error.WSSIMInstanceNotFoundException;
@@ -37,6 +39,7 @@ import de.garrafao.phitag.domain.instance.wssiminstance.query.WSSIMInstanceQuery
 import de.garrafao.phitag.domain.instance.wssimtag.WSSIMTag;
 import de.garrafao.phitag.domain.instance.wssimtag.WSSIMTagRepository;
 import de.garrafao.phitag.domain.instance.wssimtag.error.WSSIMTagNotFoundException;
+import de.garrafao.phitag.domain.instance.wssimtag.query.WSSIMTagQueryBuilder;
 import de.garrafao.phitag.domain.phase.Phase;
 import de.garrafao.phitag.domain.phitagdata.usage.Usage;
 import de.garrafao.phitag.domain.phitagdata.usage.UsageRepository;
@@ -129,7 +132,7 @@ public class WSSIMInstanceApplicationService {
             throw new WSSIMInstanceNotFoundException();
         }
 
-        return this.wssimInstanceRepository.findByQuery(query).get(0);
+        return wssimInstances.get(0);
     }
 
     /**
@@ -194,6 +197,46 @@ public class WSSIMInstanceApplicationService {
         });
 
         this.generateSamplingTasks(phase);
+    }
+
+    /**
+     * Generate instances for a given phase using additional sense tag tsv file.
+     * 
+     * @param phase    the phase
+     * @param nonLabel
+     * @param labels
+     */
+    @Transactional
+    public void generateInstances(Phase phase, List<String> labels, String nonLabel) {
+        // fetch all data ids for the project
+        List<String> dataIds = this.usageRepository.findAllDataIdsByProjectnameAndOwnername(
+                phase.getId().getProjectid().getName(),
+                phase.getId().getProjectid().getOwnername());
+
+        // find all wssim tags for the phase (hopefully small)
+        final Query query = new WSSIMTagQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName()).withPhase(phase.getId().getName())
+                .build();
+        List<WSSIMTag> wssimTags = this.wssimTagRepository.findByQuery(query);
+
+        // create wssim instances
+        WSSIMInstanceFactory factory = new WSSIMInstanceFactory().withPhase(phase).withLabelSet(String.join(",", labels))
+                .withNonLabel(nonLabel);
+
+        for (String dataId : dataIds) {
+            Usage usage = this.usageRepository.findByIdDataidAndIdProjectidNameAndIdProjectidOwnername(dataId,
+                    phase.getId().getProjectid().getName(), phase.getId().getProjectid().getOwnername())
+            .orElseThrow(UsageNotFoundException::new);
+
+            for (WSSIMTag wssimTag : wssimTags) {
+                if (wssimTag.getLemma().equals(usage.getLemma())) {
+                    WSSIMInstance instance = factory.withInstanceId(UUID.randomUUID().toString()).withUsage(usage).withTag(wssimTag).build();
+                    this.wssimInstanceRepository.save(instance);
+                }
+            }
+        }
+
     }
 
     // Parser
@@ -414,14 +457,15 @@ public class WSSIMInstanceApplicationService {
 
         String queryId = annotationProcessInformation.next();
 
-        // If sampling index is null, return null
-        if (queryId == null) {
-            return null;
-        }
 
         if (phase.getSampling().getName().equals(SamplingEnum.SAMPLING_RANDOM_WITH_REPLACEMENT.name())) {
             queryId = annotationProcessInformation.getOrder()
                     .get((int) (Math.random() * annotationProcessInformation.getOrder().size()));
+        }
+
+        // If sampling index is null, return null
+        if (queryId == null) {
+            return null;
         }
 
         final Query query = new WSSIMInstanceQueryBuilder()

@@ -30,6 +30,14 @@ public class CorpusQueryBuilder {
         queryComponents.add(new BetweenDateQueryComponent(from, to));
         return this;
     }
+    
+    public CorpusQueryBuilder withCorpusNames(final List<String> corpuses) {
+        if (corpuses == null  || corpuses.isEmpty()) {
+            return this;
+        }
+        queryComponents.add(new CorpusNameQueryComponent(corpuses));
+        return this;
+    }
 
     public Query build() {
         return new Query(queryComponents);

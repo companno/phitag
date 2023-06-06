@@ -27,17 +27,22 @@ public class CorpusJpa implements Specification<Corpus> {
     @Override
     public Predicate toPredicate(Root<Corpus> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         final List<Specification<Corpus>> specifications = new ArrayList();
-        
+
         for (QueryComponent component : this.query.getComponents()) {
             if (component instanceof LexiconIdsQueryComponent) {
-                specifications.add(new LexiconIdsQueryComponentSpecification(((LexiconIdsQueryComponent) component).getLexiconIds()));
+                specifications.add(new LexiconIdsQueryComponentSpecification(
+                        ((LexiconIdsQueryComponent) component).getLexiconIds()));
             } else if (component instanceof BetweenDateQueryComponent) {
-                specifications.add(new BetweenDateQueryComponentSpecification(((BetweenDateQueryComponent) component).getDateRange()));
+                specifications.add(new BetweenDateQueryComponentSpecification(
+                        ((BetweenDateQueryComponent) component).getDateRange()));
+            } else if (component instanceof CorpusNameQueryComponent) {
+                specifications.add(
+                        new CorpusNameQueryComponentSpecification(
+                                ((CorpusNameQueryComponent) component).getCorpusnames()));
             }
         }
 
         return SpecificationCombiner.and(specifications).toPredicate(root, query, criteriaBuilder);
     }
 
-    
 }

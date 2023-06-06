@@ -27,6 +27,7 @@ import ContentLayout from "../../../components/generic/layout/contentlayout";
 import UserCard from '../../../components/generic/card/usercard';
 import AddUserToProjectModal from '../../../components/specific/modal/addusertoprojectmodal';
 import LoadingComponent from '../../../components/generic/loadingcomponent';
+import HelpButton from '../../../components/generic/button/helpbutton';
 
 const HumanPool: NextPage = () => {
 
@@ -106,6 +107,19 @@ const HumanPool: NextPage = () => {
                                     })}>
                                         <FiList className='basic-svg' />
                                     </button>}
+                            </div>
+
+                            <div className="flex items-center my-4 ml-4">
+                                <HelpButton
+                                    title="Help: Human Annotators"
+                                    tooltip="Help: Human Annotators"
+                                    text="
+                                        Here you can find all human annotators that are currently registered in the system.
+                                        You can add them to your project by clicking on the plus icon on the user card.
+                                        You can also search for specific users by typing in the search field.
+                                    "
+                                    reference="/guide/explained-pools"
+                                />
                             </div>
                         </div>
                     </div>

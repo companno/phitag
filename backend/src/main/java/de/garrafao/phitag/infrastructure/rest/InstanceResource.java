@@ -1,6 +1,8 @@
 package de.garrafao.phitag.infrastructure.rest;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -49,13 +51,13 @@ public class InstanceResource {
      * @param authenticationToken
      *                            The authentication token of the requesting user
      * @param owner
-     *                           The owner of the project
+     *                            The owner of the project
      * @param project
-     *                          The name of the project
+     *                            The name of the project
      * @param phase
-     *                             The name of the phase          
+     *                            The name of the phase
      * @param additional
-     *                          Additional Data (e.g. WSSIM -> sense)
+     *                            Additional Data (e.g. WSSIM -> sense)
      * @return
      *         Phase data
      */
@@ -68,7 +70,6 @@ public class InstanceResource {
             @RequestParam(value = "additional", required = false, defaultValue = "false") final boolean additional) {
         return this.instanceApplicationService.getInstanceDtos(authenticationToken, owner, project, phase, additional);
     }
-
 
     /**
      * Get instance dtos of a specific phase.
@@ -85,13 +86,13 @@ public class InstanceResource {
      * @param authenticationToken
      *                            The authentication token of the requesting user
      * @param owner
-     *                           The owner of the project
+     *                            The owner of the project
      * @param project
-     *                          The name of the project
+     *                            The name of the project
      * @param phase
-     *                             The name of the phase          
+     *                            The name of the phase
      * @param additional
-     *                          Additional Data (e.g. WSSIM -> sense)
+     *                            Additional Data (e.g. WSSIM -> sense)
      * @return
      *         Phase data
      */
@@ -102,9 +103,9 @@ public class InstanceResource {
             @RequestParam(value = "project") final String project,
             @RequestParam(value = "phase") final String phase,
             @RequestParam(value = "additional", required = false, defaultValue = "false") final boolean additional,
-            @RequestParam(value = "page", required = false, defaultValue = "0") final int page
-            ) {
-        return this.instanceApplicationService.getPagedInstanceDto(authenticationToken, owner, project, phase, additional, page, 50, "");
+            @RequestParam(value = "page", required = false, defaultValue = "0") final int page) {
+        return this.instanceApplicationService.getPagedInstanceDto(authenticationToken, owner, project, phase,
+                additional, page, 50, "");
     }
 
     /**
@@ -119,12 +120,12 @@ public class InstanceResource {
      * 
      * @param authenticationToken
      *                            The authentication token of the requesting user
-     *  @param owner
-     *                           The owner of the project
+     * @param owner
+     *                            The owner of the project
      * @param project
-     *                          The name of the project
+     *                            The name of the project
      * @param phase
-     *                             The name of the phase
+     *                            The name of the phase
      * @return
      *         Phase data
      */
@@ -134,7 +135,8 @@ public class InstanceResource {
             @RequestParam(value = "owner") final String owner,
             @RequestParam(value = "project") final String project,
             @RequestParam(value = "phase") final String phase) {
-        return this.instanceApplicationService.getAnnotationInstance(authenticationToken, owner, project, phase);
+        return this.instanceApplicationService.getAnnotationInstance(authenticationToken, owner,
+                project, phase);
     }
 
     /**
@@ -146,14 +148,14 @@ public class InstanceResource {
      * 
      * @param authenticationToken
      *                            The authentication token of the requesting user
-     *  @param owner
-     *                           The owner of the project
+     * @param owner
+     *                            The owner of the project
      * @param project
-     *                          The name of the project
+     *                            The name of the project
      * @param phase
-     *                             The name of the phase
+     *                            The name of the phase
      * @param additional
-     *                         Additional Data (e.g. WSSIM -> sense)
+     *                            Additional Data (e.g. WSSIM -> sense)
      * @return
      *         Data as CSV
      */
@@ -187,14 +189,14 @@ public class InstanceResource {
      * 
      * @param authenticationToken
      *                            The authentication token of the requesting user
-     *  @param owner
-     *                           The owner of the project
+     * @param owner
+     *                            The owner of the project
      * @param project
-     *                          The name of the project
+     *                            The name of the project
      * @param phase
-     *                             The name of the phase
+     *                            The name of the phase
      * @param additional
-     *                        Additional Data (e.g. WSSIM -> sense)
+     *                            Additional Data (e.g. WSSIM -> sense)
      * @param file
      *                            The instancedata to add
      */
@@ -209,18 +211,53 @@ public class InstanceResource {
         this.instanceApplicationService.addInstances(authenticationToken, owner, project, phase, additional, file);
     }
 
+    /**
+     * Generate instance data for a phase from usages associated with the project.
+     * 
+     * @param authenticationToken
+     *                            The authentication token of the requesting user
+     * @param owner
+     *                            The owner of the project
+     * @param project
+     *                            The name of the project
+     * @param phase
+     *                            The name of the phase
+     * @param labels
+     *                            The labels set for the instances
+     * @param nonLabel
+     *                            Additional Data (e.g. WSSIM -> sense)
+     * @param file
+     *                            The instancedata to add
+     */
+    @PostMapping(value = "/generate")
+    public void generateInstance(
+            @RequestHeader("Authorization") String authenticationToken,
+            @RequestParam(value = "owner") final String owner,
+            @RequestParam(value = "project") final String project,
+            @RequestParam(value = "phase") final String phase,
+            @RequestParam(value = "labels") final String labels,
+            @RequestParam(value = "nonLabel") final String nonLabel,
+            @RequestParam(value = "file", required = false) final MultipartFile file) {
+        // clean up labels
+        List<String> labelsList = Arrays.asList(labels.split(","));
+        labelsList = labelsList.stream().map(String::trim).collect(Collectors.toList());
+
+        this.instanceApplicationService.generateInstances(authenticationToken, owner, project, phase, labelsList,
+                nonLabel,
+                file);
+    }
 
     // Custom Functionality for certain Tasks/Instances
 
     /**
      * Get the WSSIM Tags for a specific lemma
      * 
-     * @param authenticationToken   The authentication token of the requesting user
-     * @param owner                 The owner of the project
-     * @param project               The name of the project
-     * @param phase                 The name of the phase
-     * @param lemma                 The lemma in question
-     * @return                      WSSIM Tags with same lemma for this phase  
+     * @param authenticationToken The authentication token of the requesting user
+     * @param owner               The owner of the project
+     * @param project             The name of the project
+     * @param phase               The name of the phase
+     * @param lemma               The lemma in question
+     * @return WSSIM Tags with same lemma for this phase
      */
     @GetMapping(value = "/wssimtag-lemma")
     public List<WSSIMTagDto> getWssimTagsOfLemma(

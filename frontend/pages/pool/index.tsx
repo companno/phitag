@@ -16,6 +16,7 @@ import CenteredLayout from "../../components/generic/layout/centeredlayout";
 // Layout
 import Layout from "../../components/generic/layout/layout";
 import useAuthenticated from "../../lib/hook/useAuthenticated";
+import HelpButton from "../../components/generic/button/helpbutton";
 
 const Dashboard: NextPage = () => {
 
@@ -45,9 +46,18 @@ const Dashboard: NextPage = () => {
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-center mt-8 mb-2">
-                        <div className="flex font-dm-mono-medium font-bold text-lg lg:text-xl 2xl:text-2xl">
+                    <div className="flex flex-row items-center justify-between mb-2">
+                        <div className="invisible" />
+                        <div className="flex font-dm-mono-medium font-bold text-xl lg:text-2xl 2xl:text-3xl">
                             Annotators
+                        </div>
+                        <div className="">
+                            <HelpButton
+                                title="Help: Annotator Selection"
+                                tooltip="Help: Annotator Selection"
+                                text="The annotator section is where you can browse the annotator pool, which is split into human and computational annotators."
+                                reference="guide/explained-pools"
+                            />
                         </div>
                     </div>
 
@@ -69,9 +79,18 @@ const Dashboard: NextPage = () => {
                     </div>
 
 
-                    <div className="flex items-center justify-center mt-8 mb-2">
-                        <div className="flex font-dm-mono-medium font-bold text-lg lg:text-xl 2xl:text-2xl">
-                            Project
+                    <div className="flex flex-row items-center justify-between mt-8 mb-2">
+                        <div className="invisible" />
+                        <div className="flex font-dm-mono-medium font-bold text-xl lg:text-2xl 2xl:text-3xl">
+                            Projects
+                        </div>
+                        <div className="">
+                            <HelpButton
+                                title="Help: Project Selection"
+                                tooltip="Help: Project Selection"
+                                text="The project section is where you can browse personal and public projects."
+                                reference="guide/explained-pools"
+                            />
                         </div>
                     </div>
 
@@ -89,9 +108,18 @@ const Dashboard: NextPage = () => {
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-center mt-8 mb-2">
-                        <div className="flex font-dm-mono-medium font-bold text-lg lg:text-xl 2xl:text-2xl">
-                            Job
+                    <div className="flex flex-row items-center justify-between mt-8 mb-2">
+                        <div className="invisible" />
+                        <div className="flex font-dm-mono-medium font-bold text-xl lg:text-2xl 2xl:text-3xl">
+                            Jobs
+                        </div>
+                        <div className="">
+                            <HelpButton
+                                title="Help: Jobs Selection"
+                                tooltip="Help: Jobs Selection"
+                                text="The jobs section is where you can browse your personal jobs or public ones."
+                                reference="guide/explained-pools"
+                            />
                         </div>
                     </div>
 

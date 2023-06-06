@@ -20,6 +20,8 @@ import UsePairInstanceDto from "../../model/instance/usepairinstance/dto/UsePair
 import WSSIMInstanceDto from "../../model/instance/wssiminstance/dto/WSSIMInstanceDto";
 import PagedWSSIMInstance from "../../model/instance/wssiminstance/model/PagedWSSIMInstance";
 import PagedWSSIMTag from "../../model/instance/wssimtag/model/PagedWSSIMTag";
+import LexSubInstanceDto from "../../model/instance/lexsubinstance/dto/LexSubInstanceDto";
+import PagedLexSubInstance from "../../model/instance/lexsubinstance/model/PagedLexSubInstance";
 
 /**
  * Returns all instances of a phase
@@ -151,6 +153,37 @@ export function useFetchPagedWSSIMTAG(owner: string, project: string, phase: str
     }
 }
 
+/**
+ * Returns all lexsub instances of a phase as a page.
+ * 
+ * @param owner owner of the project
+ * @param project project name
+ * @param phase phase name in the project
+ * 
+ * @param page page number
+ * @param fetch if data should be fetched
+ */
+export function useFetchPagedLexSubInstance(owner: string, project: string, phase: string, page: number = 0, fetch: boolean = true) {
+    const { get } = useStorage();
+    const token = get('JWT') ?? '';
+
+    const queryPhaseDataFetcher = (url: string) => axios.get<PagedGenericDto<LexSubInstanceDto>>(url, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(res => res.data)
+
+    const { data, error, mutate } = useSWR(fetch ? `${BACKENDROUTES.INSTANCE}/paged?owner=${owner}&project=${project}&phase=${phase}&additional=${false}&page=${page}` : null, queryPhaseDataFetcher)
+
+    return {
+        data: data ? PagedLexSubInstance.fromDto(data) : PagedLexSubInstance.empty(),
+        isLoading: !error && !data,
+        isError: error,
+        mutate: mutate
+    }
+}
+
+
 
 
 /**
@@ -163,7 +196,7 @@ export function useFetchPagedWSSIMTAG(owner: string, project: string, phase: str
  * @param get storage hook
  * @returns a specific instance without revalidation
  */
-export function fetchRandomInstance<G extends IInstance, T extends IInstanceConstructor>(owner: string, project: string, phase: string, constructor: T, get: Function = () => {}) {
+export function fetchRandomInstance<G extends IInstance, T extends IInstanceConstructor>(owner: string, project: string, phase: string, constructor: T, get: Function = () => { }) {
     const token = get('JWT') ?? '';
 
     return axios.get<IInstanceDto>(`${BACKENDROUTES.INSTANCE}/random?owner=${owner}&project=${project}&phase=${phase}`, {
@@ -182,7 +215,7 @@ export function fetchRandomInstance<G extends IInstance, T extends IInstanceCons
  * @param get storage hook
  * @returns a csv/tsv file
  */
-export function exportInstance(owner: string, project: string, phase: string, additional: boolean = false, get: Function = () => {}) {
+export function exportInstance(owner: string, project: string, phase: string, additional: boolean = false, get: Function = () => { }) {
     const token = get('JWT') ?? '';
 
     return axios.get(`${BACKENDROUTES.INSTANCE}/export?owner=${owner}&project=${project}&phase=${phase}&additional=${additional}`, {
@@ -205,7 +238,7 @@ export function exportInstance(owner: string, project: string, phase: string, ad
  * @param get storage hook
  * @returns Promise
  */
-export function addInstance(owner: string, project: string, phase: string, file: File, additional: boolean = false, get: Function = () => {}) {
+export function addInstance(owner: string, project: string, phase: string, file: File, additional: boolean = false, get: Function = () => { }) {
     const token = get('JWT') ?? '';
 
     const formData = new FormData();
@@ -216,6 +249,44 @@ export function addInstance(owner: string, project: string, phase: string, file:
     formData.append('file', file);
 
     return axios.post(`${BACKENDROUTES.INSTANCE}`,
+        formData,
+        {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data'
+            }
+        }
+    ).then(res => res.data);
+}
+
+/**
+ * Generate instance data for a phase from usages associated with the project.
+ * 
+ * @param owner owner of the project
+ * @param project project name
+ * @param phase phase name in the project
+ * 
+ * @param labels labels to be used for the generation
+ * @param nonLabel non-label to be used for the generation
+ * 
+ * @param file additional file to be uploaded, if needed (e.g. for WSSIMTAG)
+ * 
+ * @param get storage hook 
+ */
+export function generateInstance(owner: string, project: string, phase: string, labels: string, nonLabel: string, file: File | null, get: Function = () => { }) {
+    const token = get('JWT') ?? '';
+
+    const formData = new FormData();
+    formData.append('owner', owner);
+    formData.append('project', project);
+    formData.append('phase', phase);
+    formData.append('labels', labels);
+    formData.append('nonLabel', nonLabel);
+    if (file) {
+        formData.append('file', file);
+    }
+
+    return axios.post(`${BACKENDROUTES.INSTANCE}/generate`,
         formData,
         {
             headers: {

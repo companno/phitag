@@ -40,3 +40,7 @@ yarn-error.log*
 
 ### other ###
 yarn.lock
+package-lock.json
+
+# Exceptions
+!/data/guides

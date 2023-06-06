@@ -42,6 +42,12 @@ public class UsageRepositoryBridge implements UsageRepository {
                 ownername);
     }
 
+
+    @Override
+    public List<String> findAllDataIdsByProjectnameAndOwnername(String projectname, String ownername) {
+        return usageRepositoryJpa.findAllDataIdsByProjectnameAndOwnername(projectname, ownername);
+    }
+
     @Override
     public Usage save(Usage usage) {
         return this.usageRepositoryJpa.save(usage);

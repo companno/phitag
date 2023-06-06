@@ -1,5 +1,6 @@
 package de.garrafao.phitag.application.statistics.userstatistic;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.transaction.Transactional;
@@ -53,15 +54,29 @@ public class UserStatisticApplicationService {
      *                 the username of the user
      * @return the user statistic as a {@link UserStatisticDto}
      */
-    public UserStatisticDto getUserStatistic(String username) {
+    public UserStatisticDto getUserStatistic(final String authenticationToken, final String username) {
         // validate user exists, active and visible
         final User user = this.commonService.getUser(username);
-        if (!user.isEnabled() || user.getVisibility().getName().equals(VisibilityEnum.VISIBILITY_PRIVATE.name())) {
+        final User requester = this.commonService.getUserByAuthenticationToken(authenticationToken);
+
+        if (!user.equals(requester) && (!user.isEnabled() || user.getVisibility().getName().equals(VisibilityEnum.VISIBILITY_PRIVATE.name()))) {
             throw new StatisticException("User is not active or visible");
         }
 
-        return UserStatisticDto.from(userStatisticRepository.findByUsername(username)
-                .orElseThrow(() -> new StatisticException("No user statistic found for user")));
+        UserStatistic statistic = userStatisticRepository.findByUsername(username)
+                .orElseThrow(() -> new StatisticException("No user statistic found for user"));
+        UserStatisticDto statisticDto = UserStatisticDto.from(statistic);
+
+        Map<String, Integer> annotationTypeCountMap = new HashMap<String, Integer>();
+        statistic.getAnnotationTypeCountMap().forEach((k, v) -> {
+            if (v > 0) {
+                annotationTypeCountMap.put(this.commonService.getAnnotationType(k).getVisiblename(), v);
+            }
+        });
+        statisticDto.setAnnotationTypeCountMap(annotationTypeCountMap);
+
+        return statisticDto;
+
     }
 
     // Setter
@@ -123,7 +138,7 @@ public class UserStatisticApplicationService {
 
         // update user statistic
         Map<String, Integer> annotationTypeCountMap = userStatistic.getAnnotationTypeCountMap();
-        annotationTypeCountMap.put(phase.getAnnotationType().getVisiblename(),
+        annotationTypeCountMap.put(phase.getAnnotationType().getName(),
                 annotationTypeCountMap.getOrDefault(phase.getAnnotationType().getName(), 0) + 1);
 
         // save user statistic

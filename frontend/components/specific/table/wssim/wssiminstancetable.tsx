@@ -11,8 +11,9 @@ import LoadingComponent from "../../../generic/loadingcomponent";
 import AddWSSIMInstanceToPhaseModal from "../../modal/addwssiminstancetophasemodal";
 import { useState } from "react";
 import PageChange from "../../../generic/table/pagination";
+import GenerateInstancesForPhaseModal from "../../modal/generateinstancesforphasemodal";
 
-const WSSIMInstanceTable: React.FC<{ phase: Phase, modalState: { open: boolean, callback: Function } }> = ({ phase, modalState }) => {
+const WSSIMInstanceTable: React.FC<{ phase: Phase, modalState: { openData: boolean, callbackData: Function, openGenerate: boolean, callbackGenerate: Function } }> = ({ phase, modalState }) => {
 
     const [page, setPage] = useState(0);
     const wssiminstance = useFetchPagedWSSIMInstance(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), page, !!phase);
@@ -102,7 +103,8 @@ const WSSIMInstanceTable: React.FC<{ phase: Phase, modalState: { open: boolean, 
             </div>
             <PageChange page={page} maxPage={wssiminstance.data.getTotalPages()} pageChangeCallback={(p: number) => {setPage(p)}} />
 
-            <AddWSSIMInstanceToPhaseModal isOpen={modalState.open} closeModalCallback={modalState.callback} phase={phase} mutateCallback={wssiminstance.mutate} />
+            <AddWSSIMInstanceToPhaseModal isOpen={modalState.openData} closeModalCallback={modalState.callbackData} phase={phase} mutateCallback={wssiminstance.mutate} />
+            <GenerateInstancesForPhaseModal isOpen={modalState.openGenerate} closeModalCallback={modalState.callbackGenerate} phase={phase} mutateCallback={wssiminstance.mutate} additional={true} additionalFileName="Tag" />
         </div>
     );
 

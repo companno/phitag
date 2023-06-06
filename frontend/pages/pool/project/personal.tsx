@@ -19,6 +19,7 @@ import Layout from '../../../components/generic/layout/layout';
 import ContentLayout from '../../../components/generic/layout/contentlayout';
 import LoadingComponent from '../../../components/generic/loadingcomponent';
 import ProjectCard from '../../../components/generic/card/projectcard';
+import HelpButton from '../../../components/generic/button/helpbutton';
 
 //Custom Modules
 
@@ -98,6 +99,14 @@ const PersonalProjects: NextPage = () => {
                                         <FiList className='basic-svg' />
                                     </button>}
                             </div>
+                            <div className="flex items-center my-4 ml-4">
+                                <HelpButton
+                                    title="Help: Project Owner Pool"
+                                    tooltip="Help: Project Owner Pool"
+                                    text="The project owner pool is a list of all projects, where you are the owner of the project. You can search for projects by name or owner."
+                                    reference="/guide/explained-pools"
+                                />
+                            </div>
                         </div>
                     </div>
 
@@ -148,6 +157,14 @@ const PersonalProjects: NextPage = () => {
                                     <FiList className='basic-svg' />
                                 </button>}
                         </div>
+                        <div className="flex ml-4">
+                                <HelpButton
+                                    title="Help: Project Pool"
+                                    tooltip="Help: Project Pool"
+                                    text="The project annotator pool is a list of all projects where you are an annotator of. You can search for projects by name or owner."
+                                    reference="/guide/explained-pools"
+                                />
+                            </div>
                     </div>
 
                     {
