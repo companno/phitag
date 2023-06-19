@@ -1,5 +1,5 @@
 // React Modules
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 // Next Modules
 import { NextPage } from "next";
@@ -27,12 +27,18 @@ const Dashboard: NextPage = () => {
     const authenticated = useAuthenticated();
     const storage = useStorage();
 
+    const [user, setUser] = useState<string | null>("");
+
     useEffect(() => {
         if (authenticated.isReady && !authenticated.isAuthenticated) {
             toast.info("Session expired, please login again.");
             Router.push("/");
         }
-    }, [authenticated]);
+
+        if (authenticated.isReady && authenticated.isAuthenticated) {
+            setUser(storage.get("USER"));
+        }
+    }, [authenticated, storage]);
 
     // default view, i,e, USECASES_DEFAULT  
     return (
@@ -116,18 +122,25 @@ const Dashboard: NextPage = () => {
 
                         <div className="col-span-1 row-span-1 aspect-square">
                             <DashboardCard
+                                title="Joblisting"
+                                description="Browse joblistings or create new ones"
+                                link="/pool/joblisting" />
+                        </div>
+
+                        <div className="col-span-1 row-span-1 aspect-square">
+                            <DashboardCard
                                 title="Corpus"
                                 description="Browse the corpus and create custom usages for your project"
                                 link="/corpus" />
                         </div>
 
-
                         <div className="col-span-1 row-span-1 aspect-square">
                             <DashboardCard
-                                title="Joblisting"
-                                description="Browse joblistings or create new ones"
-                                link="/pool/joblisting" />
+                                title="Dictionary Overview"
+                                description="Browse your dictionaries and create new ones"
+                                link={user ? `/phi/${user}/dictionary` : "/dashboard"} />
                         </div>
+
                     </div>
 
                     <div className="flex items-center justify-between mt-8 mb-2">

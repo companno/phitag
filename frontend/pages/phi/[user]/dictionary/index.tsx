@@ -118,7 +118,8 @@ const CreateDictionaryModal = ({ uname, closeCallback, mutateCallback }: { uname
 
     const filetypes = [
         new DummySelectable("Custom-XML"),
-        new DummySelectable("Custom-JSON"),
+        new DummySelectable("Wiktionary-XML-DE"),
+        new DummySelectable("Wiktionary-XML-EN"),
     ];
 
     const [dictionary, setDictionary] = useState({

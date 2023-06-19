@@ -9,7 +9,7 @@ const PageChange: React.FC<{
 }) => {
 
         return (
-            <div className="flex flex-row justify-between mt-8">
+            <div className="flex flex-row w-full justify-between mt-8">
                 <div className="flex items-center" onClick={() => {
                     if (page === 0) {
                         pageChangeCallback(maxPage - 1);

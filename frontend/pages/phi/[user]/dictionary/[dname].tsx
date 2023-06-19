@@ -17,6 +17,7 @@ import IconButtonOnClick from "../../../../components/generic/button/iconbuttono
 import { exportDictionary } from "../../../../lib/service/dictionary/DictionaryResource";
 import DummySelectable from "../../../../lib/model/dummy/DummySelectable";
 import DropdownSelect from "../../../../components/generic/dropdown/dropdownselect";
+import PageChange from "../../../../components/generic/table/pagination";
 
 const DictionaryPage = () => {
 
@@ -29,11 +30,12 @@ const DictionaryPage = () => {
 
     const [searchField, setSearchField] = useState({
         headword: "",
+        page: 0,
         addModal: false,
         exportModal: false
     });
 
-    const dictionaries = useFetchDictionaryEntries(dname, uname, searchField.headword, "", 0, router.isReady);
+    const dictionaries = useFetchDictionaryEntries(dname, uname, searchField.headword, "", searchField.page, router.isReady);
 
     useEffect(() => {
         if (authenticated.isReady && !authenticated.isAuthenticated) {
@@ -49,7 +51,7 @@ const DictionaryPage = () => {
                 <title>PhiTag: Dictionary</title>
             </Head>
 
-            <div className="flex flex-col m-auto w-full xl:w-4/5 xl:py-16 justify-center items-center">
+            <div className="flex flex-col m-auto w-full xl:w-4/5 xl:py-16 px-16 justify-center items-center shadow-md my-8">
 
                 <div className="flex flex-row w-full justify-center items-center mb-4">
                     <div className="flex font-dm-mono-medium font-bold text-2xl pr-4">
@@ -66,7 +68,8 @@ const DictionaryPage = () => {
                                 value={searchField.headword}
                                 onChange={(e) => setSearchField({
                                     ...searchField,
-                                    headword: e.target.value
+                                    headword: e.target.value,
+                                    page: 0
                                 })} />
                             <FiSearch className='basic-svg' />
                         </div>
@@ -76,7 +79,7 @@ const DictionaryPage = () => {
                                 title="Help: Dictionary"
                                 tooltip="Help: Dictionary"
                                 text="This is the dictionary page. Here you can view and search all the entries in the dictionary. You can also create new entries by clicking the plus button in the bottom right corner."
-                                reference="/guides/help-dictionary"
+                                reference="/guide/how-to-dictionary"
                             />
                         </div>
 
@@ -92,7 +95,12 @@ const DictionaryPage = () => {
                     </div>
                 </div>
 
-                <DictionaryView entries={dictionaries.data?.content || []} mutateCallback={() => dictionaries.mutate()} />
+                <DictionaryView entries={dictionaries.data?.content || []} mutateCallback={() => dictionaries.mutate()} wordcallback={(word) => setSearchField({ ...searchField, headword: word })} />
+
+                <div className="flex flex-row w-full justify-center items-center">
+                    <PageChange page={dictionaries.data?.page || searchField.page} maxPage={dictionaries.data?.totalPages || 0} pageChangeCallback={(page) => setSearchField({ ...searchField, page: page })} />
+                </div>
+
             </div>
 
 
@@ -116,7 +124,7 @@ const DictionaryPage = () => {
 
 export default DictionaryPage;
 
-const DictionaryView = ({ entries, mutateCallback }: { entries: DictionaryEntry[], mutateCallback: () => void }) => {
+const DictionaryView = ({ entries, wordcallback, mutateCallback }: { entries: DictionaryEntry[], wordcallback: (word: string) => void, mutateCallback: () => void }) => {
 
     const [selectedEntry, setSelectedEntry] = useState<string>("");
 
@@ -132,9 +140,7 @@ const DictionaryView = ({ entries, mutateCallback }: { entries: DictionaryEntry[
 
             {/* Full entry view */}
             <div className="flex flex-col w-full">
-                {/* {selectedEntry && ( */}
-                <DictionaryEntryFullView entry={entries.find((entry) => entry.id.id === selectedEntry) ?? null} mutateCallback={mutateCallback} />
-                {/* )} */}
+                <DictionaryEntryFullView entry={entries.find((entry) => entry.id.id === selectedEntry) ?? null} mutateCallback={mutateCallback} wordcallback={wordcallback} />
             </div>
 
         </div>
@@ -164,7 +170,7 @@ const DictionaryEntriesListView = ({ entries, selectedEntry, onClick }: { entrie
 
 }
 
-const DictionaryEntryFullView = ({ entry, mutateCallback }: { entry: DictionaryEntry | null, mutateCallback: () => void }) => {
+const DictionaryEntryFullView = ({ entry, wordcallback, mutateCallback }: { entry: DictionaryEntry | null, wordcallback: (word: string) => void, mutateCallback: () => void }) => {
 
     const [options, setOptions] = useState<boolean>(false);
 
@@ -182,7 +188,7 @@ const DictionaryEntryFullView = ({ entry, mutateCallback }: { entry: DictionaryE
     return (
         <div key={entry.id.id} className="flex flex-col h-full">
             <DictionaryEntryHeaderView entry={entry} openOptionsCallback={() => setOptions(true)} mutateCallback={mutateCallback} />
-            <DictionaryEntryBodyView entry={entry} newSense={options} closeNewSenseCallback={() => setOptions(false)} mutateCallback={mutateCallback} />
+            <DictionaryEntryBodyView entry={entry} newSense={options} closeNewSenseCallback={() => setOptions(false)} mutateCallback={mutateCallback} wordcallback={wordcallback} />
         </div>
     )
 }
@@ -305,14 +311,14 @@ const DictionaryEntryHeaderView = ({ entry, openOptionsCallback, mutateCallback 
     )
 }
 
-const DictionaryEntryBodyView = ({ entry, newSense, closeNewSenseCallback, mutateCallback }: { entry: DictionaryEntry, newSense: boolean, closeNewSenseCallback: () => void, mutateCallback: () => void }) => {
+const DictionaryEntryBodyView = ({ entry, wordcallback, newSense, closeNewSenseCallback, mutateCallback }: { entry: DictionaryEntry, wordcallback: (word: string) => void, newSense: boolean, closeNewSenseCallback: () => void, mutateCallback: () => void }) => {
 
     return (
         // Currently, the body is just a list of all senses in the entry.
 
         <div className="flex flex-col mt-4 ml-8 space-y-4">
             {entry.senses.map((sense, i) => (
-                <DictionaryEntrySenseView key={sense.id.id} sense={sense} mutateCallback={mutateCallback} />
+                <DictionaryEntrySenseView key={sense.id.id} sense={sense} mutateCallback={mutateCallback} wordcallback={wordcallback} />
             ))}
 
             <DictionaryEntrySenseViewNew entry={entry} open={newSense} closeCallback={closeNewSenseCallback} mutateCallback={mutateCallback} />
@@ -323,7 +329,7 @@ const DictionaryEntryBodyView = ({ entry, newSense, closeNewSenseCallback, mutat
 
 }
 
-const DictionaryEntrySenseView = ({ sense, mutateCallback }: { sense: DictionaryEntrySense, mutateCallback: () => void }) => {
+const DictionaryEntrySenseView = ({ sense, wordcallback, mutateCallback }: { sense: DictionaryEntrySense, wordcallback: (word: string) => void, mutateCallback: () => void }) => {
 
     const { get } = useStorage();
 
@@ -406,9 +412,8 @@ const DictionaryEntrySenseView = ({ sense, mutateCallback }: { sense: Dictionary
                             <span className="font-dm-mono-regular font-bold text-md mr-2 text-base16-gray-500 self-center">
                                 {sense.order}.
                             </span>
-                            <span className=" font-dm-mono-medium font-black text-xl">
-                                {sense.definition}
-                            </span>
+                            <DictionarySelfReference text={sense.definition} callback={wordcallback} />
+
                         </div>
 
                         <div className="flex flex-row space-x-4">
@@ -448,6 +453,33 @@ const DictionaryEntrySenseView = ({ sense, mutateCallback }: { sense: Dictionary
         </div>
     );
 
+}
+
+const DictionarySelfReference = ({ text, callback }: { text: string, callback: (word: string) => void }) => {
+    // Generates a text, where words wrapped in [[]] are replaced with the word underlined and clickable to the callback
+    // Callback is called with the word as a string
+    const regex = /\[\[(.*?)\]\]/g;
+    const matches = text.matchAll(regex);
+    let lastIndex = 0;
+    let result = [];
+
+    // @ts-ignore
+    for (const match of matches) {
+        const word = match[1];
+        const index = match.index;
+
+        result.push(text.substring(lastIndex, index));
+        result.push(<span key={word + index} className="underline cursor-pointer" onClick={() => callback(word)}>{word}</span>);
+        lastIndex = index + word.length + 4;
+    }
+
+    result.push(text.substring(lastIndex));
+
+    return (
+        <span className="font-dm-mono-medium font-black text-xl" id="definition">
+            {result}
+        </span>
+    );
 }
 
 const DictionaryEntrySenseViewNew = ({ entry, open, closeCallback, mutateCallback }: { entry: DictionaryEntry, open: boolean, closeCallback: () => void, mutateCallback: () => void }) => {
@@ -808,7 +840,7 @@ const CreateDictionaryEntryModal = ({ closeCallback, mutateCallback }: { closeCa
                         </div>
                         <div className="flex flex-row divide-x-8">
                             <button type="button" className="block w-full mt-8 py-2 bg-base16-gray-900 text-base16-gray-100 " onClick={() => onCancel()}>Cancel</button>
-                            <button type="button" className="block w-full mt-8 py-2 bg-base16-gray-900 text-base16-gray-100 " onClick={onSubmit}>Confirm</button>
+                            <button type="button" className="block w-full mt-8 py-2 bg-base16-gray-900 text-base16-gray-100 " onClick={onSubmit}>Create</button>
                         </div>
                     </div>
                 </div>
@@ -825,7 +857,8 @@ const ExportDictionaryModal = ({ closeCallback }: { closeCallback: () => void })
 
     const filetypes = [
         new DummySelectable("Custom-XML"),
-        new DummySelectable("Custom-JSON"),
+        new DummySelectable("Wiktionary-XML-DE"),
+        new DummySelectable("Wiktionary-XML-EN"),
     ];
 
     const [selected, setSelected] = useState(filetypes[0]);
@@ -880,7 +913,7 @@ const ExportDictionaryModal = ({ closeCallback }: { closeCallback: () => void })
                         </div>
                         <div className="flex flex-row divide-x-8">
                             <button type="button" className="block w-full mt-8 py-2 bg-base16-gray-900 text-base16-gray-100 " onClick={() => onCancel()}>Cancel</button>
-                            <button type="button" className="block w-full mt-8 py-2 bg-base16-gray-900 text-base16-gray-100 " onClick={onSubmit}>Confirm</button>
+                            <button type="button" className="block w-full mt-8 py-2 bg-base16-gray-900 text-base16-gray-100 " onClick={onSubmit}>Export</button>
                         </div>
                     </div>
                 </div>
