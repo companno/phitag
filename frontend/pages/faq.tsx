@@ -5,12 +5,13 @@ import Head from "next/head";
 import ExpandableCard from "../components/generic/card/expandablecard";
 import Layout from "../components/generic/layout/layout";
 import ContentLayout from "../components/generic/layout/contentlayout";
+import BasicLayout from "../components/generic/layout/basiclayout";
 
 
 export function FAQ() {
 
     return (
-        <Layout>
+        <BasicLayout>
 
             <Head>
                 <title>PhiTag: FAQ</title>
@@ -61,7 +62,7 @@ export function FAQ() {
                     </div>
                 </div>
             </ContentLayout>
-        </Layout>
+        </BasicLayout>
     )
 
 }
