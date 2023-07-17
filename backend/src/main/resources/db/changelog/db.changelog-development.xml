@@ -32,6 +32,6 @@
     <includeAll path="seeds/static-seeds/**" relativeToChangelogFile="true" />
     <includeAll path="seeds/**" relativeToChangelogFile="true" />
 
-    <!-- <includeAll path="computational-annotator-seeds/**" relativeToChangelogFile="true" /> -->
-    <!-- <includeAll path="corpus-seeds/**" relativeToChangelogFile="true" /> -->
+    <includeAll path="computational-annotator-seeds/**" relativeToChangelogFile="true" />
+    <includeAll path="corpus-seeds/**" relativeToChangelogFile="true" />
 </databaseChangeLog>

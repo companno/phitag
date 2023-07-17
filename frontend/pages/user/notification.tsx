@@ -129,7 +129,7 @@ const NotificationsPage = () => {
                                     title="Help: Notifications"
                                     tooltip="Help: Notifications"
                                     text="Notifications are messages that are sent to you by the system. You can mark them as read or unread. You can also select multiple notifications and mark them as read at once."
-                                    reference="/guide/explained-pools"
+                                    reference=""
                                     linkage={false}
                                 />
                             </div>

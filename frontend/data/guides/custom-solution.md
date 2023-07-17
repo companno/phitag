@@ -11,7 +11,7 @@ One size does not fit all. We understand that every annotation project is differ
 
 ## Annotator Selection
 
-The first step in creating a successful annotation project is to select annotators, which fit your project. As a leading research university in machine learning in Europe, we undestande the importance of annotation quality. Therefore, we offer a wide range of annotator selection options and have built-in quality control mechanisms. 
+The first step in creating a successful annotation project is to select annotators, which fit your project. As a leading research university in machine learning in Europe, we understand the importance of annotation quality. Therefore, we offer a wide range of annotator selection options and have built-in quality control mechanisms. 
 
 ### Human Annotators
 
@@ -33,4 +33,4 @@ Note, that the annotation tasks are not limited to their original use case, as t
 
 ## Use Cases
 
-We want to streamline the platform to each users specific use case, such that the user is able to achive their goals as efficiently as possible. Hence, we are currently working on a use case selection, which will allow you to select a use case for your profile and change the default behaviour, look and feel of the platform to your use case. Right now, we are working on our first use case, which will aid the lexicographer. If you have a specific use case in mind, please contact us.
+We want to streamline the platform to each users specific use case, such that the user is able to achieve their goals as efficiently as possible. Hence, we are currently working on a use case selection, which will allow you to select a use case for your profile and change the default behavior, look and feel of the platform to your use case. Right now, we are working on our first use case, which will aid the lexicographer. If you have a specific use case in mind, please contact us.

@@ -106,7 +106,7 @@ const PhaseCarousel: React.FC<{ project: Project }> = ({ project }) => {
                         Each phase has its own annotation types, sampling strategy and annotation requirements.
                         You can add a phase by clicking on the plus button.
                         You can also add tutorial phases, which are used to teach annotators how to annotate a specific annotation type and validate the annotators ability to annotate."
-                        reference="/guide/how-to-annotation-project"
+                        reference="/guide/explained-phase"
 
                     />
                 </div>

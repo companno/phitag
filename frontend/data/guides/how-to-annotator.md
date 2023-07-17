@@ -12,7 +12,11 @@ This guide will show you how to use the web app as an annotator. If you are look
 ## Finding a Project to Work On
 
 The first step is to find a project to work on. You can find projects in the [Job Pool](/pool/joblisting). The job pool contains all projects that are looking for annotators. You can currently filter projects by their name. 
-A job listing can either be open to be joined by anyone or have a waiting list. 
+A job listing can either be open to be joined by anyone or have a waiting list.
+
+| ![](/gif/guide/project-join.gif) |
+| :------------------------------: |
+|           Join Project           |
 
 ## After You Joined a Project
 
@@ -28,9 +32,17 @@ Now, you can select a phase to work on. Mind, that each phase has a different ta
 
 After selecting a suitable phase, you can start working on the phase. Do this by clicking the small pencil icon on the phase card. This will redirect you to the annotation interface. Here you can start working on the annotation task.
 
+| ![](/gif/guide/annotate-usepair.gif) | ![](/gif/guide/annotate-wssim.gif) | ![](/gif/guide/annotate-lexsub.gif) |
+| :----------------------------------: | :--------------------------------: | :---------------------------------: |
+|               Use-Pair               |               WSSim                |               LexSub                |
+
 ## Judgement
 
 After you finished annotating, you can see the results of your annotation under the judgement tab of the phase. If you wish to change your annotation, you can do so by clicking on the "Edit" button.
+
+| ![](/gif/guide/edit-judgement.gif) | ![](/gif/guide/download-judgement.gif) |
+| :--------------------------------: | :------------------------------------: |
+|           Edit Judgement           |           Download Judgement           |
 
 ## Conclusion
 

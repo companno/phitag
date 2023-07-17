@@ -101,3 +101,7 @@ Finally, the non_label symbol '-' is used when the annotator is unable to make a
 [4-Identical, 3-Closely Related, 2-Distantly Related, 1-Unrelated]
 
 Example E: Judgment '-' (non_label)
+
+## Visual Example
+
+![Annotation Example](/gif/guide/annotate-usepair.gif)

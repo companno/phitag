@@ -46,3 +46,7 @@ For example:
 |Substitute: **Shape**                   |
 
 Sometimes if you really cannot think of a substitute, you may use the non-label '-' response.
+
+## Visual Example
+
+![Annotation Example](/gif/guide/annotate-lexsub.gif)

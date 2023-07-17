@@ -66,8 +66,8 @@ const CorpusTable: React.FC<{}> = ({ }) => {
                     title="Help: Corpus"
                     tooltip="Help: Corpus"
                     text="The corpus is a collection of texts. You can search for a specific lemma and filter the results by PoS and year. You can also search for a specific token. The corpus is not editable. You can add the results to your project as usages."
-                    reference="none"
-                    linkage={false}
+                    reference="/guide/how-to-corpus"
+                    linkage={true}
                 />
             </div>
 

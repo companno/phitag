@@ -78,3 +78,12 @@ The following example shows a sense annotated with a binary scale, also called W
 |Rating: **0**|
 
 
+## Visual Example
+
+### WSSIM 
+
+![Annotation Example](/gif/guide/annotate-wssim.gif)
+
+### WSBest
+
+![Annotation Example](/gif/guide/annotate-wsbest.gif)

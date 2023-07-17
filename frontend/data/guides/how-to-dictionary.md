@@ -7,7 +7,7 @@ description: "Learn how to use the Phitag's dictionary"
 
 # How to: Dictionary
 
-PhiTag allows users to create their own dictionaries, with an intuitive interface. Dictionaries will become more usefull, as they get integrated into the annotation process. Currently, dictionaries can be used to view, edit and export the data they contain in a variety of formats.
+PhiTag allows users to create their own dictionaries, with an intuitive interface. Dictionaries will become more useful, as they get integrated into the annotation process. Currently, dictionaries can be used to view, edit and export the data they contain in a variety of formats.
 
 ## Creating a dictionary
 
@@ -19,6 +19,10 @@ You can also create a dictionary by importing a file, which can be done by selec
 - [Wiktionary XML (EN)](/guides/explained-dictionary-formats)
 
 If you want to import a dictionary in a different format, please let us know. If you can also provide a schema for the format (e.g. an XSD file), this will speed up the process of adding support for the format.
+
+| ![Create Dictionary](/gif/guide/dictionary-create.gif) |
+| :----------------------------------------------------: |
+|                   Create Dictionary                    |
 
 ## Viewing a dictionary
 
@@ -50,9 +54,13 @@ The headword of the entry is shown at the top of the entry view. The headword is
 
 To edit an entry in a dictionary, hover over the entry in the entry list and click on the edit button that appears on the right side of the entry. This will change the entry view into edit mode, which allows you to edit the selected data. By pressing on the *checkmark* button to the right of the edited data, you can save the changes you have made. By pressing on the *cross* button to the right of the edited data, you can discard the changes you have made. 
 
-## Deleting a dictionary entry, sense or example
+### Deleting a dictionary entry, sense or example
 
 If you want to delete certain data from an entry, you can do so by hovering over the data you want to delete and clicking on the delete button that appears on the right side of the data. This will delete the data from the entry. If you want to delete an entire entry, you can do so by hovering over the headword of the entry and clicking on the delete button that appears on the right side of the entry. This will delete the whole entry from the dictionary.
+
+| ![Edit Dictionary](/gif/guide/dictionary-edit.gif) |
+| :------------------------------------------------: |
+|                  Edit Dictionary                   |
 
 ## Adding a dictionary entry, sense or example
 
@@ -62,8 +70,22 @@ To add a new sense to an entry, you can click the *plus* button, which appears w
 
 To add a new example to a sense, you can click the *plus* button, which appears when you hover over the sense. This will add a new example to the sense, which you can now edit and add data to.
 
+| ![Add Dictionary](/gif/guide/dictionary-new-entry.gif) |
+| :----------------------------------------------------: |
+|                  Add Dictionary Entry                  |
+
 ## Exporting a dictionary
 
 If you want to export a dictionary, you can do so by clicking on the export button in the search bar. This will open a modal, which allows you to select the format in which you want to export the dictionary, which are the same formats as the ones supported for importing dictionaries. After you have selected the format, click on the "Export" button to export the dictionary. This will download a file containing the dictionary in the selected format.
 
+| ![Export Dictionary](/gif/guide/dictionary-export.gif) |
+| :----------------------------------------------------: |
+|                Export Dictionary Entry                 |
 
+
+
+## Introduction by Example
+
+<video width="100%" controls>
+  <source src="/video/dictionary-example.mp4" type="video/mp4">
+</video>
