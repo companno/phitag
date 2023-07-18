@@ -142,7 +142,7 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
                                     <div className="py-2 px-3 border-b-2 mt-2">
                                         <DropdownSelect
                                             icon={<FiEdit2 className="basic-svg" />}
-                                            items={annotationTypes.annotationTypes}
+                                            items={annotationTypes.annotationTypes.sort((a, b) => a.getVisiblename().localeCompare(b.getVisiblename()))}
                                             selected={modalState.annotationType ? [modalState.annotationType] : []}
                                             onSelectFunction={(annotationType: AnnotationType) => setModalState({
                                                 ...modalState,
@@ -159,7 +159,7 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
                                     <div className="py-2 px-3 border-b-2 mt-2">
                                         <DropdownSelect
                                             icon={<FiSliders className="basic-svg" />}
-                                            items={sampling.sampling}
+                                            items={sampling.sampling.sort((a, b) => a.getVisiblename().localeCompare(b.getVisiblename()))}
                                             selected={modalState.sampling ? [modalState.sampling] : []}
                                             onSelectFunction={(sampling: Sampling) => setModalState({
                                                 ...modalState,

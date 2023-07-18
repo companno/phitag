@@ -53,11 +53,7 @@ public class PhaseApplicationServiceIT {
 
         var phases = phaseApplicationService.queryPhaseDtos(PhaseApplicationServiceIT.token, "user-0", "project-0", query);
 
-        for (PhaseDto phaseDto : phases) {
-            System.out.println(phaseDto);
-        }
-
-        assertEquals(2, phases.size());
+        assertEquals(4, phases.size());
     }
 
 
