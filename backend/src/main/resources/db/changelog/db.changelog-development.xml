@@ -28,6 +28,9 @@
     <includeAll path="tables/notification/**" relativeToChangelogFile="true" />
     <includeAll path="tables/report/**" relativeToChangelogFile="true" />
 
+    <!-- Changelogs -->
+    <includeAll path="tables/changelogs/**" relativeToChangelogFile="true" />
+
     <!-- Seeds -->
     <includeAll path="seeds/static-seeds/**" relativeToChangelogFile="true" />
     <includeAll path="seeds/**" relativeToChangelogFile="true" />

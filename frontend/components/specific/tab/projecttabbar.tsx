@@ -5,6 +5,13 @@ import React, { FC } from "react";
 import Link from 'next/link'
 import { useRouter } from "next/router";
 import HelpButton from "../../generic/button/helpbutton";
+import { useFetchSelfEntitlement } from "../../../lib/service/annotator/AnnotatorResource";
+import { FiTrash2 } from "react-icons/fi";
+import IconButtonOnClick from "../../generic/button/iconbuttononclick";
+import ENTITLEMENTS from "../../../lib/model/entitlement/Entitlements";
+import { deleteProject } from "../../../lib/service/project/ProjectResource";
+import useStorage from "../../../lib/hook/useStorage";
+import { toast } from "react-toastify";
 
 interface IPropsTab {
     href: string;
@@ -14,6 +21,7 @@ interface IPropsTab {
 
 const ProjectTabBar: React.FC<{}> = () => {
 
+    const storage = useStorage();
     const router = useRouter();
     const path = router.pathname;
 
@@ -28,6 +36,18 @@ const ProjectTabBar: React.FC<{}> = () => {
 
     const urlprefix = `/phi/${username}/${projectname}`;
 
+    const entitlement = useFetchSelfEntitlement(username, projectname, router.isReady);
+
+    const deleteProjectFn = () => {
+        deleteProject(projectname, storage.get)
+        .then(() => {
+            toast.success("Project deleted.");
+            router.push(`/phi/${username}`);
+        }).catch((err) => {
+            toast.error("An error occurred while deleting the project.");
+        });
+    }
+
     return (
         <div className="w-full flex flex-col 2xl:flex-row justify-between">
 
@@ -39,7 +59,15 @@ const ProjectTabBar: React.FC<{}> = () => {
                 <Tab href={`${urlprefix}/statistic`} title="Statistic" isSelected={isSelectedStatistic} />
             </div>
 
-            <div className="my-2 mx-4 self-end 2xl:self-center">
+            <div className="flex flex-row my-2 mx-4 self-end 2xl:self-center space-x-4">
+
+                {entitlement.entitlement === ENTITLEMENTS.ADMIN &&
+                    <IconButtonOnClick
+                        tooltip="Delete Project"
+                        icon={<FiTrash2 className="basic-svg" />}
+                        onClick={deleteProjectFn}
+                    />
+                }
 
                 <HelpButton
                     title="Help: Projects"
@@ -55,6 +83,7 @@ const ProjectTabBar: React.FC<{}> = () => {
                     reference="/guide/explained-project"
 
                 />
+
             </div>
         </div>
 

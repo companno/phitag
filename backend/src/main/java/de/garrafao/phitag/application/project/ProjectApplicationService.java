@@ -199,6 +199,22 @@ public class ProjectApplicationService {
         this.annotatorStatisticApplicationService.initializeAnnotatorStatistic(annotator);
     }
 
+    /**
+     * Delete a project.
+     * 
+     * @param authenticationToken
+     * @param command
+     */
+    @Transactional
+    public void delete(final String authenticationToken, final String projectName) {
+        User owner = this.commonService.getUserByAuthenticationToken(authenticationToken);
+        Project project = this.commonService.getProject(owner.getUsername(), projectName);
+
+        this.validationService.projectOwnerAccess(owner, project);
+
+        this.projectRepository.delete(project);
+    }
+
     // Validators
 
     private void validateCreateCommand(final String authenticationToken, final CreateProjectCommand command) {

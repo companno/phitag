@@ -17,4 +17,6 @@ public interface ProjectRepository {
     Optional<Project> findByIdNameAndIdOwnername(String name, String ownername);
 
     Project save(Project project);
+
+    void delete(Project project);
 }

@@ -113,10 +113,6 @@ public class GuidelineApplicationService {
         validationService.projectAdminAccess(requester, projectEntity);
         validateUniqueGuideline(owner, project, file.getOriginalFilename());
 
-        if (file.getContentType() == null || !file.getContentType().equals("text/markdown")) {
-            throw new GuidelineParseException("The file is not a markdown file.");
-        }
-
         final String content;
 
         try {
