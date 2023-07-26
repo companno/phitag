@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import de.garrafao.phitag.application.common.CommonMathService;
 import de.garrafao.phitag.application.judgement.lexsubjudgement.data.AddLexSubJudgementCommand;
 import de.garrafao.phitag.application.judgement.lexsubjudgement.data.DeleteLexSubJudgementCommand;
 import de.garrafao.phitag.application.judgement.lexsubjudgement.data.EditLexSubJudgementCommand;
@@ -40,6 +42,9 @@ import de.garrafao.phitag.domain.judgement.lexsubjudgement.error.LexSubJudgement
 import de.garrafao.phitag.domain.judgement.lexsubjudgement.query.LexSubJudgementQueryBuilder;
 import de.garrafao.phitag.domain.phase.Phase;
 import de.garrafao.phitag.domain.phase.error.TutorialException;
+import de.garrafao.phitag.domain.statistic.statisticannotationmeasure.StatisticAnnotationMeasureEnum;
+import de.garrafao.phitag.domain.statistic.tutorialannotationmeasurehistory.TutorialAnnotationMeasureHistory;
+import de.garrafao.phitag.domain.statistic.tutorialannotationmeasurehistory.TutorialAnnotationMeasureHistoryRepository;
 
 @Service
 public class LexSubJudgementApplicationService {
@@ -47,6 +52,9 @@ public class LexSubJudgementApplicationService {
     private final LexSubJudgementRepository lexSubJudgementRepository;
 
     private final LexSubInstanceRepository lexSubInstanceRepository;
+
+    private final TutorialAnnotationMeasureHistoryRepository tutorialAnnotationMeasureHistoryRepository;
+
 
     // Statistics
 
@@ -56,19 +64,31 @@ public class LexSubJudgementApplicationService {
 
     private final PhaseStatisticApplicationService phaseStatisticApplicationService;
 
+    // Math
+
+    private final CommonMathService commonMathService;
+
     @Autowired
     public LexSubJudgementApplicationService(
             final LexSubJudgementRepository lexSubJudgementRepository,
             final LexSubInstanceRepository lexSubInstanceRepository,
+            final TutorialAnnotationMeasureHistoryRepository tutorialAnnotationMeasureHistoryRepository,
 
             final UserStatisticApplicationService userStatisticApplicationService,
             final AnnotatorStatisticApplicationService annotatorStatisticApplicationService,
-            final PhaseStatisticApplicationService phaseStatisticApplicationService) {
+            final PhaseStatisticApplicationService phaseStatisticApplicationService,
+            
+            final CommonMathService commonMathService
+            ) {
         this.lexSubJudgementRepository = lexSubJudgementRepository;
         this.lexSubInstanceRepository = lexSubInstanceRepository;
+        this.tutorialAnnotationMeasureHistoryRepository = tutorialAnnotationMeasureHistoryRepository;
+
         this.userStatisticApplicationService = userStatisticApplicationService;
         this.annotatorStatisticApplicationService = annotatorStatisticApplicationService;
         this.phaseStatisticApplicationService = phaseStatisticApplicationService;
+
+        this.commonMathService = commonMathService;
     }
 
     // Getter
@@ -371,23 +391,33 @@ public class LexSubJudgementApplicationService {
                     "Tutorial not completed. Please check your judgements. Not all instances were judged");
         }
 
-        commands.forEach(command -> {
-            final LexSubJudgement gold = golds.stream()
-                    .filter(j -> j.getId().getInstanceid().getInstanceid().equals(command.getInstance()))
-                    .findFirst()
-                    .orElseThrow(() -> new TutorialException(
-                            "Tutorial not completed. Please check your judgements. Not all instances were judged"));
+        // Create two lists of the labels of the gold and the annotator
+        List<String> goldLabels = golds.stream().map(LexSubJudgement::getLabel).toList();
+        List<String> annotatorLabels = commands.stream().map(AddLexSubJudgementCommand::getLabel).toList();
 
-            if (!gold.getLabel().equals(command.getLabel())) {
-                throw new TutorialException("Tutorial not completed. Judgements are incorrect");
-            }
-        });
+        List<List<String>> annotatorLabelList = Arrays.asList(goldLabels, annotatorLabels);
+        List<String> categories = golds.get(0).getInstance().getLabelSet();
+
+        // Calculate the annotator agreement
+        double agreement = this.commonMathService.calculateAnnotatorAgreement(categories, StatisticAnnotationMeasureEnum.fromId(phase.getStatisticAnnotationMeasure().getId()), annotatorLabelList);
 
         // Finally, mark the tutorial phase as completed for the annotator
         // As the object annotator is managed by the persistence context, we do not need
         // to
         // call the annotator repository and can simply update the object, HOPEFULLY?!?
-        annotator.addCompletedTutorial(phase);
+        if (agreement >= phase.getStatisticAnnotationMeasureThreshold()) {
+            annotator.addCompletedTutorial(phase);
+        } 
+
+        tutorialAnnotationMeasureHistoryRepository.save(
+            new TutorialAnnotationMeasureHistory(
+                phase,
+                annotator,
+                agreement,
+                agreement >= phase.getStatisticAnnotationMeasureThreshold()
+            )
+        );
+        
     }
 
     // Parser

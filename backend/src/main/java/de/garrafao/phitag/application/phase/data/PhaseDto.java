@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.garrafao.phitag.application.annotationtype.data.AnnotationTypeDto;
 import de.garrafao.phitag.application.sampling.data.SamplingDto;
+import de.garrafao.phitag.application.statistics.statisticannotationmeasure.data.StatisticAnnotationMeasureDto;
 import de.garrafao.phitag.domain.helper.Pair;
 import de.garrafao.phitag.domain.phase.Phase;
 import lombok.Getter;
@@ -18,6 +19,9 @@ public class PhaseDto {
     private final String displayname;
 
     private final Boolean tutorial;
+    private final StatisticAnnotationMeasureDto annotationAgreement;
+    private final Double threshold;
+
     private final AnnotationTypeDto annotationType;
     private final SamplingDto sampling;
 
@@ -31,6 +35,8 @@ public class PhaseDto {
             final PhaseIdDto id,
             final String displayname,
             final Boolean tutorial,
+            final StatisticAnnotationMeasureDto annotationAgreement,
+            final Double threshold,
             final AnnotationTypeDto annotationType,
             final SamplingDto sampling,
             final String description,
@@ -41,6 +47,9 @@ public class PhaseDto {
         this.displayname = displayname;
 
         this.tutorial = tutorial;
+        this.annotationAgreement = annotationAgreement;
+        this.threshold = threshold;
+
         this.annotationType = annotationType;
         this.sampling = sampling;
 
@@ -56,6 +65,8 @@ public class PhaseDto {
                 PhaseIdDto.from(phase.getId()),
                 phase.getDisplayname(),
                 phase.isTutorial(),
+                phase.getStatisticAnnotationMeasure() != null ? StatisticAnnotationMeasureDto.from(phase.getStatisticAnnotationMeasure()) : null,
+                phase.getStatisticAnnotationMeasureThreshold(),
                 AnnotationTypeDto.from(phase.getAnnotationType()),
                 SamplingDto.from(phase.getSampling()),
                 phase.getDescription(),
@@ -68,6 +79,8 @@ public class PhaseDto {
                 PhaseIdDto.from(phase.getId()),
                 phase.getDisplayname(),
                 phase.isTutorial(),
+                phase.getStatisticAnnotationMeasure() != null ? StatisticAnnotationMeasureDto.from(phase.getStatisticAnnotationMeasure()) : null,
+                phase.getStatisticAnnotationMeasureThreshold(),
                 AnnotationTypeDto.from(phase.getAnnotationType()),
                 SamplingDto.from(phase.getSampling()),
                 phase.getDescription(),

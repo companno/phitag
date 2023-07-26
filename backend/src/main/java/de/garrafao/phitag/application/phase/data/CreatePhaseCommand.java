@@ -15,23 +15,39 @@ public class CreatePhaseCommand {
     private final String sampling;
 
     private final boolean tutorial;
+    private final String annotationAgreement;
+    private final Double threshold;
+
     private final String description;
-    
-    public CreatePhaseCommand(final String name, final String owner, final String project, final String annotationType, final String sampling, final boolean tutorial, final String description) {
+
+    public CreatePhaseCommand(
+            final String name, final String owner, final String project,
+            final String annotationType, final String sampling,
+            final boolean tutorial, final String annotationAgreement, final Double threshold,
+            final String description) {
         Validate.notBlank(name, "name must not be blank");
         Validate.notBlank(owner, "owner must not be blank");
         Validate.notBlank(project, "project must not be blank");
         Validate.notBlank(annotationType, "annotationType must not be blank");
         
+        if (tutorial) {
+            Validate.notBlank(annotationAgreement, "annotationAgreement must not be blank");
+            this.annotationAgreement = annotationAgreement;
+            this.threshold = threshold;
+        } else {
+            this.annotationAgreement = null;
+            this.threshold = null;
+        }
 
         this.name = name;
         this.owner = owner;
         this.project = project;
-        
+
         this.annotationType = annotationType;
         this.sampling = sampling;
 
         this.tutorial = tutorial;
+
         this.description = description;
     }
 }
