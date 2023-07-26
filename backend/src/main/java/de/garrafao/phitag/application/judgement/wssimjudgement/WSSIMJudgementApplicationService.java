@@ -424,6 +424,13 @@ public class WSSIMJudgementApplicationService {
         List<List<String>> annotatorLabelList = Arrays.asList(goldLabels, annotatorLabels);
         List<String> categories = golds.get(0).getInstance().getLabelSet();
 
+        // Check if the tutorial phase has a statistic annotation measure 
+        if (phase.getStatisticAnnotationMeasure() == null || phase.getStatisticAnnotationMeasureThreshold() == null
+                || StatisticAnnotationMeasureEnum.fromId(phase.getStatisticAnnotationMeasure().getId()) == null) {
+            throw new TutorialException(
+                    "This tutorial is not valid anymore. Please contact the project owner for a new tutorial.");
+        }
+
         // Calculate the annotator agreement
         double agreement = this.commonMathService.calculateAnnotatorAgreement(categories,
                 StatisticAnnotationMeasureEnum.fromId(phase.getStatisticAnnotationMeasure().getId()),

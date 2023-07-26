@@ -52,15 +52,15 @@ const LexSubTutorial: React.FC<{ phase: Phase }> = ({ phase }) => {
     const handleFinalizeAnnotation = () => {
         bulkAnnotateLexSub(tutorialAnnotation.annotatedInstances, storage.get).then(() => {
             toast.info("Tutorial finished. Results are available on the project page.");
-            Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
         }).catch((error) => {
             if (error?.response?.status === 500) {
-                toast.error("Error while evaluating tutorial: " + error.response.data.message + "!");
+                toast.error("Error while evaluating tutorial: " + error.response.data.message);
             } else {
                 toast.warning("The system is currently not available, please try again later!");
             }
-        }
-        );
+        }).finally(() => {
+            Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
+        });
     }
 
     useEffect(() => {

@@ -45,6 +45,7 @@ import de.garrafao.phitag.domain.phase.error.TutorialException;
 import de.garrafao.phitag.domain.statistic.statisticannotationmeasure.StatisticAnnotationMeasureEnum;
 import de.garrafao.phitag.domain.statistic.tutorialannotationmeasurehistory.TutorialAnnotationMeasureHistory;
 import de.garrafao.phitag.domain.statistic.tutorialannotationmeasurehistory.TutorialAnnotationMeasureHistoryRepository;
+import liquibase.pro.packaged.t;
 
 @Service
 public class LexSubJudgementApplicationService {
@@ -54,7 +55,6 @@ public class LexSubJudgementApplicationService {
     private final LexSubInstanceRepository lexSubInstanceRepository;
 
     private final TutorialAnnotationMeasureHistoryRepository tutorialAnnotationMeasureHistoryRepository;
-
 
     // Statistics
 
@@ -77,9 +77,8 @@ public class LexSubJudgementApplicationService {
             final UserStatisticApplicationService userStatisticApplicationService,
             final AnnotatorStatisticApplicationService annotatorStatisticApplicationService,
             final PhaseStatisticApplicationService phaseStatisticApplicationService,
-            
-            final CommonMathService commonMathService
-            ) {
+
+            final CommonMathService commonMathService) {
         this.lexSubJudgementRepository = lexSubJudgementRepository;
         this.lexSubInstanceRepository = lexSubInstanceRepository;
         this.tutorialAnnotationMeasureHistoryRepository = tutorialAnnotationMeasureHistoryRepository;
@@ -398,8 +397,17 @@ public class LexSubJudgementApplicationService {
         List<List<String>> annotatorLabelList = Arrays.asList(goldLabels, annotatorLabels);
         List<String> categories = golds.get(0).getInstance().getLabelSet();
 
+        // Check if the tutorial phase has a statistic annotation measure 
+        if (phase.getStatisticAnnotationMeasure() == null || phase.getStatisticAnnotationMeasureThreshold() == null
+                || StatisticAnnotationMeasureEnum.fromId(phase.getStatisticAnnotationMeasure().getId()) == null) {
+            throw new TutorialException(
+                    "This tutorial is not valid anymore. Please contact the project owner for a new tutorial.");
+        }
+
         // Calculate the annotator agreement
-        double agreement = this.commonMathService.calculateAnnotatorAgreement(categories, StatisticAnnotationMeasureEnum.fromId(phase.getStatisticAnnotationMeasure().getId()), annotatorLabelList);
+        double agreement = this.commonMathService.calculateAnnotatorAgreement(categories,
+                StatisticAnnotationMeasureEnum.fromId(phase.getStatisticAnnotationMeasure().getId()),
+                annotatorLabelList);
 
         // Finally, mark the tutorial phase as completed for the annotator
         // As the object annotator is managed by the persistence context, we do not need
@@ -407,17 +415,15 @@ public class LexSubJudgementApplicationService {
         // call the annotator repository and can simply update the object, HOPEFULLY?!?
         if (agreement >= phase.getStatisticAnnotationMeasureThreshold()) {
             annotator.addCompletedTutorial(phase);
-        } 
+        }
 
         tutorialAnnotationMeasureHistoryRepository.save(
-            new TutorialAnnotationMeasureHistory(
-                phase,
-                annotator,
-                agreement,
-                agreement >= phase.getStatisticAnnotationMeasureThreshold()
-            )
-        );
-        
+                new TutorialAnnotationMeasureHistory(
+                        phase,
+                        annotator,
+                        agreement,
+                        agreement >= phase.getStatisticAnnotationMeasureThreshold()));
+
     }
 
     // Parser
