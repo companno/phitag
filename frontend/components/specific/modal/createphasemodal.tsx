@@ -178,7 +178,7 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
                                     <div className="flex w-full items-center py-2 px-3">
                                         <Checkbox
                                             selected={modalState.isTutorial}
-                                            description={"Is Phase a Tutorial"}
+                                            description={"Phase is a tutorial"}
                                             onClick={() => setModalState({
                                                 ...modalState,
                                                 isTutorial: !modalState.isTutorial

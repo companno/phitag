@@ -31,7 +31,7 @@ Now that the project is created, you will need to add some data on which the ann
 Now that you have added some data, you will need to add some annotators. To do this, click on the "Add Annotator" button in the top right corner of the "annotators tab". You will be redirected to the pool page. Here you can search for annotators and add them to your project. You can also add computational annotators to your project. Computational annotators are used to automatically annotate data.
 
 
-| ![](/gif/guide/add-annotator.gif) |    ![](/gif/guide/com-add.gif)    |
+| ![](/gif/guide/add-annotator.gif) | ![](/gif/guide/com-add.gif) |
 | :-------------------------------: | :-------------------------: |
 |           Add Annotator           | Add Computational Annotator |
 
@@ -52,6 +52,18 @@ Finally, now that you have added some data and annotators, you can create a phas
 | :---------------------------: |
 |           Add Phase           |
 
+### Tutorial
+
+A phase can also serve as a tutorial for your annotators. To do this, you have to select the "Phase is a tutorial" checkbox. This turns the phase into a tutorial phase. A tutorial phase needs, besides the instances, also a gold judgement file. The "Annotation Agreement Strategy" then uses this gold judgement file to calculate the annotation agreement between the annotators and the gold judgements. This allows you to see how well your annotators are doing on the tutorial phase and by specifying a minimum annotation agreement, you can make sure that your annotators understand the annotation task.
+
+To add the tutorial phase as a requirement for your annotators, you have to add the tutorial to the phases as requirements. To do this, click on the "Add Requirement" button on the overview page of your project. Here you can select the tutorial phase as a requirement.
+
+Note, to see the tutorials of a project, you have to switch to the tutorial carousel. You can do this by clicking on the toggle in the top left corner of the phase carousel of the project.
+
+| ![](/gif/guide/tutorial-creation.gif) | ![](/gif/guide/viewing-tutorials.gif) | ![](/gif/guide/adding-tutorial-req.gif) |
+| :-----------------------------------: | :-----------------------------------: | :-------------------------------------: |
+|            Create Tutorial            |        Change to Tutorial View        |        Add Tutorial Requirement         |
+
 ### Adding Annotation Instances
 
 After creating a phase, you will need to add some annotation instances to your phase. To do this, click on the phase and navigate to the "instances" tab. Here you can add annotation instances by uploading instance files. Note, that the required format of the instance file depends on the annotation task type of the phase. For more information on the required format of the instance file, see the [Annotation Standardization Repository](https://github.com/ChangeIsKey/annotation_standardization).
@@ -66,8 +78,8 @@ The results of the annotation can be found under the judgement tab of the phase.
 Note, for some statistics you will need to close the phase, after which you will not be able to add new annotation instances nor judgements to the phase.
 
 | ![](/gif/guide/download-judgement.gif) | ![](/gif/guide/project-statistics.gif) |
-| :------------------------------------: | :------------------------------------------------: |
-|           Download Judgement           |                 Project Statistics                 |
+| :------------------------------------: | :------------------------------------: |
+|           Download Judgement           |           Project Statistics           |
 
 ## Conclusion
 

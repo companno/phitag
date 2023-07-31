@@ -9,7 +9,7 @@ import Usage from "../../../../lib/model/phitagdata/usage/model/Usage";
 // components
 import LoadingComponent from "../../../generic/loadingcomponent";
 import AddWSSIMInstanceToPhaseModal from "../../modal/addwssiminstancetophasemodal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PageChange from "../../../generic/table/pagination";
 import GenerateInstancesForPhaseModal from "../../modal/generateinstancesforphasemodal";
 
@@ -17,6 +17,11 @@ const WSSIMInstanceTable: React.FC<{ phase: Phase, modalState: { openData: boole
 
     const [page, setPage] = useState(0);
     const wssiminstance = useFetchPagedWSSIMInstance(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), page, !!phase);
+
+    // Reload the data on reload
+    useEffect(() => {
+        wssiminstance.mutate();
+    }, [phase]);
 
     if (!phase || wssiminstance.isLoading || wssiminstance.isError) {
         return <LoadingComponent />;

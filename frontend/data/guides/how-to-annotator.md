@@ -36,6 +36,8 @@ After selecting a suitable phase, you can start working on the phase. Do this by
 | :----------------------------------: | :--------------------------------: | :---------------------------------: |
 |               Use-Pair               |               WSSim                |               LexSub                |
 
+Note that the annotation process only moves forward. Hence, if you want to change your annotation, you have to navigate to the phase "judgement" or "history" tab and click on the "Edit" button for the annotation you want to change. From there, you can change your annotation.
+
 ## Judgement
 
 After you finished annotating, you can see the results of your annotation under the judgement tab of the phase. If you wish to change your annotation, you can do so by clicking on the "Edit" button.

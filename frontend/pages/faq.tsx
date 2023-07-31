@@ -56,7 +56,7 @@ export function FAQ() {
                             title="I have a question that is not answered here. What should I do?"
                             content="
                                 If you have a question that is not answered here, please feel free to contact us with your question.
-                                You can find our contact information on the [About](/about) page."
+                                You can find our contact information on the [About](/about-us) page."
                         />
 
                     </div>

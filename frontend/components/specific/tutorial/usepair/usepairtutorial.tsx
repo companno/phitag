@@ -58,7 +58,7 @@ const UsePairTutorial: React.FC<{ phase: Phase }> = ({ phase }) => {
 
     const handleFinalizeAnnotation = () => {
         bulkAnnotateUsepair(tutorialAnnotation.annotatedInstances, storage.get).then(() => {
-            toast.info("Tutorial finished. Results are available on the project page.");
+            toast.info("Tutorial finished. Results can be checked in the phase overview.");
         }).catch((error) => {
             if (error?.response?.status === 500) {
                 toast.error("Error while evaluating tutorial: " + error.response.data.message);

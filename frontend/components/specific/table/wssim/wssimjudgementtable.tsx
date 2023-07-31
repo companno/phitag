@@ -1,7 +1,7 @@
 // next
 import Link from "next/link";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { FiEdit, FiTrash } from "react-icons/fi";
 
@@ -55,6 +55,11 @@ const WSSIMJudgementTable: React.FC<{ phase: Phase, modalState: { open: boolean,
             }
         });
     }
+
+    // Reload the data on reload
+    useEffect(() => {
+        wssimjudgements.mutate();
+    }, [phase]);
 
     if (!phase || wssimjudgements.isLoading || wssimjudgements.isError) {
         return <LoadingComponent />;

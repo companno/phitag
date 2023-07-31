@@ -8,13 +8,18 @@ import Phase from "../../../../lib/model/phase/model/Phase";
 import LoadingComponent from "../../../generic/loadingcomponent";
 import WSSIMTag, { WSSIMTagConstructor } from "../../../../lib/model/instance/wssimtag/model/WSSIMTag";
 import AddWSSIMInstanceToPhaseModal from "../../modal/addwssiminstancetophasemodal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PageChange from "../../../generic/table/pagination";
 
 const WSSIMTagTable: React.FC<{ phase: Phase, modalState: { open: boolean, callback: Function } }> = ({ phase, modalState }) => {
 
     const [page, setPage] = useState(0);
     const wssimtag = useFetchPagedWSSIMTag(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), page, !!phase);
+
+    // Reload the data on reload
+    useEffect(() => {
+        wssimtag.mutate();
+    }, [phase]);
 
     if (!phase || wssimtag.isLoading || wssimtag.isError) {
         return <LoadingComponent />;

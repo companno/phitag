@@ -61,7 +61,7 @@ const ProjectTabBar: React.FC<{}> = () => {
 
             <div className="flex flex-row my-2 mx-4 self-end 2xl:self-center space-x-4">
 
-                {entitlement.entitlement === ENTITLEMENTS.ADMIN &&
+                {(entitlement.entitlement === ENTITLEMENTS.ADMIN && username === storage.get("USER")) &&
                     <IconButtonOnClick
                         tooltip="Delete Project"
                         icon={<FiTrash2 className="basic-svg" />}

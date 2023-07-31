@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // services
 import { deleteWssim, useFetchHistory, useFetchPagedHistoryWSSIMJudgements } from "../../../../lib/service/judgement/JudgementResource";
@@ -50,6 +50,11 @@ const WSSIMJudgementHistoryTable: React.FC<{ phase: Phase }> = ({ phase }) => {
             }
         });
     }
+
+    // Reload the data on reload
+    useEffect(() => {
+        wssimjudgements.mutate();
+    }, [phase]);
 
     if (!phase || wssimjudgements.isLoading || wssimjudgements.isError) {
         return <LoadingComponent />;
