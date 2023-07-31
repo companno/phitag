@@ -48,4 +48,9 @@ public class ProjectRepositoryBridge implements ProjectRepository {
         return projectRepositoryJpa.findByIdNameAndIdOwnername(name, ownername);
     }
 
+    @Override
+    public void delete(final Project project) {
+        projectRepositoryJpa.delete(project);
+    }
+
 }

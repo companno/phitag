@@ -164,3 +164,20 @@ export function createProject(project: CreateProjectCommand, get: Function = () 
         }
     ).then(res => res.data);
 }
+
+/**
+ * Deletes a project
+ * 
+ * @param project project to delete
+ * @param get function to get data from local storage
+ * @returns 
+ */
+export function deleteProject(project: string, get: Function = () => {}) {
+    const token = get('JWT') ?? '';
+
+    return axios.post(`${BACKENDROUTES.PROJECT}/delete?project=${project}`, {},
+        {
+            headers: { "Authorization": `Bearer ${token}` },
+        }
+    ).then(res => res.data);
+}

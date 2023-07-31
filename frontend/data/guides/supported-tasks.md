@@ -29,7 +29,7 @@ The columns are as follows:
 - `indices_target_token`: The indices of the target token in the context. This is used to highlight the target token in the context and in most cases will be highlighted in green.
 - `indices_target_sentence`: The indices of the target sentence in the context. This is used to highlight the target sentence in the context and in most cases will be bolded.
 - `lemma`: The lemma of the target token. This is used to preselect the target token in the annotation task.
-- `group`: An optional coloum, currently not used.
+- `group`: An optional colum, currently not used.
 
 ## Instance
 
@@ -47,7 +47,7 @@ instanceID	label	comment	annotator
 The columns are as follows:
 
 - `instanceID`: The unique identifier of the instance, which was annotated.
-- `label`: The label of the annotation. This is used to identify the annotation in the annotation project and corresponds to either the lable or non-label defined in an instance.
+- `label`: The label of the annotation. This is used to identify the annotation in the annotation project and corresponds to either the label or non-label defined in an instance.
 - `comment`: An optional comment, which can be added to the annotation.
 - `annotator`: The annotator, who created the annotation.
 
@@ -57,7 +57,7 @@ In the following we will describe the currently supported annotation tasks. Note
 
 ## Use Pair
 
-The use pair annotation type is used to annotate the relation between two usages. It is used to annotate the relation between two usages. We currenlty support the annotation task "Usage Relatedness" which asks annotators to rate the degree of semantic relatedness between two uses of a lemma. For further information please refer to the ['Explained: Annotation Task - Usage Relatedness (UREL)' guide](/guide/explained-annotation-task-urel).
+The use pair annotation type is used to annotate the relation between two usages. It is used to annotate the relation between two usages. We currently support the annotation task "Usage Relatedness" which asks annotators to rate the degree of semantic relatedness between two uses of a lemma. For further information please refer to the ['Explained: Annotation Task - Usage Relatedness (UREL)' guide](/guide/explained-annotation-task-urel).
 
 ## Use Single
 

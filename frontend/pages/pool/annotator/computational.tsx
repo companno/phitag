@@ -117,7 +117,8 @@ const HumanPool: NextPage = () => {
                                         These users can be added to your project as annotators, which can then be used to annotate your data.
                                         You can add them to your project by clicking on the plus icon on the user card and filter for specific computational users by typing in the search field.
                                     "
-                                    reference="/guide/explained-pools"
+                                    reference=""
+                                    linkage={false}
                                 />
                             </div>
                         </div>

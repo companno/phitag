@@ -24,10 +24,10 @@ const AddRequirementsModal: React.FC<{ isOpen: boolean, closeModalCallback: Func
     });
 
     const onConfirm = () => {
-        if (modalState.selectedRequirements.length == 0) {
-            toast.error("Please select at least one requirement");
-            return;
-        }
+        // if (modalState.selectedRequirements.length == 0) {
+        //     toast.error("Please select at least one requirement");
+        //     return;
+        // }
 
         const command = new AddRequirementsCommand(phase.getId().getOwner(), phase.getId().getProject(), phase.getId().getPhase(),
             modalState.selectedRequirements.map((phase) => phase.getId().getPhase()));

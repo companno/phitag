@@ -15,6 +15,7 @@ import de.garrafao.phitag.application.phase.data.AddRequirementsCommand;
 import de.garrafao.phitag.application.phase.data.CreatePhaseCommand;
 import de.garrafao.phitag.application.phase.data.PhaseDto;
 import de.garrafao.phitag.application.phase.data.StartComputationalAnnotationCommand;
+import de.garrafao.phitag.application.phase.data.TutorialHistoryDto;
 import de.garrafao.phitag.domain.core.Query;
 import de.garrafao.phitag.domain.phase.query.PhaseQueryBuilder;
 
@@ -106,6 +107,31 @@ public class PhaseResource {
             @RequestParam(value = "project") final String project,
             @RequestParam(value = "phase") final String phase) {
         return phaseApplicationService.hasAccessToAnnotate(authenticationToken, owner, project, phase);
+
+    }
+
+    /**
+     * Get tutorial measurement history.
+     * 
+     * @param authenticationToken
+     *                            The authentication token of the requesting user
+     * @param owner
+     *                            The owner of the project
+     * @param project
+     *                            The name of the project
+     * @param phase
+     *                            The name of the phase
+     * @return
+     *         A list of tutorial measurement history
+     */
+
+    @GetMapping(value = "/tutorial/measurement-history")
+    public List<TutorialHistoryDto> tutorialMeasurementHistory(
+            @RequestHeader("Authorization") String authenticationToken,
+            @RequestParam(value = "owner") final String owner,
+            @RequestParam(value = "project") final String project,
+            @RequestParam(value = "phase") final String phase) {
+        return phaseApplicationService.getTutorialMeasureHistory(authenticationToken, owner, project, phase);
 
     }
 

@@ -9,7 +9,7 @@ import UsePairInstance, { UsePairInstanceConstructor } from "../../../../lib/mod
 // components
 import LoadingComponent from "../../../generic/loadingcomponent";
 import AddInstanceToPhaseModal from "../../modal/addinstancetophasemodal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PageChange from "../../../generic/table/pagination";
 import { data } from "autoprefixer";
 import GenerateInstancesForPhaseModal from "../../modal/generateinstancesforphasemodal";
@@ -18,6 +18,11 @@ const UsePairInstanceTable: React.FC<{ phase: Phase, modalState: { openData: boo
 
     const [page, setPage] = useState(0);
     const usepairinstances = useFetchPagedUsePairInstance(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), page, !!phase);
+
+    // Reload the data on reload
+    useEffect(() => {
+        usepairinstances.mutate();
+    }, [phase]);
 
     if (!phase || usepairinstances.isLoading || usepairinstances.isError) {
         return <LoadingComponent />;

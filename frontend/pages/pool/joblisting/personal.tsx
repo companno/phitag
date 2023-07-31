@@ -159,7 +159,9 @@ const PersonalJoblistingPage: NextPage = () => {
                                         Here you can see all your personal joblistings. You can create new joblistings by clicking on the plus button.
                                         You can also add users from the waiting list to the joblisting by clicking on the add button.
                                         "
-                                    reference="/guide/explained-pools"
+                                        
+                                    reference=""
+                                    linkage={false}
                                 />
                             </div>
                         </div>

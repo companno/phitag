@@ -118,7 +118,8 @@ const CreateDictionaryModal = ({ uname, closeCallback, mutateCallback }: { uname
 
     const filetypes = [
         new DummySelectable("Custom-XML"),
-        new DummySelectable("Custom-JSON"),
+        new DummySelectable("Wiktionary-XML-DE"),
+        new DummySelectable("Wiktionary-XML-EN"),
     ];
 
     const [dictionary, setDictionary] = useState({
@@ -212,7 +213,7 @@ const CreateDictionaryModal = ({ uname, closeCallback, mutateCallback }: { uname
                                 </div>
 
                                 <div className="font-dm-mono-regular my-2">
-                                    This is optional. If you don't want to upload a file, you can create an empty dictionary.
+                                    This is optional. If you do not want to upload a file, you can create an empty dictionary.
                                 </div>
 
                                 <div className="flex flex-col items-left my-6">

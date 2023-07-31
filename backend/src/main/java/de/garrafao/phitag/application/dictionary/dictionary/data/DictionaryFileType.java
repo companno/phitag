@@ -1,8 +1,9 @@
 package de.garrafao.phitag.application.dictionary.dictionary.data;
 
 public enum DictionaryFileType {
-    CUSTOM_XML("Custom-XML");
-    // CUSTOM_JSON("Custom-JSON");
+    CUSTOM_XML("Custom-XML"),
+    WIKTIONARY_XML_DE("Wiktionary-XML-DE"),
+    WIKTIONARY_XML_EN("Wiktionary-XML-EN");
 
     private final String name;
 

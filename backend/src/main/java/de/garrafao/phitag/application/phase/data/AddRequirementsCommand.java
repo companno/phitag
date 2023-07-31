@@ -20,7 +20,7 @@ public class AddRequirementsCommand {
         Validate.notBlank(owner, "owner must not be blank");
         Validate.notBlank(project, "project must not be blank");
         Validate.notBlank(phase, "name must not be blank");
-        Validate.notEmpty(tutorials, "tutorials must not be empty");
+        // Validate.notEmpty(tutorials, "tutorials must not be empty");
 
         this.owner = owner;
         this.project = project;

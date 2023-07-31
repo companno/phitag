@@ -18,6 +18,7 @@ import de.garrafao.phitag.application.phase.data.CreatePhaseCommand;
 import de.garrafao.phitag.application.phase.data.PhaseDto;
 import de.garrafao.phitag.application.phase.data.PhaseNameRestrictionEnum;
 import de.garrafao.phitag.application.phase.data.StartComputationalAnnotationCommand;
+import de.garrafao.phitag.application.phase.data.TutorialHistoryDto;
 import de.garrafao.phitag.application.validation.ValidationService;
 import de.garrafao.phitag.domain.annotationtype.AnnotationType;
 import de.garrafao.phitag.domain.annotator.Annotator;
@@ -33,6 +34,8 @@ import de.garrafao.phitag.domain.phase.error.PhaseUpdateException;
 import de.garrafao.phitag.domain.phase.error.TutorialException;
 import de.garrafao.phitag.domain.project.Project;
 import de.garrafao.phitag.domain.sampling.Sampling;
+import de.garrafao.phitag.domain.statistic.statisticannotationmeasure.StatisticAnnotationMeasure;
+import de.garrafao.phitag.domain.statistic.tutorialannotationmeasurehistory.TutorialAnnotationMeasureHistoryRepository;
 import de.garrafao.phitag.domain.status.Status;
 import de.garrafao.phitag.domain.status.TaskStatusEnum;
 import de.garrafao.phitag.domain.tasks.Task;
@@ -47,6 +50,8 @@ public class PhaseApplicationService {
     private final PhaseRepository phaseRepository;
 
     private final TaskRepository taskRepository;
+
+    private final TutorialAnnotationMeasureHistoryRepository tutorialAnnotationMeasureHistoryRepository;
 
     // Services
 
@@ -68,6 +73,7 @@ public class PhaseApplicationService {
     public PhaseApplicationService(
             final PhaseRepository phaseRepository,
             final TaskRepository taskRepository,
+            final TutorialAnnotationMeasureHistoryRepository tutorialAnnotationMeasureHistoryRepository,
 
             final UserStatisticApplicationService userStatisticApplicationService,
             final AnnotatorStatisticApplicationService annotatorStatisticApplicationService,
@@ -76,6 +82,7 @@ public class PhaseApplicationService {
             final CommonService commonService, final ValidationService validationService) {
         this.phaseRepository = phaseRepository;
         this.taskRepository = taskRepository;
+        this.tutorialAnnotationMeasureHistoryRepository = tutorialAnnotationMeasureHistoryRepository;
 
         this.userStatisticApplicationService = userStatisticApplicationService;
         this.annotatorStatisticApplicationService = annotatorStatisticApplicationService;
@@ -159,6 +166,27 @@ public class PhaseApplicationService {
         return true;
     }
 
+    /**
+     * Return tutorial measure history of a phase.
+     * 
+     * @param authenticationToken
+     * @param owner               The owner of the project.
+     * @param project             The name of the project.
+     * @param phase               The name of the phase.
+     */
+    public List<TutorialHistoryDto> getTutorialMeasureHistory(final String authenticationToken, final String owner,
+            final String project,
+            final String phase) {
+        final User requester = this.commonService.getUserByAuthenticationToken(authenticationToken);
+        final Phase phaseEntity = this.commonService.getPhase(owner, project, phase);
+
+        this.validationService.phaseAnnotationAccess(requester, phaseEntity);
+
+        return this.tutorialAnnotationMeasureHistoryRepository.findByIdPhaseid(phaseEntity.getId()).stream()
+                .map(TutorialHistoryDto::from).collect(Collectors.toList());
+
+    }
+
     // Setters
 
     /**
@@ -174,6 +202,18 @@ public class PhaseApplicationService {
         final AnnotationType annotationType = this.commonService.getAnnotationType(command.getAnnotationType());
         final Sampling sampling = this.commonService.getSampling(command.getSampling());
 
+        final StatisticAnnotationMeasure statisticAnnotationMeasure;
+        final Double annotationAgreement;
+
+        if (command.isTutorial()) {
+            statisticAnnotationMeasure = this.commonService
+                    .getStatisticAnnotationMeasure(command.getAnnotationAgreement());
+            annotationAgreement = command.getThreshold();
+        } else {
+            statisticAnnotationMeasure = null;
+            annotationAgreement = 0.0;
+        }
+
         this.validationService.projectAdminAccess(requester, projectEntity);
         validateCreateCommand(command);
 
@@ -183,7 +223,9 @@ public class PhaseApplicationService {
                         annotationType,
                         sampling,
                         command.getDescription(),
-                        command.isTutorial()));
+                        command.isTutorial(),
+                        statisticAnnotationMeasure,
+                        annotationAgreement));
 
         // Update UserStatistics for AnnotationType
         this.userStatisticApplicationService.updatePhaseRelatedStatistics(entity);
@@ -298,6 +340,15 @@ public class PhaseApplicationService {
 
         if (PhaseNameRestrictionEnum.contains(command.getName().toLowerCase())) {
             throw new PhaseNameRestrictionException();
+        }
+
+        if (command.isTutorial()) {
+            if (command.getAnnotationAgreement().isBlank()) {
+                throw new PhaseUpdateException("Annotation agreement must not be empty");
+            }
+
+            commonService.getStatisticAnnotationMeasure(command.getAnnotationAgreement());
+
         }
     }
 

@@ -60,6 +60,10 @@ const UsePairJudgementTable: React.FC<{ phase: Phase, modalState: { open: boolea
         if (usepairjudgements.isError && router.isReady) {
             toast.error("Error while fetching judgements");
         }
+
+        // reload the data on reload
+        usepairjudgements.mutate();
+
     }, [usepairjudgements.isError, router.isReady]);
 
     if (!phase || usepairjudgements.isLoading || usepairjudgements.isError) {

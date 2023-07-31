@@ -113,10 +113,6 @@ public class GuidelineApplicationService {
         validationService.projectAdminAccess(requester, projectEntity);
         validateUniqueGuideline(owner, project, file.getOriginalFilename());
 
-        if (file.getContentType() == null || !file.getContentType().equals("text/markdown")) {
-            throw new GuidelineParseException("The file is not a markdown file.");
-        }
-
         final String content;
 
         try {
@@ -132,7 +128,12 @@ public class GuidelineApplicationService {
             throw new GuidelineParseException("Could not parse the guideline file name.");
         }
 
-        final Guideline guideline = new Guideline(name, projectEntity, content);
+        Guideline guideline;
+        try {
+            guideline = new Guideline(name, projectEntity, content);
+        } catch (Exception e) {
+            throw new GuidelineParseException("The guideline could not be parsed. Check that the name of the guideline only contains alphanumerics and -.");
+        }
         this.guidelineRepository.save(guideline);
 
     }

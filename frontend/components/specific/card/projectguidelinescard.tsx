@@ -49,7 +49,8 @@ const ProjectGuidelinesCard: React.FC<IProps> = ({ project, showAddGuideline }) 
                         title="Help: Guidelines"
                         tooltip="Help: Guidelines"
                         text="Guidelines can be added to a project, to help you and your team to follow a certain set of rules."
-                        reference="/guide/how-to-annotation-project"
+                        reference=""
+                        linkage={false}
                     />
                 </div>
             </div>

@@ -44,6 +44,7 @@ import de.garrafao.phitag.domain.judgement.lexsubjudgement.LexSubJudgement;
 import de.garrafao.phitag.domain.judgement.usepairjudgement.UsePairJudgement;
 import de.garrafao.phitag.domain.judgement.wssimjudgement.WSSIMJudgement;
 import de.garrafao.phitag.domain.phase.Phase;
+import de.garrafao.phitag.domain.project.Project;
 import de.garrafao.phitag.domain.user.User;
 
 @Service
@@ -104,7 +105,7 @@ public class JudgementApplicationService {
             this.validationService.projectAdminAccess(requester, phaseEntity.getProject());
         }
 
-        // IF requester is only annotator, only return judgements of the requester
+        // IF requester is only annotator, only return judgments of the requester
         Annotator annotator = this.commonService.getAnnotator(phaseEntity.getId().getProjectid().getOwnername(),
                 phaseEntity.getId().getProjectid().getName(), requester.getUsername());
         if (annotator.getEntitlement().getName().equals(EntitlementEnum.ENTITLEMENT_USER.name())) {
@@ -115,26 +116,20 @@ public class JudgementApplicationService {
 
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             this.usePairJudgementApplicationService.findByPhase(phaseEntity).forEach(
-                    usePairJudgement -> {
-                        judgementDtos.add(UsePairJudgementDto.from(usePairJudgement));
-                    });
+                    usePairJudgement -> judgementDtos.add(UsePairJudgementDto.from(usePairJudgement)));
         } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             this.wssimJudgementApplicationService.findByPhase(phaseEntity).forEach(
-                    wssimJudgement -> {
-                        judgementDtos.add(WSSIMJudgementDto.from(wssimJudgement));
-                    });
+                    wssimJudgement -> judgementDtos.add(WSSIMJudgementDto.from(wssimJudgement)));
         } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
             this.lexSubJudgementApplicationService.findByPhase(phaseEntity).forEach(
-                    lexSubJudgement -> {
-                        judgementDtos.add(LexJudgementDto.from(lexSubJudgement));
-                    });
+                    lexSubJudgement -> judgementDtos.add(LexJudgementDto.from(lexSubJudgement)));
         }
 
         return judgementDtos;
     }
 
     /**
-     * Get all judgements for a given annotator as a page.
+     * Get all judgments for a given annotator as a page.
      * 
      * @param authenticationToken
      * @param owner
@@ -163,7 +158,7 @@ public class JudgementApplicationService {
             this.validationService.projectAdminAccess(requester, phaseEntity.getProject());
         }
 
-        // IF requester is only annotator, only return judgements of the requester
+        // IF requester is only annotator, only return judgments of the requester
         Annotator annotator = this.commonService.getAnnotator(phaseEntity.getId().getProjectid().getOwnername(),
                 phaseEntity.getId().getProjectid().getName(), requester.getUsername());
         if (annotator.getEntitlement().getName().equals(EntitlementEnum.ENTITLEMENT_USER.name())) {
@@ -537,12 +532,12 @@ public class JudgementApplicationService {
      * @param commands            list of commands containing the judgement
      */
     @Transactional
-    public void annotateBulk(final String authauthenticationToken, final List<IAddJudgementCommand> commands) {
+    public void annotateBulk(final String authenticationToken, final List<IAddJudgementCommand> commands) {
         if (commands.isEmpty()) {
             return;
         }
 
-        final User requester = this.commonService.getUserByAuthenticationToken(authauthenticationToken);
+        final User requester = this.commonService.getUserByAuthenticationToken(authenticationToken);
         final Phase phaseEntity = this.commonService.getPhase(commands.get(0).getOwner(), commands.get(0).getProject(),
                 commands.get(0).getPhase());
 

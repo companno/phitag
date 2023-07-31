@@ -38,7 +38,7 @@ public class ProjectResource {
      * public.
      * 
      * @param query
-     *               The fields to search for
+     *              The fields to search for
      * @return
      *         A list of projects
      */
@@ -49,7 +49,7 @@ public class ProjectResource {
                 .isActive(true)
                 .withVisibility(VisibilityEnum.VISIBILITY_PUBLIC.name())
                 .build();
-                
+
         return projectApplicationService.queryProjectDto(query);
     }
 
@@ -77,7 +77,7 @@ public class ProjectResource {
      * If the project is not active, only the owner can access it.
      * 
      * @param usernameProjectname
-     *  The username and project name combination
+     *                            The username and project name combination
      * @return
      *         The project
      */
@@ -94,10 +94,10 @@ public class ProjectResource {
      * 
      * The user is the owner of the project.
      * 
-     * @param authenticationToken 
-     *  The authentication token of the requesting user
+     * @param authenticationToken
+     *                            The authentication token of the requesting user
      * @param query
-     *  The values to search for
+     *                            The values to search for
      * @return
      */
     @GetMapping(value = "/personal")
@@ -126,19 +126,37 @@ public class ProjectResource {
     /**
      * Creates a new project.
      * 
-     * The owner will automatically be determined by the authentication token and also added as an annotator with admin {@link Entitlement}.
+     * The owner will automatically be determined by the authentication token and
+     * also added as an annotator with admin {@link Entitlement}.
      * 
      * @param authenticationToken
-     *  The authentication token of the requesting user
+     *                             The authentication token of the requesting user
      * @param createProjectCommand
-     *  The command to create the project
+     *                             The command to create the project
      * @return
-     *  The created project
+     *         The created project
      */
     @PostMapping(value = "/create")
     public void create(@RequestHeader("Authorization") String authenticationToken,
             @RequestBody CreateProjectCommand command) {
         projectApplicationService.create(authenticationToken, command);
+    }
+
+    /**
+     * Deletes a project.
+     * 
+     * The requesting user has to be the owner of the project.
+     * 
+     * @param authenticationToken
+     *                            The authentication token of the requesting user
+     * @param project
+     *                            The project to delete
+     */
+    @PostMapping(value = "/delete")
+    public void delete(
+            @RequestHeader("Authorization") String authenticationToken,
+            @RequestParam(value = "project") final String project) {
+        projectApplicationService.delete(authenticationToken, project);
     }
 
 }

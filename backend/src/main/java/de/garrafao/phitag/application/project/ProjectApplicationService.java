@@ -19,6 +19,7 @@ import de.garrafao.phitag.application.visibility.data.VisibilityEnum;
 import de.garrafao.phitag.domain.annotator.Annotator;
 import de.garrafao.phitag.domain.annotator.AnnotatorRepository;
 import de.garrafao.phitag.domain.annotator.query.AnnotatorQueryBuilder;
+import de.garrafao.phitag.domain.authentication.error.AccessDenidedException;
 import de.garrafao.phitag.domain.core.Query;
 import de.garrafao.phitag.domain.entitlement.Entitlement;
 import de.garrafao.phitag.domain.language.Language;
@@ -197,6 +198,26 @@ public class ProjectApplicationService {
 
         // Create annotator statistics
         this.annotatorStatisticApplicationService.initializeAnnotatorStatistic(annotator);
+    }
+
+    /**
+     * Delete a project.
+     * 
+     * @param authenticationToken
+     * @param command
+     */
+    @Transactional
+    public void delete(final String authenticationToken, final String projectName) {
+        User owner = this.commonService.getUserByAuthenticationToken(authenticationToken);
+        Project project = this.commonService.getProject(owner.getUsername(), projectName);
+
+        try {
+            this.validationService.projectOwnerAccess(owner, project);
+        } catch (Exception e) {
+            throw new AccessDenidedException("Only the owner of a project can delete it.");
+        }
+
+        this.projectRepository.delete(project);
     }
 
     // Validators

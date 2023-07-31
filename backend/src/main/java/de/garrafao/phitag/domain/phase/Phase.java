@@ -20,6 +20,7 @@ import de.garrafao.phitag.domain.annotator.Annotator;
 import de.garrafao.phitag.domain.phase.data.PhaseStatusEnum;
 import de.garrafao.phitag.domain.project.Project;
 import de.garrafao.phitag.domain.sampling.Sampling;
+import de.garrafao.phitag.domain.statistic.statisticannotationmeasure.StatisticAnnotationMeasure;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -75,6 +76,14 @@ public class Phase {
     )
     private List<Phase> tutorialRequirements;
 
+    @ManyToOne
+    @JoinColumn(name = "phitagstatisticannotationmeasures_id")
+    private StatisticAnnotationMeasure statisticAnnotationMeasure;
+
+    @Column(name = "statisticannotationmeasurethreshold")
+    private Double statisticAnnotationMeasureThreshold;
+    
+
     @ManyToMany(mappedBy = "completedTutorials")
     private List<Annotator> annotators; 
 
@@ -103,6 +112,12 @@ public class Phase {
     public Phase(final String name, final Project project, final AnnotationType annotationType, final Sampling sampling, final String description, final boolean isTutorial) {
         this(name, project, annotationType, sampling, description);
         this.isTutorial = isTutorial;
+    }
+
+    public Phase(final String name, final Project project, final AnnotationType annotationType, final Sampling sampling, final String description, final boolean isTutorial, final StatisticAnnotationMeasure statisticAnnotationMeasure, final Double statisticAnnotationMeasureThreshold) {
+        this(name, project, annotationType, sampling, description, isTutorial);
+        this.statisticAnnotationMeasure = statisticAnnotationMeasure;
+        this.statisticAnnotationMeasureThreshold = statisticAnnotationMeasureThreshold;
     }
 
     public void setStatus(final PhaseStatusEnum status) {

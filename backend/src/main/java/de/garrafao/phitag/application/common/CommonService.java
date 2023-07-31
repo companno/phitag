@@ -68,6 +68,7 @@ import de.garrafao.phitag.domain.notification.NotificationRepository;
 import de.garrafao.phitag.domain.phase.Phase;
 import de.garrafao.phitag.domain.phase.PhaseRepository;
 import de.garrafao.phitag.domain.phase.error.PhaseNotFoundException;
+import de.garrafao.phitag.domain.phase.query.PhaseQueryBuilder;
 import de.garrafao.phitag.domain.project.Project;
 import de.garrafao.phitag.domain.project.ProjectRepository;
 import de.garrafao.phitag.domain.project.error.ProjectNotExistsException;
@@ -77,6 +78,9 @@ import de.garrafao.phitag.domain.role.error.RoleNotFoundException;
 import de.garrafao.phitag.domain.sampling.Sampling;
 import de.garrafao.phitag.domain.sampling.SamplingRepository;
 import de.garrafao.phitag.domain.sampling.error.SamplingNotFoundException;
+import de.garrafao.phitag.domain.statistic.error.StatisticException;
+import de.garrafao.phitag.domain.statistic.statisticannotationmeasure.StatisticAnnotationMeasure;
+import de.garrafao.phitag.domain.statistic.statisticannotationmeasure.StatisticAnnotationMeasureRepository;
 import de.garrafao.phitag.domain.status.Status;
 import de.garrafao.phitag.domain.status.StatusRepository;
 import de.garrafao.phitag.domain.status.error.StatusNotFoundException;
@@ -137,6 +141,8 @@ public class CommonService {
 
     private final UsecaseRepository usecaseRepository;
 
+    private final StatisticAnnotationMeasureRepository statisticAnnotationMeasureRepository;
+
     // Application service dependencies
 
     // Instance repository
@@ -187,6 +193,7 @@ public class CommonService {
             final StatusRepository statusRepository,
             final SamplingRepository samplingRepository,
             final UsecaseRepository usecaseRepository,
+            final StatisticAnnotationMeasureRepository statisticAnnotationMeasureRepository,
 
             final UsePairInstanceRepository usePairInstanceRepository,
             final WSSIMTagRepository wssimTagRepository,
@@ -219,6 +226,7 @@ public class CommonService {
         this.statusRepository = statusRepository;
         this.samplingRepository = samplingRepository;
         this.usecaseRepository = usecaseRepository;
+        this.statisticAnnotationMeasureRepository = statisticAnnotationMeasureRepository;
 
         this.usePairInstanceRepository = usePairInstanceRepository;
         this.wssimTagRepository = wssimTagRepository;
@@ -296,6 +304,21 @@ public class CommonService {
     public Phase getPhase(final String owner, final String project, final String phase) {
         return this.phaseRepository.findByIdNameAndIdProjectidNameAndIdProjectidOwnername(phase, project, owner)
                 .orElseThrow(PhaseNotFoundException::new);
+    }
+
+    /**
+     * Retuirns all phases of a given project.
+     * 
+     * @param project The project.
+     * @return
+     */
+    public List<Phase> getPhasesOfProject(final Project project) {
+        final Query query = new PhaseQueryBuilder()
+                .withOwner(project.getId().getOwnername())
+                .withProject(project.getId().getName())
+                .build();
+
+        return this.phaseRepository.findByQuery(query);
     }
 
     /**
@@ -785,5 +808,10 @@ public class CommonService {
 
     public Usecase getUsecase(final String usecase) {
         return this.usecaseRepository.findByName(usecase).orElseThrow(() -> new UsecaseException("Usecase not found"));
+    }
+
+    public StatisticAnnotationMeasure getStatisticAnnotationMeasure(final String statisticAnnotationMeasure) {
+        return this.statisticAnnotationMeasureRepository.findById(statisticAnnotationMeasure)
+                .orElseThrow(() -> new StatisticException("Statistic annotation measure not found"));
     }
 }

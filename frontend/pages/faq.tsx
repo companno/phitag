@@ -5,12 +5,13 @@ import Head from "next/head";
 import ExpandableCard from "../components/generic/card/expandablecard";
 import Layout from "../components/generic/layout/layout";
 import ContentLayout from "../components/generic/layout/contentlayout";
+import BasicLayout from "../components/generic/layout/basiclayout";
 
 
 export function FAQ() {
 
     return (
-        <Layout>
+        <BasicLayout>
 
             <Head>
                 <title>PhiTag: FAQ</title>
@@ -55,13 +56,13 @@ export function FAQ() {
                             title="I have a question that is not answered here. What should I do?"
                             content="
                                 If you have a question that is not answered here, please feel free to contact us with your question.
-                                You can find our contact information on the [About](/about) page."
+                                You can find our contact information on the [About](/about-us) page."
                         />
 
                     </div>
                 </div>
             </ContentLayout>
-        </Layout>
+        </BasicLayout>
     )
 
 }

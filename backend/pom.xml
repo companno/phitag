@@ -22,7 +22,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
@@ -115,6 +115,13 @@
             <version>1.9.0</version>
         </dependency>
 
+        <!-- Math -->
+        <dependency>
+            <groupId>org.dkpro.statistics</groupId>
+            <artifactId>dkpro-statistics-agreement</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+
         <!-- Test -->
         <!-- JUnit 4 -->
         <dependency>
@@ -149,13 +156,6 @@
             <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- 
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>1.16.2</version>
-            <scope>test</scope>
-        </dependency> -->
 
     </dependencies>
 
