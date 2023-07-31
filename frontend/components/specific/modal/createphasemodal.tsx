@@ -25,6 +25,8 @@ import CreatePhaseCommand from "../../../lib/model/phase/command/CreatePhaseComm
 import Checkbox from "../../generic/checkbox/checkbox";
 import { useFetchAllSamplingMethods } from "../../../lib/service/sampling/SamplingResource";
 import Sampling from "../../../lib/model/sampling/model/Sampling";
+import { useFetchAllStatisticAnnotationMeasureResource } from "../../../lib/service/statistic/statistisannotationmeasure/StatisticAnnotationMeasureResource";
+import StatisticAnnotationMeasure from "../../../lib/model/statistic/statisticannotationmeasure/model/StatisticAnnotationMeasure";
 
 const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function, project: Project, mutateCallback: Function }> = ({ isOpen, closeModalCallback, project, mutateCallback }) => {
 
@@ -34,6 +36,7 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
     // data
     const annotationTypes = useFetchAllAnnotationTypes(isOpen);
     const sampling = useFetchAllSamplingMethods(isOpen);
+    const annotationagreement = useFetchAllStatisticAnnotationMeasureResource(isOpen);
 
     // state and handlers
     const [modalState, setModalState] = useState({
@@ -41,6 +44,8 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
         annotationType: null as unknown as AnnotationType,
         sampling: null as unknown as Sampling,
         isTutorial: false,
+        agreementStrategy: null as unknown as StatisticAnnotationMeasure,
+        threshold: 0,
         description: "",
     })
 
@@ -58,6 +63,8 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
                         annotationType: null as unknown as AnnotationType,
                         sampling: null as unknown as Sampling,
                         isTutorial: false,
+                        agreementStrategy: null as unknown as StatisticAnnotationMeasure,
+                        threshold: 0,
                         description: "",
                     });
                     mutateCallback();
@@ -79,6 +86,8 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
             annotationType: null as unknown as AnnotationType,
             sampling: null as unknown as Sampling,
             isTutorial: false,
+            agreementStrategy: null as unknown as StatisticAnnotationMeasure,
+            threshold: 0,
             description: "",
         });
         closeModalCallback();
@@ -125,16 +134,6 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
                                     </div>
                                 </div>
 
-                                <div className="flex w-full items-center py-2 px-3">
-                                    <Checkbox
-                                        selected={modalState.isTutorial}
-                                        description={"Is Phase a Tutorial"}
-                                        onClick={() => setModalState({
-                                            ...modalState,
-                                            isTutorial: !modalState.isTutorial
-                                        })} />
-                                </div>
-
                                 <div className="flex flex-col items-left my-6">
                                     <div className="font-bold text-lg">
                                         Annotation Type
@@ -142,7 +141,7 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
                                     <div className="py-2 px-3 border-b-2 mt-2">
                                         <DropdownSelect
                                             icon={<FiEdit2 className="basic-svg" />}
-                                            items={annotationTypes.annotationTypes}
+                                            items={annotationTypes.annotationTypes.sort((a, b) => a.getVisiblename().localeCompare(b.getVisiblename()))}
                                             selected={modalState.annotationType ? [modalState.annotationType] : []}
                                             onSelectFunction={(annotationType: AnnotationType) => setModalState({
                                                 ...modalState,
@@ -159,13 +158,61 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
                                     <div className="py-2 px-3 border-b-2 mt-2">
                                         <DropdownSelect
                                             icon={<FiSliders className="basic-svg" />}
-                                            items={sampling.sampling}
+                                            items={sampling.sampling.sort((a, b) => a.getVisiblename().localeCompare(b.getVisiblename()))}
                                             selected={modalState.sampling ? [modalState.sampling] : []}
                                             onSelectFunction={(sampling: Sampling) => setModalState({
                                                 ...modalState,
                                                 sampling: sampling
                                             })}
                                             message={modalState.sampling ? modalState.sampling.getVisiblename() : "None selected yet"} />
+                                    </div>
+                                </div>
+
+
+                                <div className="flex flex-col items-left my-6">
+                                    <div className="font-bold text-lg">
+                                        Tutorial
+                                    </div>
+
+
+                                    <div className="flex w-full items-center py-2 px-3">
+                                        <Checkbox
+                                            selected={modalState.isTutorial}
+                                            description={"Phase is a tutorial"}
+                                            onClick={() => setModalState({
+                                                ...modalState,
+                                                isTutorial: !modalState.isTutorial
+                                            })} />
+                                    </div>
+
+                                    <div className="py-2 px-3 border-b-2 mt-2 ">
+                                        <div className="font-light mb-2 -ml-3">
+                                            Annotation Agreement Strategy
+                                        </div>
+                                        <DropdownSelect
+                                            icon={<FiSliders className="basic-svg" />}
+                                            items={annotationagreement.statisticAnnotationMeasures.sort((a, b) => a.getVisiblename().localeCompare(b.getVisiblename()))}
+                                            selected={modalState.agreementStrategy ? [modalState.agreementStrategy] : []}
+                                            onSelectFunction={(agreement: StatisticAnnotationMeasure) => setModalState({
+                                                ...modalState,
+                                                agreementStrategy: agreement
+                                            })}
+                                            message={modalState.agreementStrategy ? modalState.agreementStrategy.getVisiblename() : "None selected yet"} />
+                                    </div>
+
+                                    <div className="py-2 px-3 border-b-2 mt-2 ">
+                                    <input
+                                            id="threshold"
+                                            name="threshold"
+                                            className="pl-3 flex flex-auto outline-none border-none w-full"
+                                            placeholder="Threshold"
+                                            type={"number"}
+                                            step={0.01}
+                                            value={modalState.threshold}
+                                            onChange={(e: any) => setModalState({
+                                                ...modalState,
+                                                threshold: e.target.value
+                                            })} />
                                     </div>
                                 </div>
 
@@ -208,6 +255,8 @@ function validateAndCreatePhase(project: Project, modalState: {
     annotationType: AnnotationType;
     sampling: Sampling;
     isTutorial: boolean;
+    agreementStrategy: StatisticAnnotationMeasure;
+    threshold: number;
     description: string;
 }): CreatePhaseCommand | null {
     if (project === undefined || project === null) {
@@ -225,6 +274,16 @@ function validateAndCreatePhase(project: Project, modalState: {
         return null;
     }
 
+    if (!modalState.sampling) {
+        toast.warning("Please select a sampling strategy.");
+        return null;
+    }
+
+    if (modalState.isTutorial && (!modalState.agreementStrategy || !modalState.threshold)) {
+        toast.warning("Please select an annotation agreement strategy for the tutorial phase.");
+        return null;
+    }
+
     return new CreatePhaseCommand(
         modalState.phasename,
         project.getId().getOwner(),
@@ -232,6 +291,8 @@ function validateAndCreatePhase(project: Project, modalState: {
         modalState.annotationType.getName(),
         modalState.sampling.getName(),
         modalState.isTutorial,
+        modalState.agreementStrategy ? modalState.agreementStrategy.getId() : "",
+        modalState.threshold,
         modalState.description
     );
 }

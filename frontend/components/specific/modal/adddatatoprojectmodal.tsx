@@ -51,7 +51,7 @@ const AddDataToProjectModal: React.FC<{ isOpen: boolean, closeModalCallback: Fun
         }
         ).catch((error) => {
             if (error?.response?.status === 500) {
-                toast.error("Error while adding data: " + error.response.data.message + "!");
+                toast.error("Error while adding data: " + error.response.data.message);
             } else {
                 toast.warning("The system is currently not available, please try again later!");
             }

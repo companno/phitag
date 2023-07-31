@@ -11,7 +11,7 @@ import Usage from "../../../../lib/model/phitagdata/usage/model/Usage";
 
 // components
 import LoadingComponent from "../../../generic/loadingcomponent";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import IconButtonOnClick from "../../../generic/button/iconbuttononclick";
 import { FiEdit, FiTool, FiTrash } from "react-icons/fi";
 import EditUsePairJudgementModal from "../../modal/editusepairjudgementmodal";
@@ -50,6 +50,11 @@ const UsePairJudgementHistoryTable: React.FC<{ phase: Phase }> = ({ phase }) => 
             }
         });
     }
+
+    // Reload the data on reload
+    useEffect(() => {
+        usepairjudgements.mutate();
+    }, [phase]);
 
     if (!phase || usepairjudgements.isLoading || usepairjudgements.isError) {
         return <LoadingComponent />;

@@ -118,7 +118,8 @@ const HumanPool: NextPage = () => {
                                         You can add them to your project by clicking on the plus icon on the user card.
                                         You can also search for specific users by typing in the search field.
                                     "
-                                    reference="/guide/explained-pools"
+                                    reference=""
+                                    linkage={false}
                                 />
                             </div>
                         </div>

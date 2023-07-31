@@ -87,7 +87,6 @@ public class CustomXMLParser implements IDictionaryParser {
         List<DictionaryEntrySense> dictionaryEntrySenses = new ArrayList<>();
         List<DictionaryEntrySenseExample> dictionaryEntrySenseExamples = new ArrayList<>();
 
-        int order = 0;
         for (EntryType entryType : parseDictionary.getEntries().getEntry()) {
             final DictionaryEntry dictionaryEntry = constructDictionaryEntryFromEntryType(dictionary, entryType);
 
@@ -113,7 +112,6 @@ public class CustomXMLParser implements IDictionaryParser {
                 senseOrder++;
             }
 
-            order++;
         }
 
         dictionaryEntryRepository.saveAll(dictionaryEntries);

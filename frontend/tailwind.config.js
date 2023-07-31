@@ -16,9 +16,9 @@ module.exports = {
                 'dm-mono-medium': ['DM Mono Medium'],
                 'dm-mono-medium-italic': ['DM Mono Medium Italic'],
 
-                'uni-corporate-light': ['DM Mono Light'],
-                'uni-corporate-regular': ['DM Mono Regular'],
-                'uni-corporate-bold': ['DM Mono Medium'],
+                'uni-corporate-light': ['Univers LT Std 45 Light'],
+                'uni-corporate-regular': ['Univers LT Std 55 Roman'],
+                'uni-corporate-bold': ['Univers LT Std 65 Bold'],
             },
 
             colors: {

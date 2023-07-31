@@ -64,15 +64,15 @@ const WSSIMTutorial: React.FC<{ phase: Phase }> = ({ phase }) => {
 
     const handleFinalizeAnnotation = () => {
         bulkAnnotateWSSIM(tutorialAnnotation.annotatedInstances, storage.get).then(() => {
-            toast.success("Tutorial finished. Results are available on the project page.");
-            Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
+            toast.info("Tutorial finished. Results can be checked in the phase overview.");
         }).catch((error) => {
             if (error?.response?.status === 500) {
-                toast.error("" + error.response.data.message + "!");
-                Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
+                toast.error("Error while evaluating tutorial: " + error.response.data.message);
             } else {
                 toast.warning("The system is currently not available, please try again later!");
             }
+        }).finally(() => {
+            Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
         });
     }
 

@@ -21,7 +21,7 @@ import PhaseStatusEnum from "../../../lib/model/phase/data/PhaseStatusEnum";
 
 interface IPhaseCard {
     phase: Phase;
-    // onClickAddData: () => void;
+    
     onClickRequirements: () => void;
     onClickComputation: () => void;
 
@@ -119,7 +119,7 @@ const PhaseCard: React.FC<IPhaseCard> = ({ phase, onClickRequirements, onClickCo
                                             </div>
                                             <div className="flex flex-row">
                                                 <div className="ml-8 font-dm-mono-light text-base16-gray-600 text-sm">
-                                                    {tutorial.right ? "Completed" : "Incomplete"}
+                                                    {tutorial.right ? "Completed" : "Not Passed"}
                                                 </div>
                                             </div>
                                         </div>

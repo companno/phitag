@@ -8,9 +8,16 @@ export default class CreatePhaseCommand {
     private readonly sampling: string;
 
     private readonly tutorial: boolean;
+    private readonly annotationAgreement: string;
+    private readonly threshold: number;
+
     private readonly description: string;
 
-    constructor (name: string, owner: string, project: string, annotationType: string, sampling: string, tutorial: boolean, description: string) {
+    constructor (
+        name: string, owner: string, project: string, 
+        annotationType: string, sampling: string, 
+        tutorial: boolean, annotationAgreement: string, threshold: number,
+        description: string) {
         this.name = name;
         this.owner = owner;
         this.project = project;
@@ -19,6 +26,9 @@ export default class CreatePhaseCommand {
         this.sampling = sampling;
 
         this.tutorial = tutorial;
+        this.annotationAgreement = annotationAgreement;
+        this.threshold = threshold;
+
         this.description = description;
     }
 

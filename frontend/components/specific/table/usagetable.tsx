@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { FiArrowLeft, FiArrowRight, FiEdit } from "react-icons/fi";
 
@@ -27,6 +27,10 @@ const UsageTable: React.FC<{ project: Project, hideEdit: boolean, modalState: { 
         usage: null as unknown as Usage,
     });
 
+    // Reload the data on reload
+    useEffect(() => {
+        usages.mutate();
+    }, [project]);
 
     if (!project || usages.isLoading || usages.isError) {
         return <LoadingComponent />;

@@ -32,11 +32,6 @@ const AddGuidelineToProjectModal: React.FC<{ isOpen: boolean, closeModalCallback
             return;
         }
 
-        if (selectedFile.type != "text/markdown") {
-            toast.error("Please select a markdown file");
-            return;
-        }
-
         addGuideline(project.getId().getOwner(), project.getId().getName(), selectedFile, get).then((res) => {
             toast.success("Successfully added guideline");
             mutateCallback();

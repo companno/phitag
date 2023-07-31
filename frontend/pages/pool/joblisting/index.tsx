@@ -142,7 +142,9 @@ const JoblistingPage: NextPage = () => {
                                         If you join a joblisting with a waitinglist, you will be added to the waitinglist and will be notified if you are accepted. 
                                         If you join an open joblisting, you will be added to the project as an annotator immediately.
                                         You can see your personal joblistings on the 'Personal Joblistings' page."
-                                    reference="/guide/explained-pools"
+
+                                    reference=""
+                                    linkage={false}
                                 />
                             </div>
 

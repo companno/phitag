@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFetchPagedLexSubInstance } from "../../../../lib/service/instance/InstanceResource";
 import Phase from "../../../../lib/model/phase/model/Phase";
 import LoadingComponent from "../../../generic/loadingcomponent";
@@ -11,6 +11,11 @@ const LexSubInstanceTable: React.FC<{ phase: Phase, modalState: { openData: bool
 
     const [page, setPage] = useState(0);
     const lexsubinstances = useFetchPagedLexSubInstance(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), page, !!phase);
+
+    // Reload the data on reload
+    useEffect(() => {
+        lexsubinstances.mutate();
+    }, [phase]);
 
     if (!phase || lexsubinstances.isLoading || lexsubinstances.isError) {
         return <LoadingComponent />;

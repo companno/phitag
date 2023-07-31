@@ -1,12 +1,12 @@
 package de.garrafao.phitag.domain.helper;
 
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 public class Pair<L, R> {
     
-    private final L left;
-    private final R right;
+    private L left;
+    private R right;
 
     public Pair(final L left, final R right) {
         this.left = left;

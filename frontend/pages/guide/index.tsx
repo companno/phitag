@@ -21,6 +21,7 @@ import { FiSearch } from "react-icons/fi";
 import GuideHeader from "../../lib/model/guides/GuideHeader";
 import { getSortedGuideHeader } from "../../lib/hook/useGuide";
 import GuideCard from "../../components/generic/card/guidecard";
+import BasicLayout from "../../components/generic/layout/basiclayout";
 
 
 export function Guides({ allGuides }: { allGuides: GuideHeader[] }) {
@@ -36,7 +37,7 @@ export function Guides({ allGuides }: { allGuides: GuideHeader[] }) {
     }
 
     return (
-        <Layout>
+        <BasicLayout>
 
             <Head>
                 <title>PhiTag: Guides</title>
@@ -78,7 +79,7 @@ export function Guides({ allGuides }: { allGuides: GuideHeader[] }) {
                     </div>
                 </div>
             </ContentLayout>
-        </Layout>
+        </BasicLayout>
     )
 
 }

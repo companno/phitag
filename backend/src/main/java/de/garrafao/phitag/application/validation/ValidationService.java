@@ -168,6 +168,22 @@ public class ValidationService {
     }
 
     /**
+     * Higher level validation of access rights, where user should be owner of the
+     * project.
+     * 
+     * @param requester
+     * @param project
+     * @return
+     */
+    public ValidationService projectOwnerAccess(final User requester, final Project project) {
+        if (project.getOwner().equals(requester)) {
+            return this;
+        }
+
+        throw new AccessDenidedException();
+    }
+
+    /**
      * Lower level validation of access rights to project and phase, where the user
      * is checked if it is an annotator of the project and phase.
      * 

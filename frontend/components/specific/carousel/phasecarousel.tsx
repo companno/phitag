@@ -27,6 +27,7 @@ import AnnotationType from "../../../lib/model/annotationtype/model/AnnotationTy
 import Phase from "../../../lib/model/phase/model/Phase";
 import Project from "../../../lib/model/project/model/Project";
 import ENTITLEMENTS from "../../../lib/model/entitlement/Entitlements";
+import Togglebox from "../../generic/checkbox/togglebox";
 
 
 
@@ -76,9 +77,10 @@ const PhaseCarousel: React.FC<{ project: Project }> = ({ project }) => {
 
             <div className="w-full mt-8 flex flex-row items-center">
                 <div className="mx-4 flex ">
-                    <Checkbox
+                    <Togglebox
                         selected={searchFilter.tutorial}
-                        description={"Is Tutorial"}
+                        left="Phase"
+                        right="Tutorial"
                         onClick={() => setSearchFilter({
                             ...searchFilter,
                             tutorial: !searchFilter.tutorial
@@ -106,7 +108,7 @@ const PhaseCarousel: React.FC<{ project: Project }> = ({ project }) => {
                         Each phase has its own annotation types, sampling strategy and annotation requirements.
                         You can add a phase by clicking on the plus button.
                         You can also add tutorial phases, which are used to teach annotators how to annotate a specific annotation type and validate the annotators ability to annotate."
-                        reference="/guide/how-to-annotation-project"
+                        reference="/guide/explained-phase"
 
                     />
                 </div>

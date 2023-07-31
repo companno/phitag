@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -24,6 +25,7 @@ import de.garrafao.phitag.application.statistics.annotatostatistic.AnnotatorStat
 import de.garrafao.phitag.application.statistics.phasestatistic.PhaseStatisticApplicationService;
 import de.garrafao.phitag.application.statistics.userstatistic.UserStatisticApplicationService;
 import de.garrafao.phitag.domain.judgement.usepairjudgement.page.UsePairJudgementPageBuilder;
+import de.garrafao.phitag.application.common.CommonMathService;
 import de.garrafao.phitag.application.judgement.usepairjudgement.data.AddUsePairJudgementCommand;
 import de.garrafao.phitag.application.judgement.usepairjudgement.data.DeleteUsePairJudgementCommand;
 import de.garrafao.phitag.application.judgement.usepairjudgement.data.EditUsePairJudgementCommand;
@@ -42,6 +44,9 @@ import de.garrafao.phitag.domain.judgement.usepairjudgement.error.UsePairJudgeme
 import de.garrafao.phitag.domain.judgement.usepairjudgement.query.UsePairJudgementQueryBuilder;
 import de.garrafao.phitag.domain.phase.Phase;
 import de.garrafao.phitag.domain.phase.error.TutorialException;
+import de.garrafao.phitag.domain.statistic.statisticannotationmeasure.StatisticAnnotationMeasureEnum;
+import de.garrafao.phitag.domain.statistic.tutorialannotationmeasurehistory.TutorialAnnotationMeasureHistory;
+import de.garrafao.phitag.domain.statistic.tutorialannotationmeasurehistory.TutorialAnnotationMeasureHistoryRepository;
 
 @Service
 public class UsePairJudgementApplicationService {
@@ -49,6 +54,8 @@ public class UsePairJudgementApplicationService {
     private final UsePairJudgementRepository usePairJudgementRepository;
 
     private final UsePairInstanceRepository usePairInstanceRepository;
+
+    private final TutorialAnnotationMeasureHistoryRepository tutorialAnnotationMeasureHistoryRepository;
 
     // Statistics
 
@@ -58,20 +65,26 @@ public class UsePairJudgementApplicationService {
 
     private final PhaseStatisticApplicationService phaseStatisticApplicationService;
 
+    private final CommonMathService commonMathService;
+
     @Autowired
     public UsePairJudgementApplicationService(
             final UsePairJudgementRepository usePairJudgementRepository,
             final UsePairInstanceRepository usePairInstanceRepository,
+            final TutorialAnnotationMeasureHistoryRepository tutorialAnnotationMeasureHistoryRepository,
 
             final UserStatisticApplicationService userStatisticApplicationService,
             final AnnotatorStatisticApplicationService annotatorStatisticApplicationService,
-            final PhaseStatisticApplicationService phaseStatisticApplicationService) {
+            final PhaseStatisticApplicationService phaseStatisticApplicationService,
+            final CommonMathService commonMathService) {
         this.usePairJudgementRepository = usePairJudgementRepository;
         this.usePairInstanceRepository = usePairInstanceRepository;
+        this.tutorialAnnotationMeasureHistoryRepository = tutorialAnnotationMeasureHistoryRepository;
 
         this.userStatisticApplicationService = userStatisticApplicationService;
         this.annotatorStatisticApplicationService = annotatorStatisticApplicationService;
         this.phaseStatisticApplicationService = phaseStatisticApplicationService;
+        this.commonMathService = commonMathService;
     }
 
     // Getter
@@ -407,23 +420,39 @@ public class UsePairJudgementApplicationService {
                     "Tutorial not completed. Please check your judgements. Not all instances were judged");
         }
 
-        commands.forEach(command -> {
-            final UsePairJudgement gold = golds.stream()
-                    .filter(j -> j.getId().getInstanceid().getInstanceid().equals(command.getInstance()))
-                    .findFirst()
-                    .orElseThrow(() -> new TutorialException(
-                            "Tutorial not completed. Please check your judgements. Not all instances were judged"));
+        // Create two lists of the labels of the gold and the annotator
+        List<String> goldLabels = golds.stream().map(UsePairJudgement::getLabel).toList();
+        List<String> annotatorLabels = commands.stream().map(AddUsePairJudgementCommand::getLabel).toList();
 
-            if (!gold.getLabel().equals(command.getLabel())) {
-                throw new TutorialException("Tutorial not completed. Judgements are incorrect");
-            }
-        });
+        List<List<String>> annotatorLabelList = Arrays.asList(goldLabels, annotatorLabels);
+        List<String> categories = golds.get(0).getInstance().getLabelSet();
+
+        // Check if the tutorial phase has a statistic annotation measure 
+        if (phase.getStatisticAnnotationMeasure() == null || phase.getStatisticAnnotationMeasureThreshold() == null
+                || StatisticAnnotationMeasureEnum.fromId(phase.getStatisticAnnotationMeasure().getId()) == null) {
+            throw new TutorialException(
+                    "This tutorial is not valid anymore. Please contact the project owner for a new tutorial.");
+        }
+
+        // Calculate the annotator agreement
+        double agreement = this.commonMathService.calculateAnnotatorAgreement(categories,
+                StatisticAnnotationMeasureEnum.fromId(phase.getStatisticAnnotationMeasure().getId()),
+                annotatorLabelList);
 
         // Finally, mark the tutorial phase as completed for the annotator
         // As the object annotator is managed by the persistence context, we do not need
         // to
         // call the annotator repository and can simply update the object, HOPEFULLY?!?
-        annotator.addCompletedTutorial(phase);
+        if (agreement >= phase.getStatisticAnnotationMeasureThreshold()) {
+            annotator.addCompletedTutorial(phase);
+        }
+
+        tutorialAnnotationMeasureHistoryRepository.save(
+                new TutorialAnnotationMeasureHistory(
+                        phase,
+                        annotator,
+                        agreement,
+                        agreement >= phase.getStatisticAnnotationMeasureThreshold()));
     }
 
     // Parser

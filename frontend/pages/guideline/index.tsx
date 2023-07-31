@@ -17,6 +17,7 @@ import StaticGuidelineCard from "../../components/generic/card/staticguidelineca
 //Layout
 import ContentLayout from "../../components/generic/layout/contentlayout";
 import Layout from "../../components/generic/layout/layout";
+import BasicLayout from "../../components/generic/layout/basiclayout";
 
 export default function GuidesAndGuidelines({ guidelines }: { guidelines: StaticData[] }) {
 
@@ -24,7 +25,7 @@ export default function GuidesAndGuidelines({ guidelines }: { guidelines: Static
     const [grid, setGrid] = useState(false);
 
     return (
-        <Layout>
+        <BasicLayout>
             <Head>
                 <title>PhiTag: Guidelines</title>
             </Head>
@@ -66,7 +67,7 @@ export default function GuidesAndGuidelines({ guidelines }: { guidelines: Static
                 </div>
             </ContentLayout>
 
-        </Layout>
+        </BasicLayout>
     );
 
 }

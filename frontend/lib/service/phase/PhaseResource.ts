@@ -16,6 +16,8 @@ import CreatePhaseCommand from "../../model/phase/command/CreatePhaseCommand";
 import AddRequirementsCommand from "../../model/phase/command/AddRequirementsCommand";
 import StartComputationalAnnotationCommand from "../../model/phase/command/StartComputationalAnnotationCommand";
 import { toast } from "react-toastify";
+import TutorialHistoryDto from "../../model/tutorialhistory/dto/TutorialHistoryDto";
+import TutorialHistory from "../../model/tutorialhistory/model/TutorialHistory";
 
 // Custom hooks for fetching phases
 
@@ -109,6 +111,36 @@ export function useFetchAnnotationAccess(owner: string, project: string, phase: 
         isLoading: !error,
         isError: !!error,
         mutate: mutate
+    }
+}
+
+/**
+ * Get tutorial measurement history.
+ * 
+ * @param owner username of the owner of the project
+ * @param project project name
+ * @param phase phase name
+ * 
+ * @returns list of tutorial history 
+ */
+export function useFetchTutorialMeasurementHistory(owner: string, project: string, phase: string, fetch: boolean = true) {
+    const { get } = useStorage();
+    const token = get('JWT') ?? '';
+
+    const tutorialHistoryFetcher = (url: string) => axios.get<TutorialHistoryDto[]>(url, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(res => res.data).catch(error => {
+        toast.info("There seems to be an error with the tutorial history. " + error.response.data.message);
+    })
+
+    const { data, error, mutate } = useSWR(fetch ? `${BACKENDROUTES.PHASE}/tutorial/measurement-history?owner=${owner}&project=${project}&phase=${phase}` : null, tutorialHistoryFetcher)
+
+    return {
+        tutorialHistory: data ? data.map(TutorialHistory.fromDto) : [] as TutorialHistory[],
+        isLoading: !error && !data,
+        isError: !!error,
     }
 }
 

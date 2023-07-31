@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -224,8 +225,15 @@ public class UsageApplicationService {
 
     private Iterable<CSVRecord> parseCsvFile(final MultipartFile file) {
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-            CSVFormat format = CSVFormat.Builder.create().setHeader().setSkipHeaderRecord(true).setDelimiter("\t")
+            BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8));
+            CSVFormat format = CSVFormat.Builder.create()
+                    .setHeader()
+                    .setSkipHeaderRecord(true)
+                    .setDelimiter("\t")
+                    .setIgnoreEmptyLines(true)
+                    .setQuote(null)
+                    .setNullString("")
+                    .setTrim(true)
                     .build();
 
             CSVParser parser = new CSVParser(reader, format);
@@ -234,28 +242,57 @@ public class UsageApplicationService {
 
             return records;
         } catch (Exception e) {
-            throw new CsvParseException();
+            throw new CsvParseException("Could not parse CSV file, please check the format. Make sure that the file is UTF-8 encoded.");
         }
     }
 
     private Usage parseRecordToUsage(Project project, CSVRecord csvRecord) {
-        try {
-            String externalId = csvRecord.get(UsageHeaderEnum.dataID);
-            String context = csvRecord.get(UsageHeaderEnum.context);
-            String indexTargetToken = csvRecord.get(UsageHeaderEnum.indices_target_token);
-            String indexTargetSentence = csvRecord.get(UsageHeaderEnum.indices_target_sentence);
-            String lemma = csvRecord.get(UsageHeaderEnum.lemma);
+        String externalId, context, indexTargetToken, indexTargetSentence, lemma, group;
 
-            String group = "";
+        try {
+            externalId = csvRecord.get("dataID");
+        } catch (Exception e) {
+            throw new CsvParseException("Could not parse dataID of CSV record, please check the format. Make sure that the file is UTF-8 encoded.");
+        }
+
+        try {
+            context = csvRecord.get(UsageHeaderEnum.context);
+        } catch (Exception e) {
+            throw new CsvParseException("Could not parse context of CSV record, please check the format. Make sure that the file is UTF-8 encoded.");
+        }
+
+        try {
+            indexTargetToken = csvRecord.get(UsageHeaderEnum.indices_target_token);
+        } catch (Exception e) {
+            throw new CsvParseException("Could not parse indices_target_token of CSV record, please check the format. Make sure that the file is UTF-8 encoded.");
+        }
+
+        try {
+            indexTargetSentence = csvRecord.get(UsageHeaderEnum.indices_target_sentence);
+        } catch (Exception e) {
+            throw new CsvParseException(
+                    "Could not parse indices_target_sentence of CSV record, please check the format. Make sure that the file is UTF-8 encoded.");
+        }
+
+        try {
+            lemma = csvRecord.get(UsageHeaderEnum.lemma);
+        } catch (Exception e) {
+            throw new CsvParseException("Could not parse lemma of CSV record, please check the format. Make sure that the file is UTF-8 encoded.");
+        }
+
+        try {
+
+            group = "";
 
             if (csvRecord.isSet(UsageHeaderEnum.group.name())) {
                 group = csvRecord.get(UsageHeaderEnum.group);
             }
 
-            return new Usage(project, externalId, context, indexTargetToken, indexTargetSentence, lemma, group);
         } catch (Exception e) {
-            throw new CsvParseException("CSV record is not valid, please check the format");
+            throw new CsvParseException("Could not parse group of CSV record, please check the format. Make sure that the file is UTF-8 encoded.");
         }
+
+        return new Usage(project, externalId, context, indexTargetToken, indexTargetSentence, lemma, group);
     }
 
     // Validation

@@ -56,6 +56,10 @@ const LexSubJudgementTable: React.FC<{ phase: Phase, modalState: { open: boolean
         if (lexsubjudgements.isError && router.isReady) {
             toast.error("Error while fetching judgements");
         }
+
+        // Reload the data on reload
+        lexsubjudgements.mutate();
+
     }, [lexsubjudgements.isError, router.isReady]);
 
     if (!phase || lexsubjudgements.isLoading || lexsubjudgements.isError) {
