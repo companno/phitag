@@ -2,6 +2,7 @@ package de.garrafao.phitag.application.project;
 
 import java.util.List;
 
+import de.garrafao.phitag.application.project.data.UpdateProjectCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,7 +87,7 @@ public class ProjectApplicationService {
      * Get projects by query with fuzzy search.
      * 
      * @param query query for search
-     * @return list of {@ProjectDto}
+     * @return list of {@ProjectDta}
      */
     public List<ProjectDto> queryProjectDto(final Query query) {
         return this.projectRepository.findByQuery(query).stream().map(ProjectDto::from).toList();
@@ -95,8 +96,8 @@ public class ProjectApplicationService {
     /**
      * Get public projects of a user
      * 
-     * @param authenticationToken
-     * @param owner
+     * @param authenticationToken fetch user information from authentication token
+     * @param owner owner of the project
      * @return list of {@ProjectDto}
      */
     public List<ProjectDto> getPublicProjectOfUserDtos(final String authenticationToken, final String owner) {
@@ -201,10 +202,37 @@ public class ProjectApplicationService {
     }
 
     /**
+     * Update a project.
+     *
+     * @param authenticationToken the authentication token of the requesting user
+     * @param command fields which user want to update
+     * @param owner  owner of the project
+     * @param project name of the project which user owner want to update
+
+     */
+
+    @Transactional
+    public void update(final String authenticationToken,final String project, final String owner, UpdateProjectCommand command){
+
+        //fetching user information
+        final User requester = this.commonService.getUserByAuthenticationToken(authenticationToken);
+
+        //check project is exist or not
+        final Project existingProject = this.commonService.getProject(owner, project);
+
+        //checking user has right to  update a project or not
+        this.validationService.projectAccess(requester, existingProject);
+
+        //Update the project
+       this.validateUpdateCommand(existingProject, command);
+    }
+
+
+    /**
      * Delete a project.
      * 
-     * @param authenticationToken
-     * @param command
+     * @param authenticationToken fetching user information form authentication token
+     * @param  projectName name of project
      */
     @Transactional
     public void delete(final String authenticationToken, final String projectName) {
@@ -219,6 +247,10 @@ public class ProjectApplicationService {
 
         this.projectRepository.delete(project);
     }
+
+
+
+
 
     // Validators
 
@@ -237,6 +269,27 @@ public class ProjectApplicationService {
 
         if (ProjectNameRestrictionEnum.contains(command.getName().toLowerCase())) {
             throw new ProjectNameRestrictionException();
+        }
+
+    }
+
+    private void validateUpdateCommand(final Project project, final UpdateProjectCommand command){
+        if (command.getNewname() != null && !command.getNewname().isEmpty() && !command.getNewname().isBlank()) {
+            project.setDisplayname(command.getNewname());
+        }
+        if (command.getNewdescription() != null && !command.getNewdescription().isEmpty() && !command.getNewdescription().isBlank()) {
+            project.setDescription(command.getNewdescription());
+        }
+        if(command.getLanguage() != null && !command.getLanguage().isEmpty() && !command.getLanguage().isBlank()){
+            Language language = this.commonService.getLanguage(command.getLanguage());
+            project.setLanguage(language);
+        }
+        if(command.getVisibility() !=null && !command.getVisibility().isEmpty() && !command.getVisibility().isBlank()){
+            Visibility visibility = this.commonService.getVisibility(command.getVisibility());
+            project.setVisibility(visibility);
+        }
+        if (command.getActive() != null) {
+            project.setActive(command.getActive());
         }
 
     }

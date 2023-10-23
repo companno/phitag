@@ -2,6 +2,7 @@ package de.garrafao.phitag.infrastructure.rest;
 
 import java.util.List;
 
+import de.garrafao.phitag.application.project.data.UpdateProjectCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -80,6 +81,7 @@ public class ProjectResource {
      *                            The username and project name combination
      * @return
      *         The project
+     *
      */
     @GetMapping(value = "/find")
     public ProjectDto find(
@@ -141,6 +143,20 @@ public class ProjectResource {
             @RequestBody CreateProjectCommand command) {
         projectApplicationService.create(authenticationToken, command);
     }
+
+    /**
+     * update project.
+     *
+
+     */
+    @PostMapping(value = "/update")
+    public void update(@RequestHeader("Authorization") String authenticationToken,
+                       @RequestBody UpdateProjectCommand command,
+                       @RequestParam(value = "owner") final String owner,
+                       @RequestParam(value = "project") final String project) {
+        projectApplicationService.update(authenticationToken, project, owner, command);
+    }
+
 
     /**
      * Deletes a project.

@@ -10,6 +10,7 @@ import ProjectDto from "../../model/project/dto/ProjectDto";
 
 // Commands
 import CreateProjectCommand from "../../model/project/command/CreateProjectCommand";
+import UpdateProjectCommand from "../../model/project/command/UpdateProjectCommand";
 
 // Custom hooks for fetching projects and project related data
 
@@ -180,4 +181,24 @@ export function deleteProject(project: string, get: Function = () => {}) {
             headers: { "Authorization": `Bearer ${token}` },
         }
     ).then(res => res.data);
+}
+
+
+/**
+ * Update project
+ * 
+ * @param project project to create
+ * @param get function to get data from local storage
+ * @returns 
+ */
+export async function UpdateProject(owner: string, project: string,  editProject:UpdateProjectCommand, get: Function = () => {}) {
+    const token = get('JWT') ?? '';
+    
+    const res = await axios.post(`${BACKENDROUTES.PROJECT}/update?owner=${owner}&project=${project}`,
+        editProject,
+        {
+            headers: { "Authorization": `Bearer ${token}` },
+        }
+    );
+    return res.data;
 }
