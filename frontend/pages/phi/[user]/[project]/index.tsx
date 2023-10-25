@@ -44,6 +44,7 @@ const ProjectPage: NextPage = () => {
 
     const project = useFetchProject(username, projectname, router.isReady);
     const entitlement = useFetchSelfEntitlement(username, projectname, !project.isLoading && !project.isError);
+    
 
 
     useEffect(() => {
@@ -71,7 +72,6 @@ const ProjectPage: NextPage = () => {
 
 
             <SingleContentLayout>
-
                 <LinkHead icon={<FiFolder className="stroke-2" />}
                     links={[
                         {
@@ -103,8 +103,6 @@ const ProjectPage: NextPage = () => {
                             <ProjectOverviewCard project={project.project} />
                         </div>
                     </div>
-
-
 
                     <div className="my-8">
                         <PhaseCarousel project={project.project} />
