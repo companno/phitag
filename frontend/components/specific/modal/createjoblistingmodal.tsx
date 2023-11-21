@@ -4,7 +4,7 @@ import { useState } from "react";
 // Next
 
 // Icons
-import { FiClipboard, FiEdit3, FiFeather, FiFolder, FiUnderline } from "react-icons/fi";
+import { FiClipboard, FiEdit3, FiFeather, FiFolder, FiLayers, FiUnderline } from "react-icons/fi";
 
 // Toast
 
@@ -21,6 +21,8 @@ import DropdownSelect from "../../generic/dropdown/dropdownselect";
 import Checkbox from "../../generic/checkbox/checkbox";
 import { toast } from "react-toastify";
 import { postNewJoblisting } from "../../../lib/service/joblisting/JoblistingResource";
+import { useFetchPhases } from "../../../lib/service/phase/PhaseResource";
+import Phase from "../../../lib/model/phase/model/Phase";
 
 
 const CreateJoblistingModal: React.FC<{ isOpen: boolean, closeModalCallback: Function, mutateCallback: Function }> = ({ isOpen, closeModalCallback, mutateCallback }) => {
@@ -35,8 +37,15 @@ const CreateJoblistingModal: React.FC<{ isOpen: boolean, closeModalCallback: Fun
         name: "",
         project: null as unknown as Project,
         open: false,
+        phase:null as unknown as Phase,
         description: "",
     })
+   
+    const phases = useFetchPhases(
+        modalState.project && modalState.project.getId() ? modalState.project.getId().getOwner() : "",
+        modalState.project && modalState.project.getId() ? modalState.project.getId().getName() : ""
+      );
+
 
     // handlers
 
@@ -52,6 +61,7 @@ const CreateJoblistingModal: React.FC<{ isOpen: boolean, closeModalCallback: Fun
                         name: "",
                         project: null as unknown as Project,
                         open: false,
+                        phase:null as unknown as Phase,
                         description: "",
                     });
                     mutateCallback();
@@ -65,13 +75,17 @@ const CreateJoblistingModal: React.FC<{ isOpen: boolean, closeModalCallback: Fun
                 });
         }
     }
+  
+      
 
+  
     const onCancel = () => {
         toast.info("Canceled creating a new joblisting.");
         setModalState({
             name: "",
             project: null as unknown as Project,
             open: false,
+            phase:null as unknown as Phase,
             description: "",
         });
         closeModalCallback();
@@ -85,7 +99,6 @@ const CreateJoblistingModal: React.FC<{ isOpen: boolean, closeModalCallback: Fun
     return (
         <div className="relative z-10 font-dm-mono-medium" onClick={() => onCancel()}>
             <div className="fixed inset-0 bg-base16-gray-500 bg-opacity-75" />
-
             <div className="fixed z-10 inset-0 overflow-y-auto">
                 <div className="flex items-center justify-center min-h-full">
                     <div className="relative bg-white overflow-hidden shadow-md py-4 px-8  max-w-xl w-full" onClick={(e: any) => e.stopPropagation()}>
@@ -117,7 +130,6 @@ const CreateJoblistingModal: React.FC<{ isOpen: boolean, closeModalCallback: Fun
                                             })} />
                                     </div>
                                 </div>
-
                                 <div className="flex flex-col items-left my-6">
                                     <div className="font-bold text-lg">
                                         Project
@@ -133,6 +145,17 @@ const CreateJoblistingModal: React.FC<{ isOpen: boolean, closeModalCallback: Fun
                                             })}
                                             message={modalState.project ? modalState.project.getDisplayname() : "Select Project"}
                                         />
+                                         {modalState.project && (
+                                        <DropdownSelect
+                                            icon={<FiLayers className="basic-svg" />}
+                                            items={phases.phases}
+                                            selected={modalState.phase ? [modalState.phase] : []}
+                                            onSelectFunction={(phase: Phase) => setModalState({
+                                                ...modalState,
+                                                phase: phase
+                                            })}
+                                            message={modalState.phase ? modalState.phase.getDisplayname() : "Select Phase"}
+                                        />)}
                                     </div>
                                 </div>
 
@@ -144,8 +167,6 @@ const CreateJoblistingModal: React.FC<{ isOpen: boolean, closeModalCallback: Fun
                                         open: !modalState.open
                                     })} />
                                 </div>
-
-
                                 <div className="flex flex-col items-left my-6">
                                     <div className="font-bold text-lg">
                                         Description
@@ -163,7 +184,6 @@ const CreateJoblistingModal: React.FC<{ isOpen: boolean, closeModalCallback: Fun
                                             })} />
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                         <div className="flex flex-row divide-x-8">
@@ -184,6 +204,7 @@ export default CreateJoblistingModal;
 function verifyAndCreateCommand(command: {
     name: string,
     project: Project,
+    phase: Phase,
     open: boolean,
     description: string
 }): CreateJoblistingCommand | null {
@@ -199,6 +220,7 @@ function verifyAndCreateCommand(command: {
         command.name,
         command.project.getId().getOwner(),
         command.project.getId().getName(),
+        command.phase.getId().getPhase(),
         command.open,
         command.description
     );

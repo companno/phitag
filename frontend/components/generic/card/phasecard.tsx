@@ -7,8 +7,12 @@ import { useState } from "react";
 import useStorage from "../../../lib/hook/useStorage";
 
 // React Icons
-import { FiEdit3, FiLayers, FiPlay, FiStopCircle } from "react-icons/fi";
+import { FiAperture, FiCode, FiCpu, FiDatabase, FiDroplet, FiEdit3, FiGitPullRequest, FiLayers, FiPackage, FiPaperclip, FiPenTool, FiPieChart, FiPlay, FiPocket, FiStopCircle } from "react-icons/fi";
 
+
+//Resource
+
+import { setCode } from "../../../lib/service/phase/PhaseResource";
 // Models
 import Phase from "../../../lib/model/phase/model/Phase";
 import ENTITLEMENTS from "../../../lib/model/entitlement/Entitlements";
@@ -18,10 +22,11 @@ import IconButtonOnClick from "../../generic/button/iconbuttononclick";
 import IconButtonWithTooltip from "../../generic/button/iconbuttonwithtooltip";
 import { closePhase } from "../../../lib/service/phase/PhaseResource";
 import PhaseStatusEnum from "../../../lib/model/phase/data/PhaseStatusEnum";
+import { toast } from "react-toastify";
 
 interface IPhaseCard {
     phase: Phase;
-    
+
     onClickRequirements: () => void;
     onClickComputation: () => void;
 
@@ -43,8 +48,35 @@ const PhaseCard: React.FC<IPhaseCard> = ({ phase, onClickRequirements, onClickCo
             }).catch((error) => {
                 console.log(error);
             });
-
     }
+
+
+    
+
+    const [phasecode, setPhaseCode] = useState("");
+
+
+
+
+    const onClickSetCode = async () => {
+        try {
+            const owner: string = phase.getId().getOwner();
+            const project: string = phase.getId().getProject();
+            const phasename: string = phase.getId().getPhase();
+
+            const pastedData: string = await navigator.clipboard.readText();
+            setPhaseCode(pastedData);
+            if (pastedData) {
+                setCode(owner, project, phasename, pastedData, storage.get).then((res) => {
+                        toast.info(`code ${pastedData} added successfully.`);
+                });
+            } else {
+               toast.info("Please copy code first.")
+            }
+        } catch (error) {
+            toast.error("Error uploading code.")
+        }
+    };
 
     if (!phase) {
         return <div />;
@@ -66,7 +98,6 @@ const PhaseCard: React.FC<IPhaseCard> = ({ phase, onClickRequirements, onClickCo
                         {phase.getAnnotationType().getVisiblename()}
                     </div>
                 </div>
-
                 <div className="flex flex-row justify-between items-center mb-1">
                     <div className="text-sm text-left">
                         Sampling Strategy:
@@ -84,7 +115,7 @@ const PhaseCard: React.FC<IPhaseCard> = ({ phase, onClickRequirements, onClickCo
                         {phase.getStatus()}
                     </div>
                 </div>
-                {/* </div> */}
+                
 
                 <div className="mx-16 my-4 border-b-2" />
 
@@ -133,6 +164,7 @@ const PhaseCard: React.FC<IPhaseCard> = ({ phase, onClickRequirements, onClickCo
                 <div className="mx-16 my-4 border-b-2" />
 
                 <div className="flex flex-row justify-end align-bottom space-x-4" onClick={(e: any) => e.stopPropagation()}>
+                    <IconButtonOnClick icon={<FiCode className="basic-svg" />} onClick={onClickSetCode} tooltip="Paste Submission Code Here" hide={phase.getStatus() === PhaseStatusEnum.CLOSED || phase.isTutorial() || entitlement !== ENTITLEMENTS.ADMIN} />
                     <IconButtonOnClick icon={<FiStopCircle className="basic-svg" />} onClick={onClickClosePhase} tooltip="Close Phase" hide={phase.getStatus() === PhaseStatusEnum.CLOSED || phase.isTutorial() || entitlement !== ENTITLEMENTS.ADMIN} />
                     <IconButtonOnClick icon={<FiLayers className="basic-svg" />} onClick={onClickRequirements} tooltip="Add Requirements" hide={phase.getStatus() === PhaseStatusEnum.CLOSED || entitlement !== ENTITLEMENTS.ADMIN || phase.isTutorial()} />
                     <IconButtonWithTooltip icon={<FiEdit3 className="basic-svg" />} reference={`${urlprefix}/${phase.isTutorial() ? "tutorial" : "annotate"}`} tooltip="Annotate" hide={phase.getStatus() === PhaseStatusEnum.CLOSED || entitlement !== ENTITLEMENTS.ADMIN && entitlement !== ENTITLEMENTS.USER} />

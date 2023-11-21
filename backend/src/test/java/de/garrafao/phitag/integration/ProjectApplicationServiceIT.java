@@ -1,14 +1,18 @@
 package de.garrafao.phitag.integration;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-
 import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import de.garrafao.phitag.application.common.CommonService;
+import de.garrafao.phitag.application.project.data.UpdateProjectCommand;
+import de.garrafao.phitag.application.user.data.UpdateUserCommand;
+import de.garrafao.phitag.domain.project.Project;
+import de.garrafao.phitag.domain.project.ProjectId;
+import de.garrafao.phitag.domain.sampling.SamplingRepository;
+import de.garrafao.phitag.domain.user.User;
+import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +35,8 @@ import de.garrafao.phitag.domain.project.query.ProjectQueryBuilder;
 import de.garrafao.phitag.domain.statistic.annotatorstatistic.AnnotatorStatisticRepository;
 import de.garrafao.phitag.domain.statistic.projectstatistic.ProjectStatisticRepository;
 import de.garrafao.phitag.domain.statistic.userstatistic.UserStatisticRepository;
+
+import static org.junit.Assert.*;
 
 @SpringBootTest
 @ActiveProfiles("integration")
@@ -56,6 +62,9 @@ public class ProjectApplicationServiceIT {
 
     @Autowired
     private AnnotatorStatisticRepository annotatorStatisticRepository;
+
+    @Autowired
+    private CommonService commonService;
 
     private static String jwtToken;
 
@@ -262,10 +271,37 @@ public class ProjectApplicationServiceIT {
         CreateProjectCommand projectDto = new CreateProjectCommand("project-0", "VISIBILITY_PUBLIC", "German",
                 "description");
 
+
         assertThrows(ProjectExistException.class, () -> {
             projectApplicationService.create(ProjectApplicationServiceIT.jwtToken, projectDto);
         });
     }
+
+
+//update
+    @Test
+    @Transactional
+    public void it_update_project() {
+        // Arrange
+        UpdateProjectCommand command = new UpdateProjectCommand("test_update",
+                "test_update_name", "German", "VISIBILITY_PUBLIC", false);
+
+        final String project = "project-0";
+        final String owner = "user-0";
+        projectApplicationService.update(ProjectApplicationServiceIT.jwtToken, project, owner, command);
+
+        ProjectDto projectDto = projectApplicationService.findProjectOfUserAsDto(ProjectApplicationServiceIT.jwtToken,
+                "user-0", "project-0");
+
+        // Assert
+        assertEquals("test_update", projectDto.getDescription());
+        assertEquals("test_update_name", projectDto.getDisplayname());
+        assertEquals("German", projectDto.getLanguage().getName());
+        assertEquals("VISIBILITY_PUBLIC", projectDto.getVisibility().getName());
+        assertEquals(false, projectDto.getActive()); // Use assertFalse for a boolean
+    }
+
+
 
     // delete
 

@@ -20,6 +20,7 @@ import BasicLayout from "../components/generic/layout/basiclayout";
 import CenteredLayout from "../components/generic/layout/centeredlayout";
 import useStorage from "../lib/hook/useStorage";
 import { login } from "../lib/service/auth/AuthenticationController";
+import Link from "next/link";
 
 const Login: NextPage = () => {
 
@@ -38,12 +39,6 @@ const Login: NextPage = () => {
         login(loginState.username, loginState.password).then(res => {
             storage.set('JWT', res.authenticationToken);
             storage.set('USER', loginState.username);
-            
-            // decode jwt, get payload
-            var jwt = require('jsonwebtoken');
-            const payload = jwt.decode(res.authenticationToken, {complete: true}).payload;
-            storage.set('USECASE', payload?.usecase);
-
             Router.push(`/dashboard`);
         }).catch(error => {
             if (error?.response?.status === 500) {
@@ -75,48 +70,54 @@ const Login: NextPage = () => {
             </Head>
 
             <CenteredLayout>
-                <div className="flex justify-around items-center">
-                    <form className="shadow-md">
-                        <div className="my-8 mx-8 font-uni-corporate-bold font-bold">
-                            <h1 className="font-bold text-xl">
-                                Welcome Back to the PhiTag-System!
-                            </h1>
+                <div className="m-auto">
+                    <div className="flex flex-col items-center">
+                        <form className="shadow-md">
+                            <div className="my-8 mx-8 font-uni-corporate-bold font-bold">
+                                <h1 className="font-bold text-xl">
+                                    Welcome Back to the PhiTag-System!
+                                </h1>
 
-                            <div className="flex items-center border-b-2 py-2 px-3 my-6">
-                                <FiUser className="basic-svg" />
-                                <input
-                                    id="username"
-                                    name="username"
-                                    className="pl-3 flex flex-auto outline-none border-none"
-                                    type={"text"}
-                                    placeholder="Username"
-                                    value={loginState.username}
-                                    onChange={(e: any) => setLoginState({
-                                        ...loginState,
-                                        username: e.target.value
-                                    })} />
+                                <div className="flex items-center border-b-2 py-2 px-3 my-6">
+                                    <FiUser className="basic-svg" />
+                                    <input
+                                        id="username"
+                                        name="username"
+                                        className="pl-3 flex flex-auto outline-none border-none"
+                                        type={"text"}
+                                        placeholder="Username"
+                                        value={loginState.username}
+                                        onChange={(e: any) => setLoginState({
+                                            ...loginState,
+                                            username: e.target.value
+                                        })} />
+                                </div>
+
+                                <div className="flex items-center border-b-2 py-2 px-3 my-6">
+                                    <FiLock className="basic-svg" />
+                                    <input
+                                        id="password"
+                                        name="password"
+                                        className="pl-3 flex flex-auto outline-none border-none"
+                                        type={"password"}
+                                        placeholder="Password"
+                                        value={loginState.password}
+                                        onChange={(e: any) => setLoginState({
+                                            ...loginState,
+                                            password: e.target.value
+                                        })} />
+                                </div>
+
+                                <button type="button" className="font-uni-corporate-bold block w-full mt-8 py-2 bg-uni-corporate-mittelblau text-white" onClick={() => handleLogin()}>
+                                    Sign In
+                                </button>
                             </div>
+                        </form>
 
-                            <div className="flex items-center border-b-2 py-2 px-3 my-6">
-                                <FiLock className="basic-svg" />
-                                <input
-                                    id="password"
-                                    name="password"
-                                    className="pl-3 flex flex-auto outline-none border-none"
-                                    type={"password"}
-                                    placeholder="Password"
-                                    value={loginState.password}
-                                    onChange={(e: any) => setLoginState({
-                                        ...loginState,
-                                        password: e.target.value
-                                    })} />
-                            </div>
-
-                            <button type="button" className="font-uni-corporate-bold block w-full mt-8 py-2 bg-base16-gray-900 text-white" onClick={() => handleLogin()}>
-                                Sign In
-                            </button>
+                        <div className="mt-2">
+                            Don&apos;t have an account yet? <Link href="/register"><span className="text-uni-corporate-mittelblau cursor-pointer font-bold">Register here!</span></Link>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </CenteredLayout>
 

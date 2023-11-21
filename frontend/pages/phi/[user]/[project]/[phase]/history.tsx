@@ -52,6 +52,7 @@ const AnnotationHistory: NextPage = () => {
             Router.push(`/phi/${username}/${projectname}`);
         }
 
+
         if (authenticated.isReady && !authenticated.isAuthenticated) {
             toast.info("Session expired, please login again.");
             Router.push("/");

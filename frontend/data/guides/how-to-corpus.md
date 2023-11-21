@@ -14,7 +14,7 @@ PhiTag provides users with an in-built [corpus](/corpus), a collection of texts,
 Initially, after accessing the corpus search, you will be presented with an empty page and a search bar. This search bar allows you to search all corpora for a specific lemma. After you type in a search query, the search bar will present you with a list of lemmas that match your query. You can select one of these lemmas to search for it in the corpus. 
 
 | ![](/gif/guide/corpus-search.gif) |
-| :-------------------------------: |
+| :-------------------------------: | 
 |            Search Bar             |
 
 ## Extended search

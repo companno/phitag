@@ -18,7 +18,6 @@ const UsePairInstanceTable: React.FC<{ phase: Phase, modalState: { openData: boo
 
     const [page, setPage] = useState(0);
     const usepairinstances = useFetchPagedUsePairInstance(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), page, !!phase);
-
     // Reload the data on reload
     useEffect(() => {
         usepairinstances.mutate();
@@ -30,7 +29,6 @@ const UsePairInstanceTable: React.FC<{ phase: Phase, modalState: { openData: boo
 
     return (
         <div>
-
             <div className="flex flex-col font-dm-mono-medium">
                 <div className="overflow-auto">
                     <table className="min-w-full border-b-[1px] border-base16-gray-200 divide-y divide-base16-gray-200">

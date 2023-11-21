@@ -110,7 +110,6 @@ export function useFetchPersonalProject(query: string, fetch: boolean = true) {
     }).then(res => res.data)
 
     const { data, error, mutate } = useSWR(fetch ? `${BACKENDROUTES.PROJECT}/personal?query=${query}` : null, queryProjectFetcher)
-
     return {
         projects: data ? data.map(Project.fromDto) : [],
         isLoading: !error && !data,
@@ -118,6 +117,7 @@ export function useFetchPersonalProject(query: string, fetch: boolean = true) {
         mutate: mutate
     }
 }
+
 
 /**
  * Fetches all projects of the current user where the user is a annotator

@@ -5,13 +5,16 @@ import Head from "next/head";
 
 import Navbar from "../../specific/navbar/navbar";
 import Footer from "../../specific/navbar/footer";
+import NProgressContainer from "./nProgress";
 
 const Layout: React.FC<{}> = ({ children }) => {
 
     return (
         <div className="h-screen flex flex-col justify-between bg-white text-base16-gray-900 overflow-auto">
+            <NProgressContainer />
 
             <Head>
+
                 <title>PhiTag</title>
             </Head>
 

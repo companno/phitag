@@ -18,6 +18,8 @@ import StartComputationalAnnotationCommand from "../../model/phase/command/Start
 import { toast } from "react-toastify";
 import TutorialHistoryDto from "../../model/tutorialhistory/dto/TutorialHistoryDto";
 import TutorialHistory from "../../model/tutorialhistory/model/TutorialHistory";
+import SetPhaseCommand from "../../model/phase/command/setPhaseCodeCommnad";
+import { error } from "console";
 
 // Custom hooks for fetching phases
 
@@ -212,3 +214,39 @@ export function startComputationalAnnotation(command: StartComputationalAnnotati
         }
     ).then(res => res.data);
 }
+
+
+/**
+ * Set code to phase
+ * 
+ * @param command command to set a phase
+ * @param get function to get data from local storage
+ * @returns Promise
+ */
+export function setCode(owner: string, project: string, phase: string, code: string, get: Function = () => { }) {
+    const token = get('JWT') ?? '';
+
+    return axios.post(
+        `${BACKENDROUTES.PHASE}/create/code?owner=${owner}&project=${project}&phase=${phase}`,
+        code,
+        {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                // Set Content-Type to text/plain or remove this header
+                "Content-Type": "text/plain",
+            },
+        }
+    ).then(res => res.data)
+    .catch((error) => {
+        if (error.response) {
+            toast.error('Error uploading code', error.response.status);
+            toast.error('Response data:', error.response.data);
+        } else if (error.request) {
+            toast.error('No response received from the server');
+        } else {
+            toast.error('Error setting up the request:', error.message);
+        }
+        toast.error('Error config:', error.config);
+    });
+}
+

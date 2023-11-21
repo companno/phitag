@@ -65,6 +65,10 @@ public class User implements UserDetails {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "prolific_id")
+    private String prolific_id;
+
+
     @Column(name = "isbot")
     private boolean isbot;
 
@@ -83,10 +87,11 @@ public class User implements UserDetails {
     @ManyToMany(mappedBy = "waitinglist")
     private List<Joblisting> joblistings;
 
+
     User() {
     }
 
-    public User(final String username, final String email, final String password, final Set<Role> roles, final Usecase usecase, final Visibility visibility, final Set<Language> languages) {
+    public User(final String username, final String email, final String password, final Set<Role> roles, final Usecase usecase, final Visibility visibility, final Set<Language> languages, final String prolific_id) {
         
         Validate.notBlank(username);
         // Validate that username only contains letters, numbers and dashes
@@ -112,12 +117,14 @@ public class User implements UserDetails {
         this.languages = languages;
         this.description = "";
 
+
         this.isbot = false;
 
         this.enabled = true;
         this.accountNonExpired = true;
         this.accountNonLocked = true;
         this.credentialsNonExpired = true;
+        this.prolific_id = prolific_id;
 
     }
 
@@ -157,4 +164,7 @@ public class User implements UserDetails {
                 this.roles.stream().map(Role::getName).collect(Collectors.joining(",")));
     }
 
+    public String getProlific_id() {
+        return prolific_id;
+    }
 }

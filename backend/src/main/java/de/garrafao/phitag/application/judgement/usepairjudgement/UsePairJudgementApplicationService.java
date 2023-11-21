@@ -235,6 +235,26 @@ public class UsePairJudgementApplicationService {
                 new PageRequestWraper(1, 0)).getTotalElements();
     }
 
+
+    /**
+     * Count all use pair judgements for a given annotator and phase.
+     *
+     * @param annotator the annotator
+     * @param phase     the phase
+     * @return the number of use pair judgements
+     */
+
+
+    public int countAttemptedJudgements(Annotator annotator, Phase phase, UsePairInstance usePairInstance) {
+        return (int) this.usePairJudgementRepository.findByQueryPaged(
+                new UsePairJudgementQueryBuilder()
+                        .withAnnotator(annotator.getId().getUsername())
+                        .withAnnotatorProjectName(annotator.getProject().getDisplayname())
+                        .withOwner(phase.getProject().getOwner().getDisplayname())
+                        .withPhase(phase.getId().getName()).build(),
+                new PageRequestWraper(1, 0)).getTotalElements();
+    }
+
     // Setter Files
 
     /**

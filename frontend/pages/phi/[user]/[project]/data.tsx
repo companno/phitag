@@ -135,7 +135,6 @@ const PhaseDataPage: NextPage = () => {
                             hide={entitlements.entitlement !== ENTITLEMENTS.ADMIN} />
                     </div>
                 </div>
-
                 <div className="m-8">
                     <UsageTable project={project.project} hideEdit={entitlements.entitlement !== ENTITLEMENTS.ADMIN}
                     modalState={{
@@ -146,7 +145,6 @@ const PhaseDataPage: NextPage = () => {
                         })
                     }} />
                 </div>
-
 
             </SingleContentLayout>
 

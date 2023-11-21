@@ -39,10 +39,10 @@ public class UsePairInstanceRepositoryBridge implements UsePairInstanceRepositor
         return this.usePairInstanceRepositoryJpa.findByIdInstanceidAndIdPhaseidNameAndIdPhaseidProjectidNameAndIdPhaseidProjectidOwnername(instanceId, phaseName, projectName, ownerName);
     }
 
+
     @Override
     public UsePairInstance save(UsePairInstance usePairInstance) {
         return this.usePairInstanceRepositoryJpa.save(usePairInstance);
     }
 
-    
 }

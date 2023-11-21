@@ -14,6 +14,8 @@ export default class User {
     private readonly languages: Array<Language>;
     private readonly annotationTypes: Array<AnnotationType>;
     private readonly description: string;
+    private readonly prolific_id: string;
+
 
     constructor(username: string,
         displayname: string,
@@ -21,7 +23,8 @@ export default class User {
         isbot: boolean,
         languages: Array<Language>,
         annotationTypes: Array<AnnotationType>,
-        description: string) {
+        description: string,
+        prolific_id: string) {
         this.username = username;
         this.displayname = displayname;
 
@@ -34,6 +37,7 @@ export default class User {
         this.annotationTypes.sort((a, b) => a.getName().localeCompare(b.getName()));
 
         this.description = description;
+        this.prolific_id = prolific_id;
     }
 
     public getUsername(): string {
@@ -63,6 +67,9 @@ export default class User {
     public getDescription(): string {
         return this.description;
     }
+    public getProlificId():string {
+        return this.prolific_id;
+    }
 
     public static fromDto(dto: UserDto): User {
         return new User(
@@ -72,7 +79,8 @@ export default class User {
             dto.isbot,
             dto.languages.map(language => Language.fromDto(language)),
             dto.annotationTypes.map(annotationType => AnnotationType.fromDto(annotationType)),
-            dto.description
+            dto.description,
+            dto.prolific_id
         );
     }
 }

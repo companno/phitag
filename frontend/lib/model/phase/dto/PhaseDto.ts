@@ -14,6 +14,8 @@ export default interface PhaseDto {
     readonly sampling: SamplingDto;
 
     readonly description: string;
+    readonly code: string;
+
 
     readonly status: string;
 

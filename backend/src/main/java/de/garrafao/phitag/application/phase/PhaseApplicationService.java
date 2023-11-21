@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import de.garrafao.phitag.application.phase.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,12 +14,6 @@ import de.garrafao.phitag.application.statistics.annotatostatistic.AnnotatorStat
 import de.garrafao.phitag.application.statistics.phasestatistic.PhaseStatisticApplicationService;
 import de.garrafao.phitag.application.statistics.userstatistic.UserStatisticApplicationService;
 import de.garrafao.phitag.application.common.CommonService;
-import de.garrafao.phitag.application.phase.data.AddRequirementsCommand;
-import de.garrafao.phitag.application.phase.data.CreatePhaseCommand;
-import de.garrafao.phitag.application.phase.data.PhaseDto;
-import de.garrafao.phitag.application.phase.data.PhaseNameRestrictionEnum;
-import de.garrafao.phitag.application.phase.data.StartComputationalAnnotationCommand;
-import de.garrafao.phitag.application.phase.data.TutorialHistoryDto;
 import de.garrafao.phitag.application.validation.ValidationService;
 import de.garrafao.phitag.domain.annotationtype.AnnotationType;
 import de.garrafao.phitag.domain.annotator.Annotator;
@@ -233,6 +228,20 @@ public class PhaseApplicationService {
         // Create PhaseStatistics for this phase
         this.phaseStatisticApplicationService.initializePhaseStatistic(entity);
 
+    }
+
+
+    @Transactional
+    public void createCode(final String authenticationToken, final String owner, final String project,
+                           final String phase, final String code) {
+        final User requester = this.commonService.getUserByAuthenticationToken(authenticationToken);
+        final Project projectEntity = this.commonService.getProject(owner, project);
+        final Phase phaseEntity = this.commonService.getPhase(owner, project, phase);
+        this.validationService.projectAccess(requester, projectEntity);
+
+        if(phaseEntity!=null){
+            phaseEntity.setCode(code);
+        }
     }
 
     /**

@@ -16,9 +16,9 @@
     <includeAll path="tables/annotationtask/**" relativeToChangelogFile="true" />
 
     <!-- Corpus -->
-    <includeAll path="tables/corpus/**" relativeToChangelogFile="true" />
+    <!--  <includeAll path="tables/corpus/**" relativeToChangelogFile="true" /> -->
 
-    <!-- Statistic -->
+     <!-- Statistic -->
     <includeAll path="tables/statistic/**" relativeToChangelogFile="true" />
 
     <!-- Other  -->
@@ -36,5 +36,5 @@
     <includeAll path="seeds/**" relativeToChangelogFile="true" />
 
     <includeAll path="computational-annotator-seeds/**" relativeToChangelogFile="true" />
-    <includeAll path="corpus-seeds/**" relativeToChangelogFile="true" />
+    <!--  <includeAll path="corpus-seeds/**" relativeToChangelogFile="true" /> -->
 </databaseChangeLog>

@@ -16,12 +16,17 @@ export default class Phase implements SelectableItem {
     private readonly sampling: Sampling;
 
     private readonly description: string;
+    private readonly code: string;
+
+
+
+
 
     private readonly status: string;
 
     private readonly tutorialrequirements: Array<Pair<string, boolean>>;
 
-    constructor(id: PhaseId, displayname: string, tutorial: boolean, annotationType: AnnotationType, sampling: Sampling, description: string, status: string, tutorialrequirements: Array<Pair<string, boolean>>) {
+    constructor(id: PhaseId, displayname: string, tutorial: boolean, annotationType: AnnotationType, sampling: Sampling, description: string, code: string, status: string, tutorialrequirements: Array<Pair<string, boolean>>) {
         this.id = id;
 
         this.displayname = displayname;
@@ -32,6 +37,8 @@ export default class Phase implements SelectableItem {
         this.sampling = sampling;
 
         this.description = description;
+        this.code = code;
+
 
         this.status = status;
 
@@ -69,6 +76,10 @@ export default class Phase implements SelectableItem {
         return this.description;
     }
 
+    getCode(): string {
+        return this.code;
+    }
+    
     getStatus(): string {
         return this.status;
     }
@@ -85,6 +96,7 @@ export default class Phase implements SelectableItem {
             AnnotationType.fromDto(dto.annotationType),
             Sampling.fromDto(dto.sampling),
             dto.description,
+            dto.code,
             dto.status,
             dto.tutorialrequirements
         );

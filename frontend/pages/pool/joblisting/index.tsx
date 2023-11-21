@@ -44,6 +44,7 @@ const JoblistingPage: NextPage = () => {
     });
 
     const joblistings = useQueryJoblisting(searchField.fieldQuery, searchField.openListing);
+    console.log(joblistings)
 
     const handleOnClickJoin = (joblisting: Joblisting) => {
         joinJoblisting(new JoinJoblistingCommand(joblisting.getId().getName(), joblisting.getId().getOwner(), joblisting.getId().getProject()), storage.get)
@@ -150,7 +151,6 @@ const JoblistingPage: NextPage = () => {
 
                         </div>
                     </div>
-
 
                     {
                         joblistings.isLoading ? <LoadingComponent /> :

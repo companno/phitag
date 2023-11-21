@@ -27,6 +27,8 @@ public class PhaseDto {
 
     private final String description;
 
+    private final String code;
+
     private final String status;
 
     private final List<Pair<String, Boolean>> tutorialrequirements;
@@ -40,6 +42,7 @@ public class PhaseDto {
             final AnnotationTypeDto annotationType,
             final SamplingDto sampling,
             final String description,
+            final String code,
             final String status,
             final List<Pair<String, Boolean>> tutorialrequirements) {
         this.id = id;
@@ -55,6 +58,7 @@ public class PhaseDto {
 
         this.description = description;
 
+        this.code =code;
         this.status = status;
 
         this.tutorialrequirements = tutorialrequirements;
@@ -70,6 +74,7 @@ public class PhaseDto {
                 AnnotationTypeDto.from(phase.getAnnotationType()),
                 SamplingDto.from(phase.getSampling()),
                 phase.getDescription(),
+                phase.getCode(),
                 phase.getStatus(),
                 new ArrayList<>());
     }
@@ -84,6 +89,7 @@ public class PhaseDto {
                 AnnotationTypeDto.from(phase.getAnnotationType()),
                 SamplingDto.from(phase.getSampling()),
                 phase.getDescription(),
+                phase.getCode(),
                 phase.getStatus(),
                 tutorial);
     }

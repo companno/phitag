@@ -99,8 +99,6 @@ const JudgementPage: NextPage = () => {
 
 
                 <SingleContentLayout>
-
-
                     <LinkHead icon={<FiLayers className="stroke-2" />}
                         links={[
                             {

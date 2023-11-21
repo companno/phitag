@@ -22,6 +22,8 @@ import PagedWSSIMInstance from "../../model/instance/wssiminstance/model/PagedWS
 import PagedWSSIMTag from "../../model/instance/wssimtag/model/PagedWSSIMTag";
 import LexSubInstanceDto from "../../model/instance/lexsubinstance/dto/LexSubInstanceDto";
 import PagedLexSubInstance from "../../model/instance/lexsubinstance/model/PagedLexSubInstance";
+import { error } from "console";
+import { toast } from "react-toastify";
 
 /**
  * Returns all instances of a phase
@@ -196,15 +198,33 @@ export function useFetchPagedLexSubInstance(owner: string, project: string, phas
  * @param get storage hook
  * @returns a specific instance without revalidation
  */
-export function fetchRandomInstance<G extends IInstance, T extends IInstanceConstructor>(owner: string, project: string, phase: string, constructor: T, get: Function = () => { }) {
+export function fetchRandomInstance<G extends IInstance, T extends IInstanceConstructor>(
+    owner: string,
+    project: string,
+    phase: string,
+    constructor: T,
+    get: Function = () => { }
+  ) {
     const token = get('JWT') ?? '';
-
-    return axios.get<IInstanceDto>(`${BACKENDROUTES.INSTANCE}/random?owner=${owner}&project=${project}&phase=${phase}`, {
+    return axios
+      .get<IInstanceDto>(`${BACKENDROUTES.INSTANCE}/random?owner=${owner}&project=${project}&phase=${phase}`, {
         headers: {
-            "Authorization": `Bearer ${token}`
+          "Authorization": `Bearer ${token}`
         }
-    }).then(res => constructor.fromDto(res.data) as G)
-}
+      })
+      .then((res) => {
+        if (res.data) {
+          return constructor.fromDto(res.data) as G;
+        } else{
+            toast.info("No new instance available");
+        }
+      })
+      .catch((error) => {
+        if (error) {
+          toast.error("No new instances available");
+        }
+      });
+  }
 
 /**
  * Exports all instances of a phase as a csv/tsv file

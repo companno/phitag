@@ -41,8 +41,8 @@ const ProjectPage: NextPage = () => {
     const authenticated = useAuthenticated();
     const router = useRouter();
     const { user: username, project: projectname } = router.query as { user: string, project: string };
-
     const project = useFetchProject(username, projectname, router.isReady);
+
     const entitlement = useFetchSelfEntitlement(username, projectname, !project.isLoading && !project.isError);
     
 
@@ -84,8 +84,6 @@ const ProjectPage: NextPage = () => {
                         }
                     ]}
                 />
-
-
                 <ProjectTabBar />
 
                 <div className="mt-10 mx-auto max-w-7xl">

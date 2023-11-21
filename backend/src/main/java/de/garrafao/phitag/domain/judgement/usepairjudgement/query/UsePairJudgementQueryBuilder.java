@@ -31,6 +31,14 @@ public class UsePairJudgementQueryBuilder {
         this.queryComponents.add(new AnnotatorQueryComponent(annotator));
         return this;
     }
+    public UsePairJudgementQueryBuilder withAnnotatorProjectName( final String projectname) {
+        if (projectname == null || projectname.isEmpty() || projectname.isBlank()) {
+            return this;
+        }
+
+        this.queryComponents.add(new AnnotatorQueryComponent(projectname));
+        return this;
+    }
 
     public UsePairJudgementQueryBuilder withInstanceid(final String instanceid) {
         if (instanceid == null || instanceid.isEmpty() || instanceid.isBlank()) {

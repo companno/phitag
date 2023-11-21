@@ -54,6 +54,10 @@ public class Phase {
     @Column(name = "description")
     private String description;
 
+    @Setter
+    @Column(name = "code")
+    private String code;
+
     @Column(name = "isTutorial", nullable = false)
     private boolean isTutorial;
 
@@ -112,6 +116,10 @@ public class Phase {
     public Phase(final String name, final Project project, final AnnotationType annotationType, final Sampling sampling, final String description, final boolean isTutorial) {
         this(name, project, annotationType, sampling, description);
         this.isTutorial = isTutorial;
+    }
+
+    public Phase(final String code){
+        this.code = code;
     }
 
     public Phase(final String name, final Project project, final AnnotationType annotationType, final Sampling sampling, final String description, final boolean isTutorial, final StatisticAnnotationMeasure statisticAnnotationMeasure, final Double statisticAnnotationMeasureThreshold) {

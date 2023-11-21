@@ -39,6 +39,9 @@ public class Joblisting {
     @Column(name = "displayname", unique = true, nullable = false)
     private String displayname;
 
+    @Column(name = "phasename", unique = true, nullable = false)
+    private String phase;
+
     @Column(name = "open")
     private boolean open;
 
@@ -62,13 +65,13 @@ public class Joblisting {
 
     Joblisting() {}
 
-    public Joblisting(final String name, final Project project, final boolean open, final String description) {
+    public Joblisting(final String name, final Project project, final String phase, final boolean open, final String description) {
         Validate.matchesPattern(name, "^[a-zA-Z0-9-]+$");
         
         this.id = new JoblistingId(name, project.getId());
         this.project = project;
-
         this.displayname = name;
+        this.phase = phase;
         this.open = open;
         this.active = true;
         this.waitinglist = new ArrayList<>();

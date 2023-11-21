@@ -2,6 +2,7 @@ package de.garrafao.phitag.infrastructure.rest;
 
 import java.util.List;
 
+import de.garrafao.phitag.application.phase.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,11 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.garrafao.phitag.application.phase.PhaseApplicationService;
-import de.garrafao.phitag.application.phase.data.AddRequirementsCommand;
-import de.garrafao.phitag.application.phase.data.CreatePhaseCommand;
-import de.garrafao.phitag.application.phase.data.PhaseDto;
-import de.garrafao.phitag.application.phase.data.StartComputationalAnnotationCommand;
-import de.garrafao.phitag.application.phase.data.TutorialHistoryDto;
 import de.garrafao.phitag.domain.core.Query;
 import de.garrafao.phitag.domain.phase.query.PhaseQueryBuilder;
 
@@ -136,12 +132,37 @@ public class PhaseResource {
     }
 
     /**
-     * Create a new phase.
+     * set code in a phase.
      * 
      * The requesting user must fulfill the following conditions:
      * - Be the owner of the project or an admin
      * - Project has to be active
+     *
      * 
+     * @param authenticationToken
+     * @param project
+     * @param owner
+     * @param phase
+     *
+     * @param  commnad
+     * @return
+     */
+    @PostMapping(value = "/create/code")
+    public void setCode(@RequestHeader("Authorization") String authenticationToken,
+                           @RequestParam(value = "owner") final String owner,
+                           @RequestParam(value = "project") final String project,
+                           @RequestParam(value = "phase") final String phase,
+                           @RequestBody    final String code) {
+        this.phaseApplicationService.createCode(authenticationToken, owner, project, phase ,code);
+    }
+
+    /**
+     * Create a new phase.
+     *
+     * The requesting user must fulfill the following conditions:
+     * - Be the owner of the project or an admin
+     * - Project has to be active
+     *
      * @param authenticationToken
      *                            The authentication token of the requesting user
      * @param command
@@ -150,7 +171,7 @@ public class PhaseResource {
      */
     @PostMapping(value = "/create")
     public void create(@RequestHeader("Authorization") String authenticationToken,
-            @RequestBody CreatePhaseCommand command) {
+                       @RequestBody CreatePhaseCommand command) {
         this.phaseApplicationService.create(authenticationToken, command);
     }
 
