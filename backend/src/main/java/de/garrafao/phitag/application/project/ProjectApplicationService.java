@@ -87,7 +87,7 @@ public class ProjectApplicationService {
      * Get projects by query with fuzzy search.
      * 
      * @param query query for search
-     * @return list of {@ProjectDta}
+     * @return list of {@ProjectDto}
      */
     public List<ProjectDto> queryProjectDto(final Query query) {
         return this.projectRepository.findByQuery(query).stream().map(ProjectDto::from).toList();
