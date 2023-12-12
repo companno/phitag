@@ -19,6 +19,13 @@
         </insert>
 
         <insert tableName="phitagannotationtype">
+            <column name="name" value="ANNOTATIONTYPE_USERANK" />
+            <column name="visiblename" value="Use Rank Annotation" />
+            <column name="active" value="true" />
+        </insert>
+
+
+        <insert tableName="phitagannotationtype">
             <column name="name" value="ANNOTATIONTYPE_WORDREPLACEMENT" />
             <column name="visiblename" value="Word Replacement" />
             <column name="active" value="false" />

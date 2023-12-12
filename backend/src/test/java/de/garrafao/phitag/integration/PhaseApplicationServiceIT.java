@@ -1,9 +1,11 @@
 package de.garrafao.phitag.integration;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 import javax.transaction.Transactional;
 
+import de.garrafao.phitag.domain.project.error.ProjectNotExistsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +57,21 @@ public class PhaseApplicationServiceIT {
 
         assertEquals(4, phases.size());
     }
+
+    /**
+    @Test
+    @Transactional
+    public void it_delete_requirements_of_phase() {
+        AuthenticateUserCommand authenticateUserCommand = new AuthenticateUserCommand("user-0", "Password1234!");
+        String jwtToken = authenticationApplicationService
+                .authenticateUser(authenticateUserCommand)
+                .getAuthenticationToken();
+
+        assertThrows(ProjectNotExistsException.class, () -> {
+          phaseApplicationService.deleteRequirements(jwtToken, "user-0", "project-0", "phase-0", "tutorials");
+        });
+    }
+    */
 
 
 }

@@ -3,6 +3,8 @@ package de.garrafao.phitag.infrastructure.rest;
 import java.util.List;
 
 import de.garrafao.phitag.application.phase.data.*;
+import de.garrafao.phitag.domain.phase.Phase;
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +18,8 @@ import de.garrafao.phitag.domain.core.Query;
 import de.garrafao.phitag.domain.phase.query.PhaseQueryBuilder;
 
 import org.springframework.web.bind.annotation.PostMapping;
+
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping(value = "/api/v1/phase")
@@ -184,11 +188,11 @@ public class PhaseResource {
      * @param phase
      */
     @PostMapping(value = "/close")
-    public void close(@RequestHeader("Authorization") String authenticationToken,
+    public void updatePhaseStatus(@RequestHeader("Authorization") String authenticationToken,
             @RequestParam(value = "owner") final String owner,
             @RequestParam(value = "project") final String project,
             @RequestParam(value = "phase") final String phase) {
-        this.phaseApplicationService.close(authenticationToken, owner, project, phase);
+        this.phaseApplicationService.updatePhaseStatus(authenticationToken, owner, project, phase);
     }
 
     /**
@@ -204,9 +208,30 @@ public class PhaseResource {
      * @param command
      *                            The command to add requirements to a phase
      */
+    @PostMapping(value = "/delete-requirements")
+    public void deleteRequirements(@RequestHeader("Authorization") String authenticationToken,
+                                   @RequestParam(value = "owner") final String owner,
+                                   @RequestParam(value = "project") final String project,
+                                   @RequestParam(value = "phase") final String phase,
+                                   @RequestParam(value = "requirements") final String requirements)  {
+        this.phaseApplicationService.deleteRequirements(authenticationToken, owner, project, phase, requirements);
+    }
+    /**
+     * Add requirements to a phase.
+     *
+     * The requesting user must fulfill the following conditions:
+     * - Be the owner of the project or an admin
+     * - Project has to be active
+     * - Phase can not be a tutorial
+     *
+     * @param authenticationToken
+     *                            The authentication token of the requesting user
+     * @param command
+     *                            The command to add requirements to a phase
+     */
     @PostMapping(value = "/add-requirements")
     public void addRequirements(@RequestHeader("Authorization") String authenticationToken,
-            @RequestBody AddRequirementsCommand command) {
+                                @RequestBody AddRequirementsCommand command) {
         this.phaseApplicationService.addRequirements(authenticationToken, command);
     }
 
@@ -221,6 +246,27 @@ public class PhaseResource {
             @RequestHeader("Authorization") String authenticationToken,
             @RequestBody final StartComputationalAnnotationCommand command) {
         phaseApplicationService.startComputationalAnnotation(authenticationToken, command);
+    }
+
+    /**
+     * Delete a phase
+     *
+     * The requesting user has to be the owner of the project.
+     *
+     * @param authenticationToken   The authentication token of the requesting user
+     *
+     * @param owner Owner
+     * @param project project
+     *  @param phaseName  phaseName
+     *
+     */
+    @PostMapping(value = "/delete")
+    public void delete(
+            @RequestHeader("Authorization") String authenticationToken,
+            @RequestParam(value = "owner") final String owner,
+            @RequestParam(value = "project") final String project,
+            @RequestParam(value = "phase") final String phase) {
+        phaseApplicationService.deletePhase(authenticationToken, owner, project, phase);
     }
 
 }

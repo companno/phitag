@@ -42,4 +42,10 @@ public class LexSubJudgementRepositoryBridge implements LexSubJudgementRepositor
         this.lexSubJudgementRepositoryJpa.delete(judgement);
     }
 
+    @Override
+    public void batchDelete(Iterable<LexSubJudgement> judgements) {
+
+        this.lexSubJudgementRepositoryJpa.deleteInBatch(judgements);
+    }
+
 }

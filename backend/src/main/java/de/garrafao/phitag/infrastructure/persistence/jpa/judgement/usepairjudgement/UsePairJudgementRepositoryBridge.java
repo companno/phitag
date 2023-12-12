@@ -42,4 +42,10 @@ public class UsePairJudgementRepositoryBridge implements UsePairJudgementReposit
         judgementRepository.delete(judgement);
     }
 
+    @Override
+    public void batchDelete(Iterable<UsePairJudgement> judgements) {
+
+    }
+
+
 }

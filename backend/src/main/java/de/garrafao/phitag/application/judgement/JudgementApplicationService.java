@@ -6,6 +6,12 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import de.garrafao.phitag.application.judgement.userankjudgement.UseRankJudgementApplicationService;
+import de.garrafao.phitag.application.judgement.userankjudgement.data.AddUseRankJudgementCommand;
+import de.garrafao.phitag.application.judgement.userankjudgement.data.DeleteUseRankJudgementCommand;
+import de.garrafao.phitag.application.judgement.userankjudgement.data.EditUseRankJudgementCommand;
+import de.garrafao.phitag.application.judgement.userankjudgement.data.UseRankJudgementDto;
+import de.garrafao.phitag.domain.judgement.userankjudgement.UseRankJudgement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
@@ -44,7 +50,6 @@ import de.garrafao.phitag.domain.judgement.lexsubjudgement.LexSubJudgement;
 import de.garrafao.phitag.domain.judgement.usepairjudgement.UsePairJudgement;
 import de.garrafao.phitag.domain.judgement.wssimjudgement.WSSIMJudgement;
 import de.garrafao.phitag.domain.phase.Phase;
-import de.garrafao.phitag.domain.project.Project;
 import de.garrafao.phitag.domain.user.User;
 
 @Service
@@ -60,6 +65,8 @@ public class JudgementApplicationService {
 
     private final UsePairJudgementApplicationService usePairJudgementApplicationService;
 
+    private final UseRankJudgementApplicationService useRankJudgementApplicationService;
+
     private final WSSIMJudgementApplicationService wssimJudgementApplicationService;
 
     private final LexSubJudgementApplicationService lexSubJudgementApplicationService;
@@ -72,12 +79,14 @@ public class JudgementApplicationService {
             final ValidationService validationService,
 
             final UsePairJudgementApplicationService usePairJudgementApplicationService,
+            final UseRankJudgementApplicationService useRankJudgementApplicationService,
             final WSSIMJudgementApplicationService wssimJudgementApplicationService,
             final LexSubJudgementApplicationService lexSubJudgementApplicationService) {
         this.commonService = commonService;
         this.validationService = validationService;
 
         this.usePairJudgementApplicationService = usePairJudgementApplicationService;
+        this.useRankJudgementApplicationService = useRankJudgementApplicationService;
         this.wssimJudgementApplicationService = wssimJudgementApplicationService;
         this.lexSubJudgementApplicationService = lexSubJudgementApplicationService;
     }
@@ -117,7 +126,11 @@ public class JudgementApplicationService {
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             this.usePairJudgementApplicationService.findByPhase(phaseEntity).forEach(
                     usePairJudgement -> judgementDtos.add(UsePairJudgementDto.from(usePairJudgement)));
-        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
+        }else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
+            this.useRankJudgementApplicationService.findByPhase(phaseEntity).forEach(
+                    useRankJudgement -> judgementDtos.add(UseRankJudgementDto.from(useRankJudgement)));
+        }
+        else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             this.wssimJudgementApplicationService.findByPhase(phaseEntity).forEach(
                     wssimJudgement -> judgementDtos.add(WSSIMJudgementDto.from(wssimJudgement)));
         } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
@@ -178,7 +191,18 @@ public class JudgementApplicationService {
                     usePairJudgements.getTotalElements(),
                     usePairJudgements.getTotalPages());
 
-        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
+            Page<UseRankJudgement> useRankJudgements = this.useRankJudgementApplicationService.findByPhase(phaseEntity,
+                    size, page, sort);
+
+            pagedJudgementDto = new PagedJudgementDto(
+                    useRankJudgements.getContent().stream().map(UseRankJudgementDto::from).collect(Collectors.toList()),
+                    useRankJudgements.getNumber(),
+                    useRankJudgements.getSize(),
+                    useRankJudgements.getTotalElements(),
+                    useRankJudgements.getTotalPages());
+
+        }else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             Page<WSSIMJudgement> wssimJudgements = this.wssimJudgementApplicationService.findByPhase(phaseEntity, size,
                     page, sort);
 
@@ -232,6 +256,9 @@ public class JudgementApplicationService {
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             this.usePairJudgementApplicationService.getHistory(phaseEntity, annotator)
                     .forEach(usePairJudgement -> judgementDtos.add(UsePairJudgementDto.from(usePairJudgement)));
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
+            this.useRankJudgementApplicationService.getHistory(phaseEntity, annotator)
+                    .forEach(useRankJudgement -> judgementDtos.add(UseRankJudgementDto.from(useRankJudgement)));
         } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             this.wssimJudgementApplicationService.getHistory(phaseEntity, annotator)
                     .forEach(wssimJudgement -> judgementDtos.add(WSSIMJudgementDto.from(wssimJudgement)));
@@ -287,7 +314,18 @@ public class JudgementApplicationService {
                     usePairJudgements.getTotalElements(),
                     usePairJudgements.getTotalPages());
 
-        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
+        }else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
+            Page<UseRankJudgement> useRankJudgements = this.useRankJudgementApplicationService.getHistory(phaseEntity,
+                    annotator, size, page, sort);
+
+            pagedJudgementDto = new PagedJudgementDto(
+                    useRankJudgements.getContent().stream().map(UseRankJudgementDto::from).collect(Collectors.toList()),
+                    useRankJudgements.getNumber(),
+                    useRankJudgements.getSize(),
+                    useRankJudgements.getTotalElements(),
+                    useRankJudgements.getTotalPages());
+
+        }  else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             Page<WSSIMJudgement> wssimJudgements = this.wssimJudgementApplicationService.getHistory(phaseEntity,
                     annotator, size, page, sort);
 
@@ -333,7 +371,10 @@ public class JudgementApplicationService {
 
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             return this.usePairJudgementApplicationService.exportUsePairJudgement(phaseEntity);
-        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
+        } else  if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
+            return this.useRankJudgementApplicationService.exportUseRankJudgement(phaseEntity);
+        }
+        else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             return this.wssimJudgementApplicationService.exportWSSIMJudgement(phaseEntity);
         } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
             return this.lexSubJudgementApplicationService.exportJudgement(phaseEntity);
@@ -389,6 +430,9 @@ public class JudgementApplicationService {
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             this.usePairJudgementApplicationService.save(phaseEntity, annotator, file);
             return;
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
+            this.useRankJudgementApplicationService.save(phaseEntity, annotator, file);
+            return;
         } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             this.wssimJudgementApplicationService.save(phaseEntity, annotator, file);
             return;
@@ -419,6 +463,9 @@ public class JudgementApplicationService {
 
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             this.usePairJudgementApplicationService.edit(phaseEntity, annotator, (EditUsePairJudgementCommand) command);
+            return;
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
+            this.useRankJudgementApplicationService.edit(phaseEntity, annotator, (EditUseRankJudgementCommand) command);
             return;
         } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             this.wssimJudgementApplicationService.edit(phaseEntity, annotator, (EditWSSIMJudgementCommand) command);
@@ -451,6 +498,10 @@ public class JudgementApplicationService {
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             this.usePairJudgementApplicationService.delete(phaseEntity, annotator,
                     (DeleteUsePairJudgementCommand) command);
+            return;
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
+            this.useRankJudgementApplicationService.delete(phaseEntity, annotator,
+                    (DeleteUseRankJudgementCommand) command);
             return;
         } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             this.wssimJudgementApplicationService.delete(phaseEntity, annotator, (DeleteWSSIMJudgementCommand) command);
@@ -492,6 +543,15 @@ public class JudgementApplicationService {
             try {
                 this.usePairJudgementApplicationService.annotate(phaseEntity, annotator,
                         (AddUsePairJudgementCommand) command);
+                annotationProcessInformation.setIndex(annotationProcessInformation.getIndex() + 1);
+            } catch (ClassCastException e) {
+                throw new AnnotationTypeNotFoundException();
+            }
+            return;
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
+            try {
+                this.useRankJudgementApplicationService.annotate(phaseEntity, annotator,
+                        (AddUseRankJudgementCommand) command);
                 annotationProcessInformation.setIndex(annotationProcessInformation.getIndex() + 1);
             } catch (ClassCastException e) {
                 throw new AnnotationTypeNotFoundException();
@@ -554,7 +614,15 @@ public class JudgementApplicationService {
                 throw new AnnotationTypeNotFoundException();
             }
             return;
-        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
+            try {
+                this.useRankJudgementApplicationService.annotateBulk(phaseEntity, annotator,
+                        commands.stream().map(AddUseRankJudgementCommand.class::cast).collect(Collectors.toList()));
+            } catch (ClassCastException e) {
+                throw new AnnotationTypeNotFoundException();
+            }
+            return;
+        }else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             try {
                 this.wssimJudgementApplicationService.annotateBulk(phaseEntity, annotator,
                         commands.stream().map(AddWSSIMJudgementCommand.class::cast).collect(Collectors.toList()));

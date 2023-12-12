@@ -112,7 +112,7 @@ const SubmissionsCard = () => {
 
                             <div className="flex flex-row divide-x-8">
                                 <button type="button" className="block w-full mt-8 py-2 bg-base16-gray-900 text-base16-gray-100 text-xl font-dm-mono-medium" onClick={handleEdit}>Edit Response</button>
-                                {checkUser.user?.getProlificId()!== undefined && (
+                                {checkUser.user?.getProlificId()!== "" || checkUser.user?.getProlificId()!== undefined || checkUser.user?.getProlificId()!== null && (
                                     <button
                                         type="button"
                                         className="block w-full mt-8 py-2 bg-base16-gray-900 text-base16-gray-100 text-xl font-dm-mono-medium"

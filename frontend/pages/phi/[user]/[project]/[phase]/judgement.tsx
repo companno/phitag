@@ -29,6 +29,7 @@ import PhaseTabBar from "../../../../../components/specific/tab/phasedatatab";
 import FullLoadingPage from "../../../../../components/pages/fullloadingpage";
 import SingleContentLayout from "../../../../../components/generic/layout/singlecontentlayout";
 import IconButtonOnClick from "../../../../../components/generic/button/iconbuttononclick";
+import UseRankJudgementTable from "../../../../../components/specific/table/userank/userankjudgementtable";
 import UsePairJudgementTable from "../../../../../components/specific/table/usepair/usepairjudgementtable";
 import WSSIMJudgementTable from "../../../../../components/specific/table/wssim/wssimjudgementtable";
 import LinkHead from "../../../../../components/generic/linker/linkhead";
@@ -144,6 +145,79 @@ const JudgementPage: NextPage = () => {
                     <div className="m-8">
                         {/* @ts-ignore */}
                         <UsePairJudgementTable phase={phase.phase} modalState={
+                            {
+                                open: modalState.isOpenAddDataModal,
+                                callback: () => setModalState({
+                                    ...modalState,
+                                    isOpenAddDataModal: false,
+                                })
+                            }
+                        } />
+                    </div>
+
+                </SingleContentLayout>
+            </Layout>
+
+        );
+    }
+
+    if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_USERANK) {
+
+        return (
+            <Layout>
+
+                <Head>
+
+                    <title>PhiTag : {phase.phase.getName()} : Judgements </title>
+                </Head>
+
+
+                <SingleContentLayout>
+                    <LinkHead icon={<FiLayers className="stroke-2" />}
+                        links={[
+                            {
+                                href: `/phi/${username}`,
+                                name: username,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}`,
+                                name: projectname,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}/${phasename}`,
+                                name: phasename,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}/${phasename}/judgement`,
+                                name: "Judgements",
+                            }
+                        ]}
+                    />
+
+
+                    <div className="w-full flex flex-col 2xl:flex-row justify-between">
+                        <PhaseTabBar />
+
+                        <div className="flex mt-8 2xl:mt-0 mx-4 space-x-4 justify-end">
+                            <IconButtonOnClick
+                                icon={<FiFilePlus className="basic-svg" />}
+                                tooltip="Add Data"
+                                onClick={() => setModalState({
+                                    ...modalState,
+                                    isOpenAddDataModal: true,
+                                })}
+                                hide={entitlement.entitlement !== ENTITLEMENTS.ADMIN} />
+                            <IconButtonOnClick
+                                icon={<FiDownload className="basic-svg " />}
+                                tooltip="Download Judgement Data"
+                                onClick={() => handleExport()}
+                                hide={entitlement.entitlement !== ENTITLEMENTS.ADMIN} />
+                        </div>
+                    </div>
+
+                    <div className="m-8">
+                        {/* @ts-ignore */}
+                        <UseRankJudgementTable phase={phase.phase} modalState={
                             {
                                 open: modalState.isOpenAddDataModal,
                                 callback: () => setModalState({

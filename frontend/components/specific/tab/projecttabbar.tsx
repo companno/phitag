@@ -72,7 +72,7 @@ const ProjectTabBar: React.FC<{}> = ({}) => {
                 <Tab href={`${urlprefix}/data`} title="Data" isSelected={isSelectedData} />
                 <Tab href={`${urlprefix}/annotator`} title="Annotator" isSelected={isSelectedAnnotator} />
                 <Tab href={`${urlprefix}/task`} title="Tasks" isSelected={isSelectedTask} />
-                <Tab href={`${urlprefix}/statistic`} title="Statistic" isSelected={isSelectedStatistic} />
+                <Tab href={`${urlprefix}/statistic`} title="Statistics" isSelected={isSelectedStatistic} />
             </div>
 
             <div className="flex flex-row my-2 mx-4 self-end 2xl:self-center space-x-4">

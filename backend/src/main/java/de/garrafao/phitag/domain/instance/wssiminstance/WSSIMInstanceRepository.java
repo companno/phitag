@@ -18,5 +18,5 @@ public interface WSSIMInstanceRepository {
 
     WSSIMInstance save(WSSIMInstance instanceData);
 
-    
+
 }

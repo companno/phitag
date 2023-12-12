@@ -18,7 +18,6 @@ import StartComputationalAnnotationCommand from "../../model/phase/command/Start
 import { toast } from "react-toastify";
 import TutorialHistoryDto from "../../model/tutorialhistory/dto/TutorialHistoryDto";
 import TutorialHistory from "../../model/tutorialhistory/model/TutorialHistory";
-import SetPhaseCommand from "../../model/phase/command/setPhaseCodeCommnad";
 import { error } from "console";
 
 // Custom hooks for fetching phases
@@ -204,6 +203,27 @@ export function addRequirementsToPhase(command: AddRequirementsCommand, get: Fun
     ).then(res => res.data);
 }
 
+/**
+ * delete requirements from a phase
+ * 
+ * @param owner owner of the project
+ * @param project name of the project
+ * @param phase name of the project
+ * @param requirements name of the project
+ * @param get function to get data from local storage
+ * @returns Promise
+ */
+export function deleteRequirementsFromPhase(owner: string, project: string, phase: string, requirements: string, get: Function = () => { }) {
+    const token = get('JWT') || '';
+    return axios.post(
+        `${BACKENDROUTES.PHASE}/delete-requirements?owner=${owner}&project=${project}&phase=${phase}&requirements=${requirements}`,
+        {}, 
+        {
+            headers: { "Authorization": `Bearer ${token}` },
+        }
+    ).then(res => res.data);
+} 
+
 export function startComputationalAnnotation(command: StartComputationalAnnotationCommand, get: Function = () => { }) {
     const token = get('JWT') ?? '';
 
@@ -214,6 +234,8 @@ export function startComputationalAnnotation(command: StartComputationalAnnotati
         }
     ).then(res => res.data);
 }
+
+
 
 
 /**
@@ -249,4 +271,24 @@ export function setCode(owner: string, project: string, phase: string, code: str
         toast.error('Error config:', error.config);
     });
 }
+/**
+ * delete  phase
+ * 
+ * @param owner owner of the project
+ * @param project name of the project
+ * @param phase name of the project
+ * @param get function to get data from local storage
+ * @returns Promise
+ */
+export function deletePhase(owner: string, project: string, phase: string, get: Function = () => { }) {
+
+    const token = get('JWT') || '';
+    return axios.post(
+        `${BACKENDROUTES.PHASE}/delete?owner=${owner}&project=${project}&phase=${phase}`,
+        {}, 
+        {
+            headers: { "Authorization": `Bearer ${token}` },
+        }
+    ).then(res => res.data);
+} 
 

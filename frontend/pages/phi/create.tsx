@@ -114,7 +114,7 @@ const Create: NextPage = () => {
                     <div className="flex flex-row justify-between">
 
                         <h1 className="font-bold text-2xl">
-                            Create a new Project
+                            Create a new Project!
                         </h1>
 
                         <HelpButton

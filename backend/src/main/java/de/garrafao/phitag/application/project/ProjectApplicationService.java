@@ -54,6 +54,7 @@ public class ProjectApplicationService {
     private final CommonService commonService;
 
     private final ValidationService validationService;
+    private final PhaseApplicationService phaseApplicationService;
 
     // Other
 

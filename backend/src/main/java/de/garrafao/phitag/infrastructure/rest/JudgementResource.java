@@ -3,6 +3,9 @@ package de.garrafao.phitag.infrastructure.rest;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import de.garrafao.phitag.application.judgement.userankjudgement.data.AddUseRankJudgementCommand;
+import de.garrafao.phitag.application.judgement.userankjudgement.data.DeleteUseRankJudgementCommand;
+import de.garrafao.phitag.application.judgement.userankjudgement.data.EditUseRankJudgementCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -227,6 +230,19 @@ public class JudgementResource {
     }
 
     /**
+     * Edit UseRankJudgement data
+     *
+     * @param authenticationToken
+     * @param command
+     */
+    @PostMapping(value = "/edit/userank")
+    public void editUseRankJudgement(
+            @RequestHeader("Authorization") String authenticationToken,
+            @RequestBody final EditUseRankJudgementCommand command) {
+        this.judgementApplicationService.edit(authenticationToken, command);
+    }
+
+    /**
      * Edit WSSIMJudgement data
      * 
      * @param authenticationToken
@@ -264,6 +280,19 @@ public class JudgementResource {
             @RequestBody final DeleteUsePairJudgementCommand command) {
         this.judgementApplicationService.delete(authenticationToken, command);
     }
+    /**
+     * Delete UseRankJudgement data
+     *
+     * @param authenticationToken
+     * @param command
+     */
+    @PostMapping(value = "/delete/userank")
+    public void deleteUseRankJudgement(
+            @RequestHeader("Authorization") String authenticationToken,
+            @RequestBody final DeleteUseRankJudgementCommand command) {
+        this.judgementApplicationService.delete(authenticationToken, command);
+    }
+
 
     /**
      * Delete WSSIMJudgement data
@@ -311,6 +340,26 @@ public class JudgementResource {
     }
 
     /**
+     * Annote a specific instance of a phase.
+     *
+     * The requesting user must fulfill the following conditions:
+     * - Be an annotator in the project, and
+     * - Project must be active
+     * - Phase must not be a tutorial
+     *
+     * @param authenticationToken
+     *                            The authentication token of the requesting user
+     * @param command
+     */
+    @PostMapping(value = "/annotate/userank")
+    public void annotateUserank(
+            @RequestHeader("Authorization") String authenticationToken,
+            @RequestBody final AddUseRankJudgementCommand command) {
+        this.judgementApplicationService.annotate(authenticationToken, command);
+    }
+
+
+    /**
      * Annotate bulk of instances of a phase.
      * 
      * The requesting user must fulfill the following conditions:
@@ -331,6 +380,29 @@ public class JudgementResource {
         this.judgementApplicationService.annotateBulk(authenticationToken,
                 commands.stream().map(c -> (IAddJudgementCommand) c).collect(Collectors.toList()));
     }
+
+    /**
+     * Annotate bulk of instances of a phase.
+     *
+     * The requesting user must fulfill the following conditions:
+     * - Be an annotator in the project
+     * - Project must be active
+     * - If phase is a tutorial, the annotation is only checked for correctness
+     *
+     * @param authenticationToken
+     *                            The authentication token of the requesting
+     *                            user
+     * @param commands
+     *                            List of annotations
+     */
+    @PostMapping(value = "/annotate/userank/bulk")
+    public void annotateBulkUserank(
+            @RequestHeader("Authorization") String authenticationToken,
+            @RequestBody final List<AddUseRankJudgementCommand> commands) {
+        this.judgementApplicationService.annotateBulk(authenticationToken,
+                commands.stream().map(c -> (IAddJudgementCommand) c).collect(Collectors.toList()));
+    }
+
 
     /**
      * Annote a specific instance of a phase for WSSIM

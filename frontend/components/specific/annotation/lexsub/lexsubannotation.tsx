@@ -10,7 +10,7 @@ import Router, { useRouter } from "next/router";
 import { fetchRandomInstance, useFetchPagedLexSubInstance } from "../../../../lib/service/instance/InstanceResource";
 import LoadingComponent from "../../../generic/loadingcomponent";
 import UsageField from "../usage/usagefield";
-import { FiArrowRight, FiChevronRight, FiEdit3, FiFeather } from "react-icons/fi";
+import { FiArrowRight, FiBookmark, FiChevronRight, FiEdit3, FiFeather } from "react-icons/fi";
 import ProgressBar from "../progressbar/progressbar";
 
 const LexSubAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
@@ -169,6 +169,20 @@ const LexSubAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
     return (
         <div className="w-full flex flex-col justify-between">
             <ProgressBar minValue={0} maxValue={useFetchPagedLexSubInstanceData.getTotalElements()} currentValue={useFetchPagedLexSubJudgementData.getTotalElements()} />
+            {(phase.getTaskHead() ?? "") !== "" && (
+                <div className="w-half shadow-md ">
+                    <div className="m-8 flex flex-row">
+                        <div className="my-4">
+                            <FiBookmark className="basic-svg" />
+                        </div>
+                        <div className="border-r-2 mx-4" />
+                        <div className="my-4 font-dm-mono-light text-lg overflow-auto">
+                            {phase.getTaskHead()}
+                        </div>
+
+                    </div>
+                </div>
+            )}
             <div className="w-full flex flex-col justify-center space-y-4 ">
                 <UsageField usage={annotation.instance.getUsage()} />
             </div>

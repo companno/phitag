@@ -27,6 +27,8 @@ public class PhaseDto {
 
     private final String description;
 
+    private final String taskhead;
+
     private final String code;
 
     private final String status;
@@ -42,6 +44,7 @@ public class PhaseDto {
             final AnnotationTypeDto annotationType,
             final SamplingDto sampling,
             final String description,
+            final String taskhead,
             final String code,
             final String status,
             final List<Pair<String, Boolean>> tutorialrequirements) {
@@ -57,6 +60,7 @@ public class PhaseDto {
         this.sampling = sampling;
 
         this.description = description;
+        this.taskhead = taskhead;
 
         this.code =code;
         this.status = status;
@@ -74,6 +78,7 @@ public class PhaseDto {
                 AnnotationTypeDto.from(phase.getAnnotationType()),
                 SamplingDto.from(phase.getSampling()),
                 phase.getDescription(),
+                phase.getTaskhead(),
                 phase.getCode(),
                 phase.getStatus(),
                 new ArrayList<>());
@@ -89,6 +94,7 @@ public class PhaseDto {
                 AnnotationTypeDto.from(phase.getAnnotationType()),
                 SamplingDto.from(phase.getSampling()),
                 phase.getDescription(),
+                phase.getTaskhead(),
                 phase.getCode(),
                 phase.getStatus(),
                 tutorial);

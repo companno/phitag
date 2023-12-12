@@ -27,6 +27,16 @@
             <column name="active" value="true"/>
             <column name="description" value="This is an example job listing for WSSIM Annotation. It is used to show how the job listing feature works."/>
         </insert>
+        <insert tableName="phitagjoblisting">
+            <column name="name" value="Example-Use-Rank-Annotation-Joblisting"/>
+            <column name="projectname" value="Example-Project-Use-Rank"/>
+            <column name="ownername" value="Example-User"/>
+            <column name="displayname" value="Example-Use-Rank-Annotation-Joblisting"/>
+            <column name="phasename" value="Example-Use-Rank-Annotation-Joblisting"/>
+            <column name="open" value="true"/>
+            <column name="active" value="true"/>
+            <column name="description" value="This is an example job listing for Use Rank Annotation. It is used to show how the job listing feature works."/>
+        </insert>
         
 
     </changeSet>

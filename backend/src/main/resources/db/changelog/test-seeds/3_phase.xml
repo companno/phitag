@@ -16,6 +16,7 @@
             <column name="phitagannotationtype_name" value="ANNOTATIONTYPE_USEPAIR"/>
             <column name="phitagsamplingstrategy_name" value="SAMPLING_RANDOM_WITH_REPLACEMENT"/>
             <column name="description" value=""/>
+            <column name="task_head" value=""/>
             <column name="is_tutorial" value="false"/>
             <column name="status" value="OPEN"/>
         </insert>
@@ -29,6 +30,7 @@
             <column name="phitagannotationtype_name" value="ANNOTATIONTYPE_USEPAIR"/>
             <column name="phitagsamplingstrategy_name" value="SAMPLING_RANDOM_WITH_REPLACEMENT"/>
             <column name="description" value=""/>
+            <column name="task_head" value=""/>
             <column name="is_tutorial" value="false"/>
             <column name="status" value="CLOSED"/>
         </insert>
@@ -42,6 +44,7 @@
             <column name="phitagannotationtype_name" value="ANNOTATIONTYPE_USEPAIR"/>
             <column name="phitagsamplingstrategy_name" value="SAMPLING_RANDOM_WITH_REPLACEMENT"/>
             <column name="description" value=""/>
+            <column name="task_head" value=""/>
             <column name="is_tutorial" value="false"/>
             <column name="status" value="OPEN"/>
         </insert>
@@ -55,6 +58,7 @@
             <column name="phitagannotationtype_name" value="ANNOTATIONTYPE_USEPAIR"/>
             <column name="phitagsamplingstrategy_name" value="SAMPLING_RANDOM_WITH_REPLACEMENT"/>
             <column name="description" value=""/>
+            <column name="task_head" value=""/>
             <column name="is_tutorial" value="false"/>
             <column name="status" value="CLOSED"/>
         </insert>

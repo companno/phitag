@@ -6,6 +6,9 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import de.garrafao.phitag.application.instance.userankinstance.UseRankInstanceApplicationService;
+import de.garrafao.phitag.application.instance.userankinstance.data.UseRankInstanceDto;
+import de.garrafao.phitag.domain.instance.userankinstance.UseRankInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
@@ -47,6 +50,8 @@ public class InstanceApplicationService {
 
     private final UsePairInstanceApplicationService usePairInstanceApplicationService;
 
+    private final UseRankInstanceApplicationService useRankInstanceApplicationService;
+
     private final WSSIMInstanceApplicationService wssimInstanceApplicationService;
 
     private final WSSIMTagApplicationService wssimTagApplicationService;
@@ -61,6 +66,7 @@ public class InstanceApplicationService {
             final ValidationService validationService,
 
             final UsePairInstanceApplicationService usePairInstanceApplicationService,
+            final UseRankInstanceApplicationService useRankInstanceApplicationService,
             final WSSIMInstanceApplicationService wssimInstanceApplicationService,
             final WSSIMTagApplicationService wssimTagApplicationService,
             final LexSubInstanceApplicationService lexSubInstanceApplicationService) {
@@ -68,6 +74,7 @@ public class InstanceApplicationService {
         this.validationService = validationService;
 
         this.usePairInstanceApplicationService = usePairInstanceApplicationService;
+        this.useRankInstanceApplicationService = useRankInstanceApplicationService;
         this.wssimInstanceApplicationService = wssimInstanceApplicationService;
         this.wssimTagApplicationService = wssimTagApplicationService;
         this.lexSubInstanceApplicationService = lexSubInstanceApplicationService;
@@ -98,6 +105,10 @@ public class InstanceApplicationService {
             this.usePairInstanceApplicationService.findByPhase(phaseEntity)
                     .forEach(usePairInstance -> instanceDtos.add(UsePairInstanceDto.from(usePairInstance)));
         }
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
+            this.useRankInstanceApplicationService.findByPhase(phaseEntity)
+                    .forEach(useRankInstance -> instanceDtos.add(UseRankInstanceDto.from(useRankInstance)));
+        }
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             if (additional) {
                 this.wssimTagApplicationService.findByPhase(phaseEntity)
@@ -114,6 +125,7 @@ public class InstanceApplicationService {
 
         return instanceDtos;
     }
+
 
     /**
      * Get all instances for a given phase as page
@@ -180,6 +192,16 @@ public class InstanceApplicationService {
                     pagedInstance.getSize(),
                     pagedInstance.getTotalElements(),
                     pagedInstance.getTotalPages());
+        }  else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
+            Page<UseRankInstance> pagedInstance = this.useRankInstanceApplicationService.findByPhasePaged(phaseEntity,
+                    size, page, order);
+            pagedInstanceDto = new PagedInstanceDto(
+                    pagedInstance.getContent().stream().map(UseRankInstanceDto::from).collect(Collectors.toList()),
+                    pagedInstance.getNumber(),
+                    pagedInstance.getSize(),
+                    pagedInstance.getTotalElements(),
+                    pagedInstance.getTotalPages());
+
         } else {
             pagedInstanceDto = new PagedInstanceDto();
         }
@@ -225,6 +247,11 @@ public class InstanceApplicationService {
             return UsePairInstanceDto
                     .from(this.usePairInstanceApplicationService.getAnnotationInstance(phaseEntity, annotator));
         }
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
+            return UseRankInstanceDto
+                    .from(this.useRankInstanceApplicationService.getAnnotationInstance(phaseEntity, annotator));
+        }
+
 
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             return WSSIMInstanceDto
@@ -260,6 +287,10 @@ public class InstanceApplicationService {
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             return this.usePairInstanceApplicationService.exportUsePairInstance(phaseEntity);
         }
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
+            return this.useRankInstanceApplicationService.exportUseRankInstance(phaseEntity);
+        }
+
 
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             if (additional) {
@@ -299,6 +330,11 @@ public class InstanceApplicationService {
 
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             this.usePairInstanceApplicationService.save(phaseEntity, file);
+            return;
+        }
+
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
+            this.useRankInstanceApplicationService.save(phaseEntity, file);
             return;
         }
 
@@ -350,6 +386,10 @@ public class InstanceApplicationService {
 
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             this.usePairInstanceApplicationService.generateInstances(phaseEntity, labels, nonLabel);
+            return;
+        }
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
+            this.useRankInstanceApplicationService.generateInstances(phaseEntity, labels, nonLabel);
             return;
         }
 

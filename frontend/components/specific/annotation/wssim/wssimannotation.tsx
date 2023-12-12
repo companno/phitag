@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Router from "next/router";
 
 // icon
-import { FiFeather } from "react-icons/fi";
+import { FiBookmark, FiFeather } from "react-icons/fi";
 
 // Toast
 import { toast } from "react-toastify";
@@ -166,6 +166,20 @@ const WSSIMAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
     return (
         <div className="w-full flex flex-col justify-between ">
             <ProgressBar minValue={0} maxValue={useFetchPagedWSSIMInstanceData.getTotalElements()} currentValue={useFetchPagedWSSIMJudgementsData.getTotalElements()} />
+            {(phase.getTaskHead() ?? "") !== "" && (
+                <div className="w-half shadow-md ">
+                    <div className="m-8 flex flex-row">
+                        <div className="my-4">
+                            <FiBookmark className="basic-svg" />
+                        </div>
+                        <div className="border-r-2 mx-4" />
+                        <div className="my-4 font-dm-mono-light text-lg overflow-auto">
+                            {phase.getTaskHead()}
+                        </div>
+
+                    </div>
+                </div>
+            )}
             <div className="w-full flex flex-col justify-center space-y-4 ">
                 <UsageField key={0} usage={annotation.instance.getUsage()} />
                 <WSSIMTagField key={1} tag={annotation.instance.getTag()} />
