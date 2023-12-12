@@ -1,20 +1,14 @@
 package de.garrafao.phitag.application.project;
 
-import java.util.List;
-
-import de.garrafao.phitag.application.project.data.UpdateProjectCommand;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import de.garrafao.phitag.application.statistics.annotatostatistic.AnnotatorStatisticApplicationService;
-import de.garrafao.phitag.application.statistics.projectstatic.ProjectStatisticApplicationService;
-import de.garrafao.phitag.application.statistics.userstatistic.UserStatisticApplicationService;
 import de.garrafao.phitag.application.common.CommonService;
 import de.garrafao.phitag.application.entitlement.data.EntitlementEnum;
 import de.garrafao.phitag.application.project.data.CreateProjectCommand;
 import de.garrafao.phitag.application.project.data.ProjectDto;
 import de.garrafao.phitag.application.project.data.ProjectNameRestrictionEnum;
+import de.garrafao.phitag.application.project.data.UpdateProjectCommand;
+import de.garrafao.phitag.application.statistics.annotatostatistic.AnnotatorStatisticApplicationService;
+import de.garrafao.phitag.application.statistics.projectstatic.ProjectStatisticApplicationService;
+import de.garrafao.phitag.application.statistics.userstatistic.UserStatisticApplicationService;
 import de.garrafao.phitag.application.validation.ValidationService;
 import de.garrafao.phitag.application.visibility.data.VisibilityEnum;
 import de.garrafao.phitag.domain.annotator.Annotator;
@@ -31,6 +25,11 @@ import de.garrafao.phitag.domain.project.error.ProjectNameRestrictionException;
 import de.garrafao.phitag.domain.project.query.ProjectQueryBuilder;
 import de.garrafao.phitag.domain.user.User;
 import de.garrafao.phitag.domain.visibility.Visibility;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class ProjectApplicationService {
@@ -54,7 +53,7 @@ public class ProjectApplicationService {
     private final CommonService commonService;
 
     private final ValidationService validationService;
-    private final PhaseApplicationService phaseApplicationService;
+
 
     // Other
 
@@ -245,6 +244,18 @@ public class ProjectApplicationService {
         } catch (Exception e) {
             throw new AccessDenidedException("Only the owner of a project can delete it.");
         }
+     /*   final List<Phase> phases = this.commonService.getPhasesOfProject(project);
+        final List<Annotator> annotators = this.commonService.getAnnotatorsOfProject(owner.getUsername(), projectName);
+        if (!phases.isEmpty() && !annotators.isEmpty()) {
+            for (Phase phase : phases) {
+                this.phaseApplicationService.deletePhase(authenticationToken, owner.getUsername(), project.getId().getName(),
+                        phase.getDisplayname());
+            }
+
+            for (Annotator annotator : annotators) {
+               this.annotatorRepository.delete(annotator);
+            }
+        }**/
 
         this.projectRepository.delete(project);
     }
