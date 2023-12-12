@@ -207,8 +207,8 @@ const Register: NextPage = () => {
                                         age: !registerState.age
                                     })} />
                             </div>
-                            <button type="button" className="block w-full mt-8 py-2 font-uni-corporate-bold bg-uni-corporate-mittelblau text-white " onClick={() => handleSignUp()}>Register</button>
 
+                            <button type="button" className="block w-full mt-8 py-2 font-dm-mono-bold bg-base16-gray-900 text-white " onClick={() => handleSignUp()}>Register</button>
                         </div>
                     </form>
                 </div>
