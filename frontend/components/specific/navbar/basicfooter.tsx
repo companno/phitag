@@ -34,12 +34,6 @@ const BasicFooter: React.FC<{}> = () => {
                             </a>
                         </Link>
 
-                        <Link href="/use-cases">
-                            <a className="flex items-center">
-                                Use Cases
-                            </a>
-                        </Link>
-
                         <Link href="/faq">
                             <a className="flex items-center">
                                 FAQ
@@ -52,15 +46,13 @@ const BasicFooter: React.FC<{}> = () => {
                             </a>
                         </Link>
 
-                        <Link href="https://www.uni-stuttgart.de/en/legal-notice/">
+                        <Link href="/legal-notice">
                             <a className="flex items-center">
                                 Legal Notice
                             </a>
                         </Link>
 
                     </div>
-
-
                 </div>
 
             </div>
