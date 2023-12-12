@@ -577,30 +577,6 @@ public class CommonService {
         return 0;
     }
 
-
-    /**
-     * Get all instances for a given phase.
-     *
-     * @param phase      the phase
-     * @return a list of all {@IInstance} for the given phase
-     */
-    public void deleteAllInstancesOfPhase(final Phase phase) {
-        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
-           this.deleteUsePairInstanceByPhase(phase);
-        }
-        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
-            this.deleteUseRankInstanceByPhase(phase);
-        }
-        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
-           this.deleteWSSIMInstanceByPhase(phase);
-        }
-        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
-          this.deleteLexSubInstanceByPhase(phase);
-        }
-
-    }
-
-
     /**
      * Get all use pair instances for a given phase.
      * 
@@ -721,17 +697,6 @@ public class CommonService {
                 .getTotalElements();
     }
 
-    /**
-     * Delete all WSSIM instances for a given phase.
-     *
-     * @param phase The phase.
-     */
-    public void deleteWSSIMInstanceByPhase(final Phase phase){
-        final List<WSSIMInstance> wssimInstances = this.findWSSIMInstanceByPhase(phase);
-        if(!wssimInstances.isEmpty()){
-            this.wssimInstanceRepository.delete(wssimInstances);
-        }
-    }
 
 
 
@@ -766,17 +731,6 @@ public class CommonService {
                 .getTotalElements();
     }
 
-    /**
-     * Delete all WSSIMTag for a given phase.
-     *
-     * @param phase The phase.
-     */
-    public void deleteWSSITagByPhase(final Phase phase){
-        final List<WSSIMTag> wssimTags = this.findWSSIMTagByPhase(phase);
-        if(!wssimTags.isEmpty()){
-            this.wssimTagRepository.delete(wssimTags);
-        }
-    }
 
 
 
@@ -812,19 +766,6 @@ public class CommonService {
         return this.lexSubInstanceRepository.findByQueryPaged(query, new PageRequestWraper(1, 0, null))
                 .getTotalElements();
     }
-
-    /**
-     * Delete all lexsub instances for a given phase.
-     *
-     * @param phase The phase.
-     */
-    public void deleteLexSubInstanceByPhase(final Phase phase){
-        final List<LexSubInstance> lexSubInstances = this.findLexSubInstanceByPhase(phase);
-        if(!lexSubInstances.isEmpty()){
-            this.lexSubInstanceRepository.delete(lexSubInstances);
-        }
-    }
-
 
 
     /**
