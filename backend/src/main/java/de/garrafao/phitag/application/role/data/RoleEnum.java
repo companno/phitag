@@ -2,7 +2,8 @@ package de.garrafao.phitag.application.role.data;
 
 public enum RoleEnum {
     ROLE_ADMIN("ROLE_ADMIN"),
-    ROLE_USER("ROLE_USER");
+    ROLE_USER("ROLE_USER"),
+    ROLE_PROLIFIC("ROLE_PROLIFIC");
 
     private final String name;
 

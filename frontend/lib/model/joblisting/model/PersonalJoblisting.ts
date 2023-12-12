@@ -8,17 +8,18 @@ export default class PersonalJoblisting {
     private readonly id: JoblistingId;
 
     private readonly displayname: string;
+    private readonly phase: string;
 
     private readonly open: boolean;
     private readonly description: string;
 
     private readonly waitinglist: Array<DummySelectable>;
 
-    constructor(id: JoblistingId, displayname: string, open: boolean, description: string, waitinglist: Array<DummySelectable>) {
+    constructor(id: JoblistingId, displayname: string, phase: string, open: boolean, description: string, waitinglist: Array<DummySelectable>) {
         this.id = id;
 
         this.displayname = displayname;
-
+        this.phase = phase;
         this.open = open;
         this.description = description;
 
@@ -32,6 +33,10 @@ export default class PersonalJoblisting {
     public getDisplayname(): string {
         return this.displayname;
     }
+    public getPhase(): string {
+        return this.phase;
+    }
+
 
     public isOpen(): boolean {
         return this.open;
@@ -48,7 +53,7 @@ export default class PersonalJoblisting {
     static fromDto(dto: PersonalJoblistingDto): PersonalJoblisting {
         const waitinglist = new Array<DummySelectable>();
         dto.waitinglist.forEach((element: string) => waitinglist.push(new DummySelectable(element, element)));
-        return new PersonalJoblisting(JoblistingId.fromDto(dto.id), dto.displayname, dto.open, dto.description, waitinglist);
+        return new PersonalJoblisting(JoblistingId.fromDto(dto.id), dto.displayname,dto.phase, dto.open, dto.description, waitinglist);
     }
 
 

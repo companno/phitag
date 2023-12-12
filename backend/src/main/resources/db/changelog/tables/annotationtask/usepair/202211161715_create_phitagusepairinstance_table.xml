@@ -67,7 +67,8 @@
             baseColumnNames="phasename, projectname, ownername"
             constraintName="FK_phitagusepairinstance_phitagphase"
             referencedTableName="phitagphase"
-            referencedColumnNames="name, projectname, ownername" />
+            referencedColumnNames="name, projectname, ownername"
+        />
 
         <addForeignKeyConstraint
             baseTableName="phitagusepairinstance"

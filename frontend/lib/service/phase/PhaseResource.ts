@@ -18,6 +18,7 @@ import StartComputationalAnnotationCommand from "../../model/phase/command/Start
 import { toast } from "react-toastify";
 import TutorialHistoryDto from "../../model/tutorialhistory/dto/TutorialHistoryDto";
 import TutorialHistory from "../../model/tutorialhistory/model/TutorialHistory";
+import { error } from "console";
 
 // Custom hooks for fetching phases
 
@@ -202,6 +203,27 @@ export function addRequirementsToPhase(command: AddRequirementsCommand, get: Fun
     ).then(res => res.data);
 }
 
+/**
+ * delete requirements from a phase
+ * 
+ * @param owner owner of the project
+ * @param project name of the project
+ * @param phase name of the project
+ * @param requirements name of the project
+ * @param get function to get data from local storage
+ * @returns Promise
+ */
+export function deleteRequirementsFromPhase(owner: string, project: string, phase: string, requirements: string, get: Function = () => { }) {
+    const token = get('JWT') || '';
+    return axios.post(
+        `${BACKENDROUTES.PHASE}/delete-requirements?owner=${owner}&project=${project}&phase=${phase}&requirements=${requirements}`,
+        {}, 
+        {
+            headers: { "Authorization": `Bearer ${token}` },
+        }
+    ).then(res => res.data);
+} 
+
 export function startComputationalAnnotation(command: StartComputationalAnnotationCommand, get: Function = () => { }) {
     const token = get('JWT') ?? '';
 
@@ -212,3 +234,61 @@ export function startComputationalAnnotation(command: StartComputationalAnnotati
         }
     ).then(res => res.data);
 }
+
+
+
+
+/**
+ * Set code to phase
+ * 
+ * @param command command to set a phase
+ * @param get function to get data from local storage
+ * @returns Promise
+ */
+export function setCode(owner: string, project: string, phase: string, code: string, get: Function = () => { }) {
+    const token = get('JWT') ?? '';
+
+    return axios.post(
+        `${BACKENDROUTES.PHASE}/create/code?owner=${owner}&project=${project}&phase=${phase}`,
+        code,
+        {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                // Set Content-Type to text/plain or remove this header
+                "Content-Type": "text/plain",
+            },
+        }
+    ).then(res => res.data)
+    .catch((error) => {
+        if (error.response) {
+            toast.error('Error uploading code', error.response.status);
+            toast.error('Response data:', error.response.data);
+        } else if (error.request) {
+            toast.error('No response received from the server');
+        } else {
+            toast.error('Error setting up the request:', error.message);
+        }
+        toast.error('Error config:', error.config);
+    });
+}
+/**
+ * delete  phase
+ * 
+ * @param owner owner of the project
+ * @param project name of the project
+ * @param phase name of the project
+ * @param get function to get data from local storage
+ * @returns Promise
+ */
+export function deletePhase(owner: string, project: string, phase: string, get: Function = () => { }) {
+
+    const token = get('JWT') || '';
+    return axios.post(
+        `${BACKENDROUTES.PHASE}/delete?owner=${owner}&project=${project}&phase=${phase}`,
+        {}, 
+        {
+            headers: { "Authorization": `Bearer ${token}` },
+        }
+    ).then(res => res.data);
+} 
+

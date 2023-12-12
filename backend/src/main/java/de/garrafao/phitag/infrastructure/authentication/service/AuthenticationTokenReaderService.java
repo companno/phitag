@@ -59,7 +59,7 @@ public class AuthenticationTokenReaderService implements IAuthenticationTokenRea
 
     /**
      * This method is used to get the claims from the token.
-     * BUT, this metod is also a verifying method for a token.
+     * BUT, this method is also a verifying method for a token.
      * Hence, use this method for all operations on the token, to ensure that the token is valid.  
     */ 
     private Claims validateTokenAndGetClaims(final AuthenticationToken authenticationToken) {

@@ -48,6 +48,16 @@
             <column name="description" value="An example project showing the WSSIM annotation task"/>
         </insert>
 
+        <insert tableName="phitagproject">
+            <column name="name" value="Example-Project-Use-Rank"/>
+            <column name="ownername" value="Example-User"/>
+            <column name="displayname" value="Example-Project-Use-Rank"/>
+            <column name="active" value="true"/>
+            <column name="phitagvisibility_name" value="VISIBILITY_PUBLIC"/>
+            <column name="phitaglanguage_name" value="English"/>
+            <column name="description" value="An example project showing the Use Rank annotation task"/>
+        </insert>
+
         <!-- Add user as annotator -->
 
         <insert tableName="phitagannotator">
@@ -61,6 +71,12 @@
         <insert tableName="phitagannotator">
             <column name="username" value="Example-User"/>
             <column name="projectname" value="Example-Project-WSSIM"/>
+            <column name="ownername" value="Example-User"/>
+            <column name="phitagentitlement_name" value="ENTITLEMENT_ADMIN"/>
+        </insert>
+        <insert tableName="phitagannotator">
+            <column name="username" value="Example-User"/>
+            <column name="projectname" value="Example-Project-Use-Rank"/>
             <column name="ownername" value="Example-User"/>
             <column name="phitagentitlement_name" value="ENTITLEMENT_ADMIN"/>
         </insert>

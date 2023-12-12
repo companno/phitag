@@ -17,4 +17,6 @@ public interface UsePairJudgementRepository {
 
     void delete(UsePairJudgement judgement);
 
+    void batchDelete(Iterable<UsePairJudgement> judgements);
+
 }

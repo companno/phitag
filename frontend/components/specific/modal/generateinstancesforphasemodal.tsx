@@ -13,6 +13,7 @@ import Phase from "../../../lib/model/phase/model/Phase";
 import { toast } from "react-toastify";
 import { generateInstance } from "../../../lib/service/instance/InstanceResource";
 import useStorage from "../../../lib/hook/useStorage";
+import ANNOTATIONTYPES from "../../../lib/AnnotationTypes";
 
 const GenerateInstancesForPhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function, phase: Phase, mutateCallback: Function, additional: boolean, additionalFileName: string }> = ({ isOpen, closeModalCallback, phase, mutateCallback, additional, additionalFileName }) => {
 
@@ -33,6 +34,7 @@ const GenerateInstancesForPhaseModal: React.FC<{ isOpen: boolean, closeModalCall
             toast.error("This should not happen. Please contact the developers!");
             return;
         }
+
 
         // @ts-ignore
         generateInstance(phase.getId().getOwner(), phase.getId().getProject(), phase.getId().getPhase(), modalState.labels, modalState.nonLabel, modalState.selectedFile, storage.get)
@@ -85,6 +87,7 @@ const GenerateInstancesForPhaseModal: React.FC<{ isOpen: boolean, closeModalCall
                                     You are about to generate new instances for the phase.
                                 </div>
 
+
                                 <div className="flex flex-col items-left mb-6">
                                     <div className="font-bold text-lg">
                                         Labels
@@ -104,6 +107,7 @@ const GenerateInstancesForPhaseModal: React.FC<{ isOpen: boolean, closeModalCall
                                     </div>
                                 </div>
 
+
                                 <div className="flex flex-col items-left mb-6">
                                     <div className="font-bold text-lg">
                                         Non-Label
@@ -121,8 +125,7 @@ const GenerateInstancesForPhaseModal: React.FC<{ isOpen: boolean, closeModalCall
                                                 nonLabel: e.target.value
                                             })} />
                                     </div>
-                                </div>
-
+                                </div> 
                                 {/* only, if additional set */}
                                 {additional && (
                                     <div className="flex flex-col items-left my-6">

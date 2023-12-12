@@ -1,6 +1,7 @@
 // React
 import { useEffect, useState, useCallback } from "react";
-import Router from "next/router";
+import Router, { useRouter } from "next/router";
+import { useFetchProject } from "../../lib/service/project/ProjectResource";
 
 // Nextjs
 import { NextPage } from "next";
@@ -52,6 +53,9 @@ const SettingIndex: NextPage = () => {
 
     languages.languages.sort((a, b) => a.getName().localeCompare(b.getName()));
     visibilities.visibilities.sort((a, b) => a.getName().localeCompare(b.getName()));
+
+
+
 
 
     // update user state
@@ -257,6 +261,8 @@ const SettingIndex: NextPage = () => {
                                         visibility: item,
                                     })}
                                     message={updateUser.visibility ? updateUser.visibility.getVisiblename() : ""} />
+                                    {console.log(updateUser.visibility)}
+
                             </div>
                         </div>
 
@@ -340,6 +346,7 @@ const SettingIndex: NextPage = () => {
                                 message={renderLanguageSelect(updateUser.languages, (language: Language) => {
                                     calculateNewLanguageArray(language, updateUser.languages);
                                 })} />
+                                
                         </div>
                     </div>
 

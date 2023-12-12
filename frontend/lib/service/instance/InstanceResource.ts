@@ -22,6 +22,10 @@ import PagedWSSIMInstance from "../../model/instance/wssiminstance/model/PagedWS
 import PagedWSSIMTag from "../../model/instance/wssimtag/model/PagedWSSIMTag";
 import LexSubInstanceDto from "../../model/instance/lexsubinstance/dto/LexSubInstanceDto";
 import PagedLexSubInstance from "../../model/instance/lexsubinstance/model/PagedLexSubInstance";
+import { error } from "console";
+import { toast } from "react-toastify";
+import UseRankInstanceDto from "../../model/instance/userankinstance/dto/UseRankInstanceDto";
+import PagedUseRankInstance from "../../model/instance/userankinstance/model/PagedUseRankInstance";
 
 /**
  * Returns all instances of a phase
@@ -81,6 +85,40 @@ export function useFetchPagedUsePairInstance(owner: string, project: string, pha
 
     return {
         data: data ? PagedUsePairInstance.fromDto(data) : PagedUsePairInstance.empty(),
+        isLoading: !error && !data,
+        isError: error,
+        mutate: mutate
+    }
+}
+
+
+/**
+ * Returns all use rank instances of a phase as a page.
+ * 
+ * @param owner owner of the project
+ * @param project project name
+ * @param phase phase name in the project
+ * @param constructor data class to be converted to (implements fromDto, i.e. the convertion function)
+ * @param additional if additional data should be fetched (e.g. wssim )
+ * 
+ * @param page page number
+ * @param fetch if data should be fetched
+ * @returns paged list of all instances
+ */
+export function useFetchPagedUseRankInstance(owner: string, project: string, phase: string, page: number = 0, fetch: boolean = true) {
+    const { get } = useStorage();
+    const token = get('JWT') ?? '';
+
+    const queryPhaseDataFetcher = (url: string) => axios.get<PagedGenericDto<UseRankInstanceDto>>(url, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(res => res.data)
+
+    const { data, error, mutate } = useSWR(fetch ? `${BACKENDROUTES.INSTANCE}/paged?owner=${owner}&project=${project}&phase=${phase}&additional=${false}&page=${page}` : null, queryPhaseDataFetcher)
+
+    return {
+        data: data ? PagedUseRankInstance.fromDto(data) : PagedUseRankInstance.empty(),
         isLoading: !error && !data,
         isError: error,
         mutate: mutate
@@ -196,15 +234,33 @@ export function useFetchPagedLexSubInstance(owner: string, project: string, phas
  * @param get storage hook
  * @returns a specific instance without revalidation
  */
-export function fetchRandomInstance<G extends IInstance, T extends IInstanceConstructor>(owner: string, project: string, phase: string, constructor: T, get: Function = () => { }) {
+export function fetchRandomInstance<G extends IInstance, T extends IInstanceConstructor>(
+    owner: string,
+    project: string,
+    phase: string,
+    constructor: T,
+    get: Function = () => { }
+  ) {
     const token = get('JWT') ?? '';
-
-    return axios.get<IInstanceDto>(`${BACKENDROUTES.INSTANCE}/random?owner=${owner}&project=${project}&phase=${phase}`, {
+    return axios
+      .get<IInstanceDto>(`${BACKENDROUTES.INSTANCE}/random?owner=${owner}&project=${project}&phase=${phase}`, {
         headers: {
-            "Authorization": `Bearer ${token}`
+          "Authorization": `Bearer ${token}`
         }
-    }).then(res => constructor.fromDto(res.data) as G)
-}
+      })
+      .then((res) => {
+        if (res.data) {
+          return constructor.fromDto(res.data) as G;
+        } else{
+            toast.info("No new instance available");
+        }
+      })
+      .catch((error) => {
+        if (error) {
+          toast.error("No new instances available");
+        }
+      });
+  }
 
 /**
  * Exports all instances of a phase as a csv/tsv file
@@ -276,6 +332,7 @@ export function addInstance(owner: string, project: string, phase: string, file:
 export function generateInstance(owner: string, project: string, phase: string, labels: string, nonLabel: string, file: File | null, get: Function = () => { }) {
     const token = get('JWT') ?? '';
 
+
     const formData = new FormData();
     formData.append('owner', owner);
     formData.append('project', project);
@@ -294,7 +351,7 @@ export function generateInstance(owner: string, project: string, phase: string, 
                 'Content-Type': 'multipart/form-data'
             }
         }
-    ).then(res => res.data);
+    ).then(res => res.data)
 }
 
 

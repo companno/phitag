@@ -16,6 +16,7 @@
             <column name="open" value="false" />
             <column name="active" value="true" />
             <column name="description" value="description-0" />
+            <column name="phasename" value="phase-0" />
         </insert>
 
 
@@ -27,6 +28,7 @@
             <column name="open" value="true" />
             <column name="active" value="true" />
             <column name="description" value="description-0" />
+            <column name="phasename" value="phase-1" />
         </insert>
 
         <!-- Joblisting Join Table -->

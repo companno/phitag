@@ -20,11 +20,13 @@ public class CreatePhaseCommand {
 
     private final String description;
 
+    private final String taskhead;
+
     public CreatePhaseCommand(
             final String name, final String owner, final String project,
             final String annotationType, final String sampling,
             final boolean tutorial, final String annotationAgreement, final Double threshold,
-            final String description) {
+            final String description, final String taskhead) {
         Validate.notBlank(name, "name must not be blank");
         Validate.notBlank(owner, "owner must not be blank");
         Validate.notBlank(project, "project must not be blank");
@@ -49,5 +51,6 @@ public class CreatePhaseCommand {
         this.tutorial = tutorial;
 
         this.description = description;
+        this.taskhead = taskhead;
     }
 }

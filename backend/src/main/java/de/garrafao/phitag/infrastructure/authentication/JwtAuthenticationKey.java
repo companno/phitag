@@ -15,7 +15,7 @@ import io.jsonwebtoken.security.Keys;
 public class JwtAuthenticationKey {
 
     private Key key;
-    private String signingKey;
+    private final String signingKey;
 
     @Autowired
     public JwtAuthenticationKey(@Value("${phitag.security.jwt.signing-key}") final String signingKey) {

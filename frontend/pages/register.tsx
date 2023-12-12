@@ -49,6 +49,7 @@ const Register: NextPage = () => {
         passwordConfirm: "",
         language: Array<Language>(),
         usecase: null as unknown as Usecase,
+        prolific_id:"",
         terms: false,
         age: false
     });
@@ -228,6 +229,7 @@ function verifySignUp(registerState: {
     passwordConfirm: string;
     language: Language[];
     usecase: Usecase;
+    prolific_id:string;
     terms: boolean;
     age: boolean;
 }): null | CreateUserCommand {
@@ -262,6 +264,7 @@ function verifySignUp(registerState: {
         registerState.password,
         registerState.usecase.getName(),
         registerState.language.map(l => l.getName()),
+        registerState.prolific_id,
         registerState.terms,
         registerState.age
     );

@@ -20,6 +20,10 @@
             <column name="name" value="ROLE_BOT" />
             <column name="visiblename" value="Bot" />
         </insert>
+        <insert tableName="phitagrole">
+            <column name="name" value="ROLE_PROLIFIC" />
+            <column name="visiblename" value="Prolific" />
+        </insert>
 
     </changeSet>
 </databaseChangeLog>

@@ -2,7 +2,7 @@ package de.garrafao.phitag.domain.judgement.wssimjudgement.query;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import de.garrafao.phitag.domain.judgement.common.query.*;
 import de.garrafao.phitag.domain.core.Query;
 import de.garrafao.phitag.domain.core.QueryComponent;
 

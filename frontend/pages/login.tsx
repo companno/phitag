@@ -38,7 +38,7 @@ const Login: NextPage = () => {
         login(loginState.username, loginState.password).then(res => {
             storage.set('JWT', res.authenticationToken);
             storage.set('USER', loginState.username);
-            
+
             // decode jwt, get payload
             var jwt = require('jsonwebtoken');
             const payload = jwt.decode(res.authenticationToken, {complete: true}).payload;
