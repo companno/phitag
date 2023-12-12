@@ -9,7 +9,7 @@ const BasicFooter: React.FC<{}> = () => {
             <div className="w-full 2xl:w-3/5 self-center">
 
                 <div className="py-2 px-6">
-                    <div className="flex flex-col space-y-2 xl:flex-row justify-between">
+                    <div className="flex flex-col space-y-2 sm:flex-row justify-between">
                         <Link href="/">
                             <a className="flex items-center ">
                                 Homepage

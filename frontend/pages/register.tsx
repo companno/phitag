@@ -101,11 +101,11 @@ const Register: NextPage = () => {
             <CenteredLayout>
                 <div className="flex justify-around items-center">
                     <form className="shadow-md">
-                        <div className="my-8 mx-8 font-uni-corporate-bold font-bold">
+                        <div className="my-8 mx-8 font-dm-mono-bolf font-bold">
                             <h1 className="font-bold text-xl">
                                 Sign Up to the PhiTag-System!
                             </h1>
-                            
+
                             <div className="flex items-center border-b-2 py-2 px-3 my-6">
                                 <FiUser className="basic-svg" />
 

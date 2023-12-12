@@ -39,25 +39,3 @@
 
     font-display: swap;
 }
-
-@font-face {
-    font-family: 'Univers LT Std 45 Light';
-    src: url('../public/font/Univers/UniversforUniS45LtObl-Rg.ttf');
-
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Univers LT Std 55 Roman';
-    src: url('../public/font/Univers/UniversforUniS55Rm-Regular.ttf');
-
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Univers LT Std 65 Bold';
-    src: url('../public/font/Univers/UniversforUniS65Bd-Regular.ttf');
-
-    font-display: swap;
-}
-
