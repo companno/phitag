@@ -7,14 +7,19 @@ export default class UsePairInstance implements IInstance {
 
     readonly id: UsePairInstanceId;
 
+    private readonly firstLemma: string;
+    private readonly secondLemma: string;
+
     private readonly firstusage: Usage;
     private readonly secondusage: Usage;
 
     private readonly labelSet: Array<string>;
     private readonly nonLabel: string;
 
-    constructor(id: UsePairInstanceId, firstUsage: Usage, secondUsage: Usage, labelSet: Array<string>, nonLabel: string) {
+    constructor(id: UsePairInstanceId, firstLemma: string, secondLemma: string, firstUsage: Usage, secondUsage: Usage, labelSet: Array<string>, nonLabel: string) {
         this.id = id;
+        this.firstLemma = firstLemma;
+        this.secondLemma = secondLemma;
         this.firstusage = firstUsage;
         this.secondusage = secondUsage;
         this.labelSet = labelSet;
@@ -23,6 +28,14 @@ export default class UsePairInstance implements IInstance {
 
     public getId(): UsePairInstanceId {
         return this.id;
+    }
+
+    public getFirstlemma(): string {
+        return this.firstLemma;
+    }
+
+    public getSecondlemma(): string {
+        return this.secondLemma;
     }
 
     public getFirstusage(): Usage {
@@ -48,6 +61,8 @@ export default class UsePairInstance implements IInstance {
     public static fromDto(dto: UsePairInstanceDto): UsePairInstance {
         return new UsePairInstance(
             UsePairInstanceId.fromDto(dto.id),
+            Usage.fromDto(dto.firstusage).getLemma(),
+            Usage.fromDto(dto.secondusage).getLemma(),
             Usage.fromDto(dto.firstusage),
             Usage.fromDto(dto.secondusage),
             dto.labelSet,

@@ -57,7 +57,7 @@ const UsePairAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
 
     const handleSubmitAnnotation = (judgement: string) => {
         mutateUsePairJudgements();
-   
+
         if(usepairinstances.data.getTotalElements()===usepairjudgementsData.getTotalElements()){
             toast.success("Congrats!!! You finished it all");
             Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
@@ -85,7 +85,7 @@ const UsePairAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
             }
         }
 
-       
+
     }
 
     const fetchNewAnnotation = () => {
@@ -114,7 +114,7 @@ const UsePairAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
             });
 
         }
-        
+
         fetchRandomInstance<UsePairInstance, UsePairInstanceConstructor>(phase.getId().getOwner(), phase.getId().getProject(), phase.getId().getPhase(), (new UsePairInstanceConstructor()), storage.get)
             .then((instance) => {
                 if (instance && usepairinstances.data.getTotalElements() !== usepairjudgementsData.getTotalElements()) {
@@ -197,17 +197,37 @@ const UsePairAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
         <div className="w-full flex flex-col justify-between">
             <ProgressBar currentValue={usepairjudgementsData.getTotalElements()} minValue={0} maxValue={usepairinstances.data.getTotalElements()} />
             {true ?
-                <div className="w-full flex flex-col justify-center space-y-4 ">
-                    <UsageField key={0} usage={annotation.instance.getFirstusage()} />
-                    <UsageField key={1} usage={annotation.instance.getSecondusage()} />
+                <div className="w-full flex flex-row justify-center space-y-4 ">
+                    <div className="w-full flex flex-col">
+                        <div className="font-bold text-lg">
+                            {annotation.instance.getFirstlemma()}
+                        </div>
+                        <UsageField key={0} usage={annotation.instance.getFirstusage()} />
+                    </div>
+                    <div className="w-full flex flex-col">
+                        <div className="font-bold text-lg">
+                            {annotation.instance.getSecondlemma()}
+                        </div>
+                        <UsageField key={1} usage={annotation.instance.getSecondusage()} />
+                    </div>
                 </div>
                 :
                 <div className="w-full flex flex-col justify-center space-y-4 ">
-                    <UsageField key={0} usage={annotation.instance.getSecondusage()} />
-                    <UsageField key={1} usage={annotation.instance.getFirstusage()} />
+                    <div className="w-full flex flex-col">
+                        <div className="font-bold text-lg">
+                            {annotation.instance.getSecondlemma()}
+                        </div>
+                        <UsageField key={0} usage={annotation.instance.getSecondusage()} />
+                    </div>
+                    <div className="w-full flex flex-col">
+                        <div className="font-bold text-lg">
+                            {annotation.instance.getFirstlemma()}
+                        </div>
+                        <UsageField key={1} usage={annotation.instance.getFirstusage()} />
+                    </div>
                 </div>
             }
-            
+
             <div className="w-full flex flex-row my-8 items-center justify-between xl:justify-center xl:space-x-6">
                 {annotation.instance.getLabelSet().concat(annotation.instance.getNonLabel()).map((label) => {
                     return (
