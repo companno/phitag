@@ -57,5 +57,10 @@ public class UseRankPairJudgementId implements Serializable, IJudgementId {
                 && instanceid.equals(other.instanceid);
     }
 
+    @Override
+    public String getUUID() {
+        // TODO Auto-generated method stub
+        return uuid;
+    }
 
 }

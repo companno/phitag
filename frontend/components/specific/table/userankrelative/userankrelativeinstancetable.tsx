@@ -73,6 +73,7 @@ const UseRankRelativeInstanceTable: React.FC<{ phase: Phase, modalState: { openD
                         </thead>
                         <tbody className=" text-base16-gray-700">
                             {userankrelativeinstances.data.getContent().map((instance, i) => {
+                                //@ts-ignore, TODO: fix this
                                 let userankrelativeinstance: UseRankRelativeInstance = instance;
                                 return (
                                     <><tr>
