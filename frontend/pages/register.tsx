@@ -49,7 +49,6 @@ const Register: NextPage = () => {
         passwordConfirm: "",
         language: Array<Language>(),
         usecase: null as unknown as Usecase,
-        prolific_id:"",
         terms: false,
         age: false
     });
@@ -101,7 +100,7 @@ const Register: NextPage = () => {
             <CenteredLayout>
                 <div className="flex justify-around items-center">
                     <form className="shadow-md">
-                        <div className="my-8 mx-8 font-dm-mono-bolf font-bold">
+                        <div className="my-8 mx-8 font-uni-corporate-bold font-bold">
                             <h1 className="font-bold text-xl">
                                 Sign Up to the PhiTag-System!
                             </h1>
@@ -207,8 +206,8 @@ const Register: NextPage = () => {
                                         age: !registerState.age
                                     })} />
                             </div>
+                            <button type="button" className="block w-full mt-8 py-2 font-uni-corporate-bold bg-uni-corporate-mittelblau text-white " onClick={() => handleSignUp()}>Register</button>
 
-                            <button type="button" className="block w-full mt-8 py-2 font-dm-mono-bold bg-base16-gray-900 text-white " onClick={() => handleSignUp()}>Register</button>
                         </div>
                     </form>
                 </div>
@@ -229,7 +228,6 @@ function verifySignUp(registerState: {
     passwordConfirm: string;
     language: Language[];
     usecase: Usecase;
-    prolific_id:string;
     terms: boolean;
     age: boolean;
 }): null | CreateUserCommand {
@@ -264,7 +262,6 @@ function verifySignUp(registerState: {
         registerState.password,
         registerState.usecase.getName(),
         registerState.language.map(l => l.getName()),
-        registerState.prolific_id,
         registerState.terms,
         registerState.age
     );

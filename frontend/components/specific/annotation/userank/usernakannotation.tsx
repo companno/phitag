@@ -16,11 +16,17 @@ import UsageField from "../usage/usagefield";
 import { toast } from "react-toastify";
 import Router from "next/router";
 import AddUseRankJudgementCommand from "../../../../lib/model/judgement/userankjudgement/command/AddUseRankJudgementCommand";
-import { annotateUserank, useFetchPagedUseRankJudgements } from "../../../../lib/service/judgement/JudgementResource";
+import { annotateUserank, countAttemptedJudgements, useFetchPagedUseRankJudgements } from "../../../../lib/service/judgement/JudgementResource";
 import LoadingComponent from "../../../generic/loadingcomponent";
 import ProgressBar from "../progressbar/progressbar";
 import React from "react";
 import Draggable from "../usage/userank/dragabbleusage";
+import { useFetchPhaseStatistic } from "../../../../lib/service/statistic/StatisticResource";
+import { MdFullscreen } from "react-icons/md";
+import IconButtonOnClick from "../../../generic/button/iconbuttononclick";
+import DraggableUsage from "../usage/userank/dragabbleusage";
+
+
 
 
 
@@ -36,29 +42,48 @@ const UseRankAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
         initialLoad: true
 
     });
+    const user = useStorage().get("USER");
 
-   
+    const [selectedSize, setSelectedSize] = useState<number>(400);
+    const possibleValues = [150, 200, 300, 400, 500, 600, 700];
+
+    const handleScreenSize = () => {
+        const currentIndex = possibleValues.indexOf(selectedSize);
+
+        const nextIndex = (currentIndex + 1) % possibleValues.length;
+
+        setSelectedSize(possibleValues[nextIndex]);
+    };
+
+
+
 
     const page: number = 0;
     const userankinstances = useFetchPagedUseRankInstance(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), page, !!phase);
 
-    const { data: userankjudgementsData, mutate: mutateUserankJudgements } = useFetchPagedUseRankJudgements(
-        phase?.getId().getOwner(),
-        phase?.getId().getProject(),
-        phase?.getId().getPhase(),
-        page,
-        !!phase
-    );
-    
+
+
+
+    const { data: userAnnotationCount, mutate: mutateCountJudgements } = countAttemptedJudgements(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), !!phase);
+
+
+
+
 
     const labelArray = annotation.instance ? annotation.instance.getLabelSet() : null;
     const noLabel = annotation.instance ? annotation.instance.getNonLabel() : null;
 
     const rank = {
-        first: labelArray ? labelArray[0]: "First Usage",
-        second: labelArray ? labelArray[1]: "Second Usage",
-        third: labelArray ? labelArray[2]: "Third Usage",
-        fourth: labelArray ? labelArray[3]: "Fourth Usage",
+        first: labelArray ? labelArray[0] : "First Usage",
+        second: labelArray ? labelArray[1] : "Second Usage",
+        third: labelArray ? labelArray[2] : "Third Usage",
+        fourth: labelArray ? labelArray[3] : "Fourth Usage",
+        fifth: labelArray ? labelArray[4] : "Fifth Usage",
+        sixth: labelArray ? labelArray[5] : "Sixth Usage",
+        seventh: labelArray ? labelArray[6] : "Seventh Usage",
+        eight: labelArray ? labelArray[7] : "Eight Usage",
+        ninth: labelArray ? labelArray[8] : "Ninth Usage",
+        tenth: labelArray ? labelArray[9] : "Tenth Usage",
     }
 
     const nonLabelSet = {
@@ -67,50 +92,91 @@ const UseRankAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
     const [judgementData, setJudgementData] = useState("");
 
     const handleUsagesReordered = (rank: string) => {
+
         setJudgementData(rank);
     };
+
+    const usages = [
+        {
+            key: rank.first,
+            usage: annotation.instance?.getFirstusage(),
+        },
+        {
+            key: rank.second,
+            usage: annotation.instance?.getSecondusage(),
+        },
+        {
+            key: rank.third,
+            usage: annotation.instance?.getThirdusage(),
+        },
+        {
+            key: rank.fourth,
+            usage: annotation.instance?.getFourthusage(),
+        }, {
+
+            key: rank.fifth,
+            usage: annotation.instance?.getFifthusage(),
+        }, {
+            key: rank.sixth,
+            usage: annotation.instance?.getSixthusage(),
+        }, {
+            key: rank.seventh,
+            usage: annotation.instance?.getSeventhusage(),
+        }, {
+            key: rank.eight,
+            usage: annotation.instance?.getEightusage(),
+        },
+        {
+            key: rank.ninth,
+            usage: annotation.instance?.getNinthusage(),
+        },
+        {
+            key: rank.tenth,
+            usage: annotation.instance?.getTenthusage(),
+        },
+    ];
+
+    // Filter out null usages
+    const filteredUsages = usages.filter(item => item.usage && item.usage.getContext() !== undefined);
 
 
     // Hooks
     const storage = useStorage();
     const annotationAccess = useFetchAnnotationAccess(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), !!phase);
 
-    
+
 
     const handleSubmitAnnotation = () => {
-        mutateUserankJudgements();
+        mutateCountJudgements();
         const judgement: string = judgementData;
-        console.log(judgement, "judgement")
-        if(!judgement){
+        if (!judgement) {
             toast.info("Please rank first or choose non label")
             return;
         }
 
-        if (userankinstances.data.getTotalElements() === userankjudgementsData.getTotalElements()) {
+        if (userankinstances.data.getTotalElements() === userAnnotationCount) {
             toast.success("Congrats!!! You finished it all");
             Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
             return
         }
-        if (userankinstances.data.getTotalElements() !== userankjudgementsData.getTotalElements()) {
-            const resultCommand = verifyResultCommand(phase, judgement, annotation);
-            setAnnotation({
-                ...annotation,
-                instance: null as unknown as UserankInstance,
-                comment: ""
-            });
-            if (resultCommand !== null) {
-                annotateUserank(resultCommand, storage.get)
-                    .then((result) => {
-                        fetchNewAnnotation();
-                    }).catch((error) => {
-                        if (error?.response?.status === 500) {
-                            toast.error("Error while adding judgement: " + error.response.data.message + "!");
-                        } else {
-                            toast.warning("The system is currently not available, please try again later!");
-                        }
+        const resultCommand = verifyResultCommand(phase, judgement, annotation);
+        setAnnotation({
+            ...annotation,
+            instance: null as unknown as UserankInstance,
+            comment: ""
+        });
+        if (resultCommand !== null) {
+            annotateUserank(resultCommand, storage.get)
+                .then((result) => {
+                    fetchNewAnnotation();
+                }).catch((error) => {
+                    if (error?.response?.status === 500) {
+                        toast.error("Error while adding judgement: " + error.response.data.message + "!");
+                    } else {
+                        toast.warning("The system is currently not available, please try again later!");
                     }
-                    );
-            }
+                }
+                );
             setJudgementData("");
         }
 
@@ -118,50 +184,46 @@ const UseRankAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
     }
 
     const handleSkip = () => {
+        mutateCountJudgements();
 
         const judgement: string = annotation.instance.getNonLabel().toString();
-
-
-        mutateUserankJudgements();
-        if (userankinstances.data.getTotalElements() === userankjudgementsData.getTotalElements()) {
+        if (userankinstances.data.getTotalElements() === userAnnotationCount) {
             toast.success("Congrats!!! You finished it all");
             Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
             return
         }
-        if (userankinstances.data.getTotalElements() !== userankjudgementsData.getTotalElements()) {
-            const resultCommand = verifyResultCommand(phase, judgement, annotation);
-            setAnnotation({
-                ...annotation,
-                instance: null as unknown as UserankInstance,
-                comment: ""
-            });
-            if (resultCommand !== null) {
-                annotateUserank(resultCommand, storage.get)
-                    .then((result) => {
-                        fetchNewAnnotation();
-                    }).catch((error) => {
-                        if (error?.response?.status === 500) {
-                            toast.error("Error while adding judgement: " + error.response.data.message + "!");
-                        } else {
-                            toast.warning("The system is currently not available, please try again later!");
-                        }
+        const resultCommand = verifyResultCommand(phase, judgement, annotation);
+        setAnnotation({
+            ...annotation,
+            instance: null as unknown as UserankInstance,
+            comment: ""
+        });
+        if (resultCommand !== null) {
+            annotateUserank(resultCommand, storage.get)
+                .then((result) => {
+                    fetchNewAnnotation();
+                }).catch((error) => {
+                    if (error?.response?.status === 500) {
+                        toast.error("Error while adding judgement: " + error.response.data.message + "!");
+                    } else {
+                        toast.warning("The system is currently not available, please try again later!");
                     }
-                    );
-            }
+                }
+                );
         }
 
 
     }
 
     const fetchNewAnnotation = () => {
-        mutateUserankJudgements();
-        if (userankinstances.data.getTotalElements() === userankjudgementsData.getTotalElements()) {
+        mutateCountJudgements()
+        if (userankinstances.data.getTotalElements() === userAnnotationCount) {
             Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
         }
         else {
             fetchRandomInstance<UserankInstance, UseRankInstanceConstructor>(phase.getId().getOwner(), phase.getId().getProject(), phase.getId().getPhase(), (new UseRankInstanceConstructor()), storage.get)
                 .then((instance) => {
-                    if (instance && userankinstances.data.getTotalElements() !== userankjudgementsData.getTotalElements()) {
+                    if (instance) {
                         setAnnotation({
                             ...annotation,
 
@@ -182,14 +244,14 @@ const UseRankAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
 
         fetchRandomInstance<UserankInstance, UseRankInstanceConstructor>(phase.getId().getOwner(), phase.getId().getProject(), phase.getId().getPhase(), (new UseRankInstanceConstructor()), storage.get)
             .then((instance) => {
-                if (instance && userankinstances.data.getTotalElements() !== userankjudgementsData.getTotalElements()) {
+                if (instance) {
                     setAnnotation({
                         ...annotation,
 
                         instance: instance,
                         comment: "",
                     });
-                } else if (!instance && userankinstances.data.getTotalElements() !== userankjudgementsData.getTotalElements()) {
+                } else {
 
                     toast.info("Could not fetch new annotation. Check if instances are provided for annotation.");
                 }
@@ -204,53 +266,41 @@ const UseRankAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
     // Hook
 
     useEffect(() => {
-        if (userankinstances.data.getTotalElements()) {
 
-            if (userankinstances.data.getTotalElements() === userankjudgementsData.getTotalElements()) {
-                toast.info("No instance available to anotate")
-                Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
-
-
-            }
-
-            if (userankinstances.data.getTotalElements() !== userankjudgementsData.getTotalElements()) {
-                mutateUserankJudgements();
-                if (annotationAccess.isError) {
-                    Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
-                    return;
-                } else if (annotation.initialLoad) {
-                    fetchRandomInstance<UserankInstance, UseRankInstanceConstructor>(
-                        phase.getId().getOwner(),
-                        phase.getId().getProject(),
-                        phase.getId().getPhase(),
-                        new UseRankInstanceConstructor(),
-                        storage.get
-                    )
-                        .then((instance) => {
-                            if (instance) {
-                                setAnnotation((prevAnnotation) => ({
-                                    ...prevAnnotation,
-                                    instance: instance,
-                                    comment: "",
-                                    initialLoad: false,
-                                }));
-                            } /* else {
+        if (annotationAccess.isError) {
+            Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
+            return;
+        } else if (annotation.initialLoad) {
+            fetchRandomInstance<UserankInstance, UseRankInstanceConstructor>(
+                phase.getId().getOwner(),
+                phase.getId().getProject(),
+                phase.getId().getPhase(),
+                new UseRankInstanceConstructor(),
+                storage.get
+            )
+                .then((instance) => {
+                    if (instance) {
+                        setAnnotation((prevAnnotation) => ({
+                            ...prevAnnotation,
+                            instance: instance,
+                            comment: "",
+                            initialLoad: false,
+                        }));
+                    } /* else {
                                 toast.info("You finished all");
                                 Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
                             } */
-                        })
-                        .catch((error) => {
-                            toast.error("Could not fetch new annotation. Check if instances are provided for annotation.");
-                            Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
-                        });
-                }
-            }
+                })
+                .catch((error) => {
+                    toast.error("Could not fetch new annotation. Check if instances are provided for annotation.");
+                    Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
+                });
 
         }
 
 
 
-    }, [userankinstances.data.getTotalElements(), userankjudgementsData.getTotalElements(), annotationAccess, annotation.initialLoad, storage, phase]);
+    }, [annotationAccess, annotation.initialLoad, storage, phase]);
 
 
     if (!phase || !annotation.instance || annotation.initialLoad) {
@@ -260,7 +310,18 @@ const UseRankAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
     return (
 
         <div className="w-full flex flex-col justify-between">
-            <ProgressBar currentValue={userankjudgementsData.getTotalElements()} minValue={0} maxValue={userankinstances.data.getTotalElements()} />
+            <div className="relative w-full">
+                <ProgressBar
+                    currentValue={userAnnotationCount}
+                    minValue={0}
+                    maxValue={userankinstances.data.getTotalElements()}
+                />
+                <div className="absolute bottom-10 right-0">
+                    <div > {/* Adjust the size as needed */}
+                        <IconButtonOnClick icon={<MdFullscreen onClick={() => { handleScreenSize() }} className="text-3xl" />} tooltip={"Click here to increase the size"} />
+                    </div>
+                </div>
+            </div>
             {(phase.getTaskHead() ?? "") !== "" && (
                 <div className="w-half shadow-md ">
                     <div className="m-8 flex flex-row">
@@ -275,24 +336,8 @@ const UseRankAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
                     </div>
                 </div>
             )}
-                <Draggable  usages={[
-                {
-                    key: rank.first,
-                    usage: annotation.instance.getFirstusage(),
-                },
-                {
-                    key: rank.second,
-                    usage: annotation.instance.getSecondusage(),
-                },
-                {
-                    key: rank.third,
-                    usage: annotation.instance.getThirdusage(),
-                },
-                {
-                    key: rank.fourth,
-                    usage: annotation.instance.getFourthusage(),
-                },
-            ]} handleUsagesReordered={handleUsagesReordered } />
+
+            <DraggableUsage usages={filteredUsages} handleUsagesReordered={handleUsagesReordered} containerSize={selectedSize} />
 
 
             <div className="w-full flex flex-col justify-center space-y-4 ">

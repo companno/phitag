@@ -1,34 +1,12 @@
 package de.garrafao.phitag.application.judgement.usepairjudgement;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.transaction.Transactional;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.CSVRecord;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import de.garrafao.phitag.application.statistics.annotatostatistic.AnnotatorStatisticApplicationService;
-import de.garrafao.phitag.application.statistics.phasestatistic.PhaseStatisticApplicationService;
-import de.garrafao.phitag.application.statistics.userstatistic.UserStatisticApplicationService;
-import de.garrafao.phitag.domain.judgement.usepairjudgement.page.UsePairJudgementPageBuilder;
 import de.garrafao.phitag.application.common.CommonMathService;
 import de.garrafao.phitag.application.judgement.usepairjudgement.data.AddUsePairJudgementCommand;
 import de.garrafao.phitag.application.judgement.usepairjudgement.data.DeleteUsePairJudgementCommand;
 import de.garrafao.phitag.application.judgement.usepairjudgement.data.EditUsePairJudgementCommand;
+import de.garrafao.phitag.application.statistics.annotatostatistic.AnnotatorStatisticApplicationService;
+import de.garrafao.phitag.application.statistics.phasestatistic.PhaseStatisticApplicationService;
+import de.garrafao.phitag.application.statistics.userstatistic.UserStatisticApplicationService;
 import de.garrafao.phitag.domain.annotator.Annotator;
 import de.garrafao.phitag.domain.authentication.error.AccessDenidedException;
 import de.garrafao.phitag.domain.core.PageRequestWraper;
@@ -41,17 +19,40 @@ import de.garrafao.phitag.domain.judgement.usepairjudgement.UsePairJudgement;
 import de.garrafao.phitag.domain.judgement.usepairjudgement.UsePairJudgementRepository;
 import de.garrafao.phitag.domain.judgement.usepairjudgement.error.UsePairJudgementException;
 import de.garrafao.phitag.domain.judgement.usepairjudgement.error.UsePairJudgementNotFoundException;
+import de.garrafao.phitag.domain.judgement.usepairjudgement.page.UsePairJudgementPageBuilder;
 import de.garrafao.phitag.domain.judgement.usepairjudgement.query.UsePairJudgementQueryBuilder;
+import de.garrafao.phitag.domain.judgement.userankjudgement.query.UseRankJudgementQueryBuilder;
 import de.garrafao.phitag.domain.phase.Phase;
 import de.garrafao.phitag.domain.phase.error.TutorialException;
 import de.garrafao.phitag.domain.statistic.statisticannotationmeasure.StatisticAnnotationMeasureEnum;
 import de.garrafao.phitag.domain.statistic.tutorialannotationmeasurehistory.TutorialAnnotationMeasureHistory;
 import de.garrafao.phitag.domain.statistic.tutorialannotationmeasurehistory.TutorialAnnotationMeasureHistoryRepository;
+import de.garrafao.phitag.domain.tutorial.usepair.UsePairTutorialJudgement;
+import de.garrafao.phitag.domain.tutorial.usepair.UsePairTutorialJudgementRepository;
+import de.garrafao.phitag.domain.tutorial.usepair.page.UsePairTutorialJudgementPageBuilder;
+import de.garrafao.phitag.domain.tutorial.usepair.query.UsePairTutorialJudgementQueryBuilder;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.transaction.Transactional;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class UsePairJudgementApplicationService {
 
     private final UsePairJudgementRepository usePairJudgementRepository;
+
+    private final UsePairTutorialJudgementRepository usePairTutorialJudgementRepository;
 
     private final UsePairInstanceRepository usePairInstanceRepository;
 
@@ -67,9 +68,14 @@ public class UsePairJudgementApplicationService {
 
     private final CommonMathService commonMathService;
 
+
+
+
+
     @Autowired
     public UsePairJudgementApplicationService(
             final UsePairJudgementRepository usePairJudgementRepository,
+            final UsePairTutorialJudgementRepository usePairTutorialJudgementRepository,
             final UsePairInstanceRepository usePairInstanceRepository,
             final TutorialAnnotationMeasureHistoryRepository tutorialAnnotationMeasureHistoryRepository,
 
@@ -78,6 +84,7 @@ public class UsePairJudgementApplicationService {
             final PhaseStatisticApplicationService phaseStatisticApplicationService,
             final CommonMathService commonMathService) {
         this.usePairJudgementRepository = usePairJudgementRepository;
+        this.usePairTutorialJudgementRepository = usePairTutorialJudgementRepository;
         this.usePairInstanceRepository = usePairInstanceRepository;
         this.tutorialAnnotationMeasureHistoryRepository = tutorialAnnotationMeasureHistoryRepository;
 
@@ -97,7 +104,6 @@ public class UsePairJudgementApplicationService {
      */
     public List<UsePairJudgement> findByPhase(final Phase phase) {
         final Query query = new UsePairJudgementQueryBuilder()
-                .withOwner(phase.getId().getProjectid().getOwnername())
                 .withProject(phase.getId().getProjectid().getName())
                 .withPhase(phase.getId().getName())
                 .build();
@@ -130,6 +136,49 @@ public class UsePairJudgementApplicationService {
                 .build());
     }
 
+    //tutorials getter
+
+    /**
+     * Get all use pair tutorail judgements for a given phase.
+     *
+     * @param phase the phase
+     * @return a {@link UsePairJudgement} list
+     */
+    public List<UsePairTutorialJudgement> findTutorialByPhase(final Phase phase) {
+        final Query query = new UsePairTutorialJudgementQueryBuilder()
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+        return this.usePairTutorialJudgementRepository.findByQuery(query);
+    }
+
+    /**
+     * Get all use pair tutorial judgements for a given phase as a paged list.
+     *
+     * @param phase
+     * @param pagesize
+     * @param pagenumber
+     * @param orderBy
+     * @return
+     */
+    public Page<UsePairTutorialJudgement> findTutorialByPhase(
+            final Phase phase,
+            final int pagesize,
+            final int pagenumber,
+            final String orderBy) {
+        final Query query = new UsePairTutorialJudgementQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+        return this.usePairTutorialJudgementRepository.findByQueryPaged(query, new UsePairTutorialJudgementPageBuilder()
+                .withPageSize(pagesize)
+                .withPageNumber(pagenumber)
+                .withOrderBy(orderBy)
+                .build());
+    }
+
+
     /**
      * Get all use pair judgements for a given annotator.
      * 
@@ -142,6 +191,20 @@ public class UsePairJudgementApplicationService {
                 .withProject(phase.getId().getProjectid().getName()).withPhase(phase.getId().getName())
                 .withAnnotator(annotator.getId().getUsername()).build();
         return this.usePairJudgementRepository.findByQuery(query);
+    }
+
+    /**
+     * Get all use pair judgements for a given annotator.
+     *
+     * @param phase     the phase
+     * @param annotator the annotator
+     * @return a {@link UsePairJudgement} list
+     */
+    public List<UsePairTutorialJudgement> getTutorialHistory(final Phase phase, final Annotator annotator) {
+        final Query query = new UsePairTutorialJudgementQueryBuilder().withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName()).withPhase(phase.getId().getName())
+                .withAnnotator(annotator.getId().getUsername()).build();
+        return this.usePairTutorialJudgementRepository.findByQuery(query);
     }
 
     /**
@@ -172,6 +235,36 @@ public class UsePairJudgementApplicationService {
                 .withOrderBy(orderBy)
                 .build());
     }
+
+    /**
+     * Get all use pair judgements for a given annotator as a paged list.
+     *
+     * @param phase
+     * @param annotator
+     * @param pagesize
+     * @param pagenumber
+     * @param orderBy
+     * @return
+     */
+    public Page<UsePairTutorialJudgement> getTutorialHistory(
+            final Phase phase,
+            final Annotator annotator,
+            final int pagesize,
+            final int pagenumber,
+            final String orderBy) {
+        final Query query = new UsePairTutorialJudgementQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .withAnnotator(annotator.getId().getUsername())
+                .build();
+        return this.usePairTutorialJudgementRepository.findByQueryPaged(query, new UsePairTutorialJudgementPageBuilder()
+                .withPageSize(pagesize)
+                .withPageNumber(pagenumber)
+                .withOrderBy(orderBy)
+                .build());
+    }
+
 
     /**
      * Export all use pair judgements for a given phase.
@@ -207,6 +300,39 @@ public class UsePairJudgementApplicationService {
     }
 
     /**
+     * Export all use pair tutorial judgements for a given phase.
+     *
+     * @param phase the phase
+     * @return a CSV file as {@link InputStreamResource}
+     */
+    public InputStreamResource exportUsePairTutorialJudgement(final Phase phase) {
+        List<UsePairTutorialJudgement> resultData = this.findTutorialByPhase(phase);
+        String[] csvHeader = {
+                "instanceID", "label", "comment", "annotator"
+        };
+        List<List<String>> csvData = parseUsePairTutorialJudgementsToCsvBody(resultData);
+
+        ByteArrayInputStream outputStream;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CSVPrinter csvPrinter = createCsvPrinter(csvHeader, out);
+        csvData.forEach(row -> {
+            try {
+                csvPrinter.printRecord(row);
+            } catch (Exception e) {
+                throw new CsvParseException();
+            }
+        });
+        try {
+            csvPrinter.flush();
+            outputStream = new ByteArrayInputStream(out.toByteArray());
+        } catch (Exception e) {
+            throw new CsvParseException();
+        }
+
+        return new InputStreamResource(outputStream);
+    }
+
+    /**
      * Count all use pair judgements for a given annotator.
      * 
      * @param annotator the annotator
@@ -220,6 +346,8 @@ public class UsePairJudgementApplicationService {
                 new PageRequestWraper(1, 0)).getTotalElements();
     }
 
+
+
     /**
      * Count all use pair judgements for a given annotator and phase.
      * 
@@ -231,29 +359,34 @@ public class UsePairJudgementApplicationService {
         return (int) this.usePairJudgementRepository.findByQueryPaged(
                 new UsePairJudgementQueryBuilder()
                         .withAnnotator(annotator.getId().getUsername())
+                        .withAnnotatorProjectName(annotator.getProject().getId().getName())
                         .withPhase(phase.getId().getName()).build(),
                 new PageRequestWraper(1, 0)).getTotalElements();
     }
-
 
     /**
-     * Count all use pair judgements for a given annotator and phase.
+     * Count all use pair attempted judgements for a given annotator.
      *
      * @param annotator the annotator
-     * @param phase     the phase
-     * @return the number of use pair judgements
+     * @param phase  Phase
+     * @return the number of use rank judgements
      */
-
-
-    public int countAttemptedJudgements(Annotator annotator, Phase phase, UsePairInstance usePairInstance) {
+    public int countAttemptedJudgements(final Phase phase,  Annotator annotator) {
+        String phaseName = phase.getId().getName();
+        String ownerName = phase.getProject().getOwner().getDisplayname();
+        String projectName = phase.getProject().getId().getName();
+        String annotatorName = annotator.getId().getUsername();
         return (int) this.usePairJudgementRepository.findByQueryPaged(
-                new UsePairJudgementQueryBuilder()
-                        .withAnnotator(annotator.getId().getUsername())
-                        .withAnnotatorProjectName(annotator.getProject().getDisplayname())
-                        .withOwner(phase.getProject().getOwner().getDisplayname())
-                        .withPhase(phase.getId().getName()).build(),
+                new UseRankJudgementQueryBuilder()
+                        .withProject(projectName)
+                        .withPhase(phaseName)
+                        .withOwner(ownerName)
+                        .withAnnotator(annotatorName)
+                        .build(),
                 new PageRequestWraper(1, 0)).getTotalElements();
     }
+
+
 
     // Setter Files
 
@@ -265,6 +398,7 @@ public class UsePairJudgementApplicationService {
      */
     @Transactional
     public void save(final Phase phase, final Annotator annotator, final MultipartFile file) {
+
         validateCsvFile(file);
 
         parseCsvFile(file).forEach(csvrecord -> {
@@ -314,6 +448,7 @@ public class UsePairJudgementApplicationService {
         this.usePairJudgementRepository.save(judgement);
     }
 
+
     /**
      * Delete a use pair judgement.
      * 
@@ -332,15 +467,19 @@ public class UsePairJudgementApplicationService {
                 .withUUID(command.getUUID())
                 .build();
         final List<UsePairJudgement> usePairJudgements = this.usePairJudgementRepository.findByQuery(query);
+
+        /**
         if (usePairJudgements.size() != 1) {
             throw new UsePairJudgementNotFoundException();
 
         }
         final UsePairJudgement judgement = usePairJudgements.get(0);
-
+         */
+        final UsePairJudgement judgement = usePairJudgements.get(0);
         if (!annotator.equals(judgement.getAnnotator())) {
             throw new AccessDenidedException();
         }
+
 
         this.usePairJudgementRepository.delete(judgement);
     }
@@ -372,6 +511,26 @@ public class UsePairJudgementApplicationService {
     }
 
     /**
+     * Add a use pair tutorial judgement.
+     *
+     * @param phase     the phase to which the use pair judgement belongs
+     * @param annotator the annotator who created the use pair judgement
+     * @param command   the command
+     */
+    @Transactional
+    public void annotateTutorial(final Phase phase, final Annotator annotator, final AddUsePairJudgementCommand command) {
+        String instanceId = command.getInstance();
+
+        final UsePairInstance instance = this.findCorrespondingInstanceData(phase, instanceId);
+       // validateAddUsePairJudgementCommand(instance, command);
+
+        final UsePairTutorialJudgement resultData = new UsePairTutorialJudgement(instance, annotator, command.getLabel(),
+                command.getComment());
+        this.usePairTutorialJudgementRepository.save(resultData);
+    }
+
+
+    /**
      * Add bulk use pair judgement for a given phase.
      * If the phase is a tutorial phase, the judgements are checked against the
      * tutorial judgements and if they are correct, the tutorial phase is marked as
@@ -386,6 +545,9 @@ public class UsePairJudgementApplicationService {
             final List<AddUsePairJudgementCommand> commands) {
         if (phase.isTutorial()) {
             tutorialAnnotationCorrectness(phase, annotator, commands);
+           commands.forEach(command -> {
+                this.annotateTutorial(phase, annotator, command);
+            });
             return;
         }
 
@@ -443,7 +605,6 @@ public class UsePairJudgementApplicationService {
         // Create two lists of the labels of the gold and the annotator
         List<String> goldLabels = golds.stream().map(UsePairJudgement::getLabel).toList();
         List<String> annotatorLabels = commands.stream().map(AddUsePairJudgementCommand::getLabel).toList();
-
         List<List<String>> annotatorLabelList = Arrays.asList(goldLabels, annotatorLabels);
         List<String> categories = golds.get(0).getInstance().getLabelSet();
 
@@ -507,6 +668,22 @@ public class UsePairJudgementApplicationService {
 
         return csvBody;
     }
+    private List<List<String>> parseUsePairTutorialJudgementsToCsvBody(List<UsePairTutorialJudgement> usePairTutorialJudgements) {
+        List<List<String>> csvBody = new ArrayList<>();
+
+        for (UsePairTutorialJudgement data : usePairTutorialJudgements) {
+            List<String> csvRow = new ArrayList<>();
+
+            csvRow.add(data.getInstance().getId().getInstanceid());
+            csvRow.add(data.getLabel());
+            csvRow.add(data.getComment());
+            csvRow.add(data.getAnnotator().getId().getUsername());
+
+            csvBody.add(csvRow);
+        }
+
+        return csvBody;
+    }
 
     private Iterable<CSVRecord> parseCsvFile(final MultipartFile file) {
         try {
@@ -547,6 +724,8 @@ public class UsePairJudgementApplicationService {
     // Validation
 
     private void validateCsvFile(final MultipartFile file) {
+
+
         if (file == null) {
             throw new IllegalArgumentException("file is null");
         }

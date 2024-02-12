@@ -21,10 +21,11 @@ import { toast } from "react-toastify";
 import PageChange from "../../../generic/table/pagination";
 import UseRankJudgement from "../../../../lib/model/judgement/userankjudgement/model/UseRankJudgement";
 import DeleteUseRankJudgementCommand from "../../../../lib/model/judgement/userankjudgement/command/DeleteUseRankJudgementCommand";
-import { DragDropContext, Draggable, DropResult, Droppable } from "react-beautiful-dnd";
 import EditUseRankJudgementCommand from "../../../../lib/model/judgement/userankjudgement/command/EditUseRankJudgementCommand";
 import EditUseRankJudgementModal from "../../modal/edituserankjudgementmodal";
 import DraggableJudgemets from "./dndjudgements/dragablejudgements";
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import UsageCard from "../../card/usagecard";
 
 const UseRankJudgementHistoryTable: React.FC<{ phase: Phase }> = ({ phase }) => {
 
@@ -105,6 +106,18 @@ const UseRankJudgementHistoryTable: React.FC<{ phase: Phase }> = ({ phase }) => 
             }
         });
     }
+    const [expandedInstances, setExpandedInstances] = useState<boolean[]>(
+        new Array(userankjudgements.data.getContent().length).fill(false)
+    );
+
+    const toggleExpansion = (index: number) => {
+        setExpandedInstances((prevExpanded) => {
+            const newExpanded = [...prevExpanded];
+            newExpanded[index] = !newExpanded[index];
+            return newExpanded;
+        });
+    };
+
 
 
 
@@ -148,20 +161,9 @@ const UseRankJudgementHistoryTable: React.FC<{ phase: Phase }> = ({ phase }) => 
                             </th>
                             <th scope="col"
                                 className="px-6 py-3 text-left uppercase tracking-wider whitespace-nowrap">
-                                First Usage
+                                Usage
                             </th>
-                            <th scope="col"
-                                className="px-6 py-3 text-left uppercase tracking-wider whitespace-nowrap">
-                                Second Usage
-                            </th>
-                            <th scope="col"
-                                className="px-6 py-3 text-left uppercase tracking-wider whitespace-nowrap">
-                                Third Usage
-                            </th>
-                            <th scope="col"
-                                className="px-6 py-3 text-left uppercase tracking-wider whitespace-nowrap">
-                                Fourth Usage
-                            </th>
+                            
                             <th scope="col"
                                 className="px-6 py-3 text-left uppercase tracking-wider whitespace-nowrap">
                                Rank
@@ -185,57 +187,34 @@ const UseRankJudgementHistoryTable: React.FC<{ phase: Phase }> = ({ phase }) => 
                         {userankjudgements.data.getContent().map((judgement, i) => {
                             let userankjudgement: UseRankJudgement = judgement;
                             return (
-                                
+                               <> 
                                 <tr key={userankjudgement.getId().getId()}>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         {userankjudgement.getId().getInstanceId()}
                                     </td>
 
 
-                                    <td className="px-6 py-4 overflow-auto font-dm-mono-light">
-                                        <span key={i} className="tooltip group w-fit">
-                                            {getFormatedShortUsage(userankjudgement.getInstance().getFirstusage())}
-                                            <div className="tooltip-container group-hover:scale-100">
-                                                <div className="whitespace-nowrap mx-4 my-2">
-                                                    Data ID: {userankjudgement.getInstance().getFirstusage().getId().getDataid()}
-                                                </div>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="flex items-center">
+                                                {expandedInstances[i] ? (
+                                                    <div>
+                                                        Hide
+                                                        <IoIosArrowUp
+                                                            className="ml-2 cursor-pointer"
+                                                            onClick={() => toggleExpansion(i)}
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <div>
+                                                        Show
+                                                        <IoIosArrowDown
+                                                            className="ml-2 cursor-pointer"
+                                                            onClick={() => toggleExpansion(i)}
+                                                        />
+                                                    </div>
+                                                )}
                                             </div>
-                                        </span>
-                                    </td>
-
-                                    <td className="px-6 py-4 overflow-auto font-dm-mono-light">
-                                        <span key={i} className="tooltip group w-fit">
-                                            {getFormatedShortUsage(userankjudgement.getInstance().getSecondusage())}
-                                            <div className="tooltip-container group-hover:scale-100">
-                                                <div className="whitespace-nowrap mx-4 my-2">
-                                                    Data ID: {userankjudgement.getInstance().getSecondusage().getId().getDataid()}
-                                                </div>
-                                            </div>
-                                        </span>
-                                    </td>
-
-                                    <td className="px-6 py-4 overflow-auto font-dm-mono-light">
-                                        <span key={i} className="tooltip group w-fit">
-                                            {getFormatedShortUsage(userankjudgement.getInstance().getThirdusage())}
-                                            <div className="tooltip-container group-hover:scale-100">
-                                                <div className="whitespace-nowrap mx-4 my-2">
-                                                    Data ID: {userankjudgement.getInstance().getThirdusage().getId().getDataid()}
-                                                </div>
-                                            </div>
-                                        </span>
-                                    </td>
-
-                                    <td className="px-6 py-4 overflow-auto font-dm-mono-light">
-                                        <span key={i} className="tooltip group w-fit">
-                                            {getFormatedShortUsage(userankjudgement.getInstance().getFourthusage())}
-                                            <div className="tooltip-container group-hover:scale-100">
-                                                <div className="whitespace-nowrap mx-4 my-2">
-                                                    Data ID: {userankjudgement.getInstance().getFourthusage().getId().getDataid()}
-                                                </div>
-                                            </div>
-                                        </span>
-                                    </td>
-
+                                        </td>
 
                                     <td className="px-9 py-4 whitespace-nowrap" key={i}>
                                             {judgement.getLabel()!=="-"?
@@ -287,6 +266,15 @@ const UseRankJudgementHistoryTable: React.FC<{ phase: Phase }> = ({ phase }) => 
                                         </div>
                                     </td>
                                 </tr>
+                                 {expandedInstances[i] && (
+                                    <tr key={`${i}-expanded`}
+                                        className="transition-max-h transition-property: transform duration-0  max-h-0 ">
+                                        <td colSpan={6}>
+                                            <UsageCard isOpen={true} userankinstance={userankjudgement.getInstance()} />
+                                        </td>
+                                    </tr>
+                                )}
+                            </>
                             );
                         })}
                     </tbody>

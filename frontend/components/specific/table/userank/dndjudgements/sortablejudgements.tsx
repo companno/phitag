@@ -9,7 +9,7 @@ interface IProps {
     rankId: string
 }
 
-const SortableJudgements:React.FC<IProps> = ({rank, rankId}) => {
+const SortableJudgements: React.FC<IProps> = ({ rank, rankId }) => {
 
 
 
@@ -23,11 +23,18 @@ const SortableJudgements:React.FC<IProps> = ({rank, rankId}) => {
         cursor: 'grab',
     };
     return (
-        <div className="shadow-md" style={styles} ref={setNodeRef} {...attributes} {...listeners}>
-            <div  className="text-center p-3 mt-2 mr-2 mb-2 ml-2 active:transform 
-              active:scale-95 flex  cursor-pointer transition-all duration-200 font-dm-mono-medium  items-center">
-                {rank}
-            </div></div>
+            
+            <div style={styles} ref={setNodeRef} {...attributes} {...listeners} className="w-full flex flex-row my-2 items-center justify-between xl:justify-center xl:space-x-6">
+                <div
+                    className="flex shadow-md cursor-pointer hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-200 font-dm-mono-medium"
+
+                    style={{ minWidth: "0", overflow: "hidden" }}>
+                    <div className="w-auto min-w-3 h-3 m-6 text-center text-lg ">
+                        {rank}
+                    </div>
+                </div>
+
+            </div>
     )
 
 }

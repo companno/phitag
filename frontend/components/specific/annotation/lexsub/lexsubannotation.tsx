@@ -45,13 +45,13 @@ const LexSubAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
     );
 
     const handleSubmitAnnotation = () => {
-        mutateUseFetchPagedJudgements();
+        /* mutateUseFetchPagedJudgements();
         if(useFetchPagedLexSubInstanceData.getTotalElements() === useFetchPagedLexSubJudgementData.getTotalElements()){
             /* user?storage.set("done", user):null; */
-            toast.success("Congrats!!! You finished it all");
+       /*      toast.success("Congrats!!! You finished it all");
             Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
         }
-        if(useFetchPagedLexSubInstanceData.getTotalElements() !== useFetchPagedLexSubJudgementData.getTotalElements()){
+        if(useFetchPagedLexSubInstanceData.getTotalElements() !== useFetchPagedLexSubJudgementData.getTotalElements()){ */
 
         if (annotation.instance === null) {
             toast.warning("This should not happen. Please try again.");
@@ -89,15 +89,9 @@ const LexSubAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
                 );
         }
     }
-    }
 
     const fetchNewAnnotation = () => {
-        mutateUseFetchPagedJudgements();
-        if(useFetchPagedLexSubInstanceData.getTotalElements() === useFetchPagedLexSubJudgementData.getTotalElements()){
-/*             user?storage.set("done", user):null;
- */            toast.success("Congrats!!! You finished it all");
-            Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
-        }else {
+      
             fetchRandomInstance<LexSubInstance, LexSubInstanceConstructor>(phase.getId().getOwner(), phase.getId().getProject(), phase.getId().getPhase(), (new LexSubInstanceConstructor()), storage.get)
             .then((instance) => {
                 if (instance) {
@@ -116,25 +110,16 @@ const LexSubAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
                 toast.error("Could not fetch new annotation. Check if instances are provided for annotation.");
                 Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
             });
-        }
+        
       
     }
 
 
 
     useEffect(() => {
-        mutateUseFetchPagedJudgements();
+       
 
-        if(useFetchPagedLexSubInstanceData.getTotalElements()){
-            if (useFetchPagedLexSubInstanceData.getTotalElements() === useFetchPagedLexSubJudgementData.getTotalElements()) {
-                toast.info("No instance available to anotate")
-                Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
-            }
-
-
-        }
-
-        if (useFetchPagedLexSubInstanceData.getTotalElements() !== useFetchPagedLexSubJudgementData.getTotalElements()) {
+    
             if (annotationAccess.isError) {
                 Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
             }
@@ -157,10 +142,10 @@ const LexSubAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
                         Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
                     });
             }
-        }
+        
 
        
-    }, [useFetchPagedLexSubInstanceData.getTotalElements(), useFetchPagedLexSubJudgementData.getTotalElements(), annotationAccess, annotation.initialLoad, storage, phase]);
+    }, [ annotationAccess, annotation.initialLoad, storage, phase]);
 
     if (!phase || !annotation.instance || annotation.initialLoad) {
         return <LoadingComponent />;

@@ -24,6 +24,6 @@ export default class UsageId {
     }
 
     static fromDto(dto: UsageIdDto): UsageId {
-        return new UsageId(dto.dataid, dto.project, dto.owner);
+        return new UsageId(dto?.dataid, dto?.project, dto?.owner);
     }
 }

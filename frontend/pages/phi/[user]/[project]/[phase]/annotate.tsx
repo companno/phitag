@@ -24,6 +24,8 @@ import ANNOTATIONTYPES from "../../../../../lib/AnnotationTypes";
 import useAuthenticated from "../../../../../lib/hook/useAuthenticated";
 import { useFetchPhase } from "../../../../../lib/service/phase/PhaseResource";
 import LexSubAnnotation from "../../../../../components/specific/annotation/lexsub/lexsubannotation";
+import UseRankRelativeAnnotation from "../../../../../components/specific/annotation/userankrelative/usernakrelativeannotation";
+import UseRankPairAnnotation from "../../../../../components/specific/annotation/userankpair/usernakpairannotation";
 
 // model
 
@@ -147,6 +149,90 @@ const AnnotatePage: NextPage = () => {
             </Layout>
         );
     }
+
+    if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_USERANK_RELATIVE) {
+        return (
+            <Layout>
+
+                <Head>
+                    <title>PhiTag : {phase.phase.getName()} : Annotate </title>
+                </Head>
+
+                <SingleContentLayout>
+
+                    <LinkHead icon={<FiEdit3 className="stroke-2" />}
+                        links={[
+                            {
+                                href: `/phi/${username}`,
+                                name: username,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}`,
+                                name: projectname,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}/${phasename}`,
+                                name: phasename,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}/${phasename}/annotate`,
+                                name: "Annotate",
+                            }
+                        ]}
+                    />
+
+
+                    <div className="mt-2 xl:mt-10">
+                        <UseRankRelativeAnnotation phase={phase.phase} />
+                    </div>
+
+                </SingleContentLayout>
+            </Layout>
+        );
+    }
+
+    if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_USERANK_PAIR) {
+        return (
+            <Layout>
+
+                <Head>
+                    <title>PhiTag : {phase.phase.getName()} : Annotate </title>
+                </Head>
+
+                <SingleContentLayout>
+
+                    <LinkHead icon={<FiEdit3 className="stroke-2" />}
+                        links={[
+                            {
+                                href: `/phi/${username}`,
+                                name: username,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}`,
+                                name: projectname,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}/${phasename}`,
+                                name: phasename,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}/${phasename}/annotate`,
+                                name: "Annotate",
+                            }
+                        ]}
+                    />
+
+
+                    <div className="mt-2 xl:mt-10">
+                        <UseRankPairAnnotation phase={phase.phase} />
+                    </div>
+
+                </SingleContentLayout>
+            </Layout>
+        );
+    }
+
+
 
 
     if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_WSSIM) {

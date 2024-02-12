@@ -1,7 +1,6 @@
 package de.garrafao.phitag.application.judgement.userankjudgement;
 
 import de.garrafao.phitag.application.common.CommonMathService;
-
 import de.garrafao.phitag.application.judgement.userankjudgement.data.AddUseRankJudgementCommand;
 import de.garrafao.phitag.application.judgement.userankjudgement.data.DeleteUseRankJudgementCommand;
 import de.garrafao.phitag.application.judgement.userankjudgement.data.EditUseRankJudgementCommand;
@@ -18,7 +17,6 @@ import de.garrafao.phitag.domain.instance.userankinstance.UseRankRepository;
 import de.garrafao.phitag.domain.instance.userankinstance.query.UseRankInstanceQueryBuilder;
 import de.garrafao.phitag.domain.judgement.userankjudgement.UseRankJudgement;
 import de.garrafao.phitag.domain.judgement.userankjudgement.UseRankJudgementRepository;
-import de.garrafao.phitag.domain.judgement.userankjudgement.error.UseRankJudgementException;
 import de.garrafao.phitag.domain.judgement.userankjudgement.error.UseRankJudgementNotFoundException;
 import de.garrafao.phitag.domain.judgement.userankjudgement.page.UseRankJudgementPageBuilder;
 import de.garrafao.phitag.domain.judgement.userankjudgement.query.UseRankJudgementQueryBuilder;
@@ -27,6 +25,10 @@ import de.garrafao.phitag.domain.phase.error.TutorialException;
 import de.garrafao.phitag.domain.statistic.statisticannotationmeasure.StatisticAnnotationMeasureEnum;
 import de.garrafao.phitag.domain.statistic.tutorialannotationmeasurehistory.TutorialAnnotationMeasureHistory;
 import de.garrafao.phitag.domain.statistic.tutorialannotationmeasurehistory.TutorialAnnotationMeasureHistoryRepository;
+import de.garrafao.phitag.domain.tutorial.userank.UseRankTutorialJudgement;
+import de.garrafao.phitag.domain.tutorial.userank.UseRankTutorialJudgementRepository;
+import de.garrafao.phitag.domain.tutorial.userank.page.UseRankTutorialJudgementPageBuilder;
+import de.garrafao.phitag.domain.tutorial.userank.query.UseRankTutorialJudgementQueryBuilder;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -48,6 +50,8 @@ public class UseRankJudgementApplicationService {
 
     private final UseRankJudgementRepository useRankJudgementRepository;
 
+    private final UseRankTutorialJudgementRepository useRankTutorialJudgementRepository;
+
     private final UseRankRepository useRankRepository;
 
     private final TutorialAnnotationMeasureHistoryRepository tutorialAnnotationMeasureHistoryRepository;
@@ -65,6 +69,7 @@ public class UseRankJudgementApplicationService {
     @Autowired
     public UseRankJudgementApplicationService(
             final UseRankJudgementRepository useRankJudgementRepository,
+            final UseRankTutorialJudgementRepository useRankTutorialJudgementRepository,
             final UseRankRepository useRankRepository,
             final TutorialAnnotationMeasureHistoryRepository tutorialAnnotationMeasureHistoryRepository,
 
@@ -73,6 +78,7 @@ public class UseRankJudgementApplicationService {
             final PhaseStatisticApplicationService phaseStatisticApplicationService,
             final CommonMathService commonMathService) {
         this.useRankJudgementRepository = useRankJudgementRepository;
+        this.useRankTutorialJudgementRepository = useRankTutorialJudgementRepository;
         this.useRankRepository = useRankRepository;
 
         this.tutorialAnnotationMeasureHistoryRepository = tutorialAnnotationMeasureHistoryRepository;
@@ -86,8 +92,23 @@ public class UseRankJudgementApplicationService {
     // Getter
 
     /**
-     * Get all use rank judgements for a given phase.
+     * Get all use rank tutorial judgements for a given phase.
      * 
+     * @param phase the phase
+     * @return a {@link UserRankTutorialJudgement} list
+     */
+    public List<UseRankTutorialJudgement> findTutorialByPhase(final Phase phase) {
+        final Query query = new UseRankJudgementQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+        return this.useRankTutorialJudgementRepository.findByQuery(query);
+    }
+
+    /**
+     * Get all use rank judgements for a given phase.
+     *
      * @param phase the phase
      * @return a {@link UserRankJudgement} list
      */
@@ -169,6 +190,37 @@ public class UseRankJudgementApplicationService {
                 .build());
     }
 
+
+    /**
+     * Get all use rank  tutorial judgements for a given annotator as a paged list.
+     *
+     * @param phase
+     * @param annotator
+     * @param pagesize
+     * @param pagenumber
+     * @param orderBy
+     * @return
+     */
+    public Page<UseRankTutorialJudgement> getTutorialHistory(
+            final Phase phase,
+            final Annotator annotator,
+            final int pagesize,
+            final int pagenumber,
+            final String orderBy) {
+        final Query query = new UseRankTutorialJudgementQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .withAnnotator(annotator.getId().getUsername())
+                .build();
+        return this.useRankTutorialJudgementRepository.findByQueryPaged(query, new UseRankTutorialJudgementPageBuilder()
+                .withPageSize(pagesize)
+                .withPageNumber(pagenumber)
+                .withOrderBy(orderBy)
+                .build());
+    }
+
+
     /**
      * Export all use rank judgements for a given phase.
      * 
@@ -203,55 +255,65 @@ public class UseRankJudgementApplicationService {
     }
 
     /**
+     * Export all use rank judgements for a given phase.
+     *
+     * @param phase the phase
+     * @return a CSV file as {@link InputStreamResource}
+     */
+    public InputStreamResource exportUseRankTutorialJudgement(final Phase phase) {
+        List<UseRankTutorialJudgement> resultData = this.findTutorialByPhase(phase);
+        String[] csvHeader = {
+                "instanceID", "rank", "comment", "annotator"
+        };
+        List<List<String>> csvData = parseUseRankTutorialJudgementsToCsvBody(resultData);
+
+        ByteArrayInputStream outputStream;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CSVPrinter csvPrinter = createCsvPrinter(csvHeader, out);
+        csvData.forEach(row -> {
+            try {
+                csvPrinter.printRecord(row);
+            } catch (Exception e) {
+                throw new CsvParseException();
+            }
+        });
+        try {
+            csvPrinter.flush();
+            outputStream = new ByteArrayInputStream(out.toByteArray());
+        } catch (Exception e) {
+            throw new CsvParseException();
+        }
+
+        return new InputStreamResource(outputStream);
+    }
+
+    /**
      * Count all use rank judgements for a given annotator.
      * 
      * @param annotator the annotator
      * @return the number of use rank judgements
      */
-    public int countJudgements(Annotator annotator) {
+    public int countAttemptedJudgements(final Phase phase,  Annotator annotator) {
+        String phaseName = phase.getId().getName();
+        String ownerName = phase.getProject().getOwner().getDisplayname();
+        String projectName = phase.getProject().getId().getName();
+        String annotatorName = annotator.getId().getUsername();
         return (int) this.useRankJudgementRepository.findByQueryPaged(
                 new UseRankJudgementQueryBuilder()
-                        .withAnnotator(annotator.getId().getUsername())
+                        .withProject(projectName)
+                        .withPhase(phaseName)
+                        .withOwner(ownerName)
+                        .withAnnotator(annotatorName)
                         .build(),
                 new PageRequestWraper(1, 0)).getTotalElements();
     }
 
-    /**
-     * Count all use rank judgements for a given annotator and phase.
-     * 
-     * @param annotator the annotator
-     * @param phase     the phase
-     * @return the number of use rank judgements
-     */
-    public int countJudgements(Annotator annotator, Phase phase) {
-        return (int) this.useRankJudgementRepository.findByQueryPaged(
-                new UseRankJudgementQueryBuilder()
-                        .withAnnotator(annotator.getId().getUsername())
-                        .withPhase(phase.getId().getName()).build(),
-                new PageRequestWraper(1, 0)).getTotalElements();
-    }
 
 
-    /**
-     * Count all use rank judgements for a given annotator and phase.
-     *
-     * @param annotator the annotator
-     * @param phase     the phase
-     * @return the number of use rank judgements
-     */
 
 
-    public int countAttemptedJudgements(Annotator annotator, Phase phase, UseRankInstance useRankInstance) {
-        return (int) this.useRankJudgementRepository.findByQueryPaged(
-                new UseRankJudgementQueryBuilder()
-                        .withAnnotator(annotator.getId().getUsername())
-                        .withAnnotatorProjectName(annotator.getProject().getDisplayname())
-                        .withOwner(phase.getProject().getOwner().getDisplayname())
-                        .withPhase(phase.getId().getName()).build(),
-                new PageRequestWraper(1, 0)).getTotalElements();
-    }
 
-    // Setter Files
+
 
     /**
      * Import use rank judgements from a CSV file.
@@ -365,6 +427,25 @@ public class UseRankJudgementApplicationService {
     }
 
     /**
+     * Add a use rank tutorial judgement.
+     *
+     * @param phase     the phase to which the use pair judgement belongs
+     * @param annotator the annotator who created the use pair judgement
+     * @param command   the command
+     */
+    @Transactional
+    public void annotateTutorial(final Phase phase, final Annotator annotator, final AddUseRankJudgementCommand command) {
+        String instanceId = command.getInstance();
+
+        final UseRankInstance instance = this.findCorrespondingInstanceData(phase, instanceId);
+      //  validateAddUseRankJudgementCommand(instance, command);
+
+        final UseRankTutorialJudgement resultData = new UseRankTutorialJudgement(instance, annotator, command.getLabel(),
+                command.getComment());
+        this.useRankTutorialJudgementRepository.save(resultData);
+    }
+
+    /**
      * Add bulk use rank judgement for a given phase.
      * If the phase is a tutorial phase, the judgements are checked against the
      * tutorial judgements and if they are correct, the tutorial phase is marked as
@@ -379,6 +460,9 @@ public class UseRankJudgementApplicationService {
             final List<AddUseRankJudgementCommand> commands) {
         if (phase.isTutorial()) {
             tutorialAnnotationCorrectness(phase, annotator, commands);
+            commands.forEach(command -> {
+                this.annotateTutorial(phase, annotator, command);
+            });
             return;
         }
 
@@ -488,6 +572,22 @@ public class UseRankJudgementApplicationService {
         List<List<String>> csvBody = new ArrayList<>();
 
         for (UseRankJudgement data : useRankJudgements) {
+            List<String> csvRow = new ArrayList<>();
+
+            csvRow.add(data.getInstance().getId().getInstanceid());
+            csvRow.add(data.getLabel());
+            csvRow.add(data.getComment());
+            csvRow.add(data.getAnnotator().getId().getUsername());
+
+            csvBody.add(csvRow);
+        }
+
+        return csvBody;
+    }
+    private List<List<String>> parseUseRankTutorialJudgementsToCsvBody(List<UseRankTutorialJudgement> judgements) {
+        List<List<String>> csvBody = new ArrayList<>();
+
+        for (UseRankTutorialJudgement data : judgements) {
             List<String> csvRow = new ArrayList<>();
 
             csvRow.add(data.getInstance().getId().getInstanceid());

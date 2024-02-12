@@ -41,7 +41,7 @@
             </column>
 
             <column name="phitagusage_second_dataid" type="varchar">
-                <constraints nullable="false" />
+                <constraints nullable="true" />
             </column>
 
             <column name="phitagusage_second_projectname" type="varchar">
@@ -49,31 +49,97 @@
             </column>
 
             <column name="phitagusage_second_ownername" type="varchar">
-                <constraints nullable="false" />
+                <constraints nullable="true" />
             </column>
 
             <column name="phitagusage_third_dataid" type="varchar">
-                <constraints nullable="false" />
+                <constraints nullable="true" />
             </column>
 
             <column name="phitagusage_third_projectname" type="varchar">
-                <constraints nullable="false" />
+                <constraints nullable="true" />
             </column>
 
             <column name="phitagusage_third_ownername" type="varchar">
-                <constraints nullable="false" />
+                <constraints nullable="true" />
             </column>
 
             <column name="phitagusage_fourth_dataid" type="varchar">
-                <constraints nullable="false" />
+                <constraints nullable="true" />
             </column>
 
             <column name="phitagusage_fourth_projectname" type="varchar">
-                <constraints nullable="false" />
+                <constraints nullable="true" />
             </column>
 
             <column name="phitagusage_fourth_ownername" type="varchar">
-                <constraints nullable="false" />
+                <constraints nullable="true" />
+            </column>
+            <column name="phitagusage_fifth_dataid" type="varchar">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="phitagusage_fifth_projectname" type="varchar">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="phitagusage_fifth_ownername" type="varchar">
+                <constraints nullable="true" />
+            </column>
+            <column name="phitagusage_sixth_dataid" type="varchar">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="phitagusage_sixth_projectname" type="varchar">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="phitagusage_sixth_ownername" type="varchar">
+                <constraints nullable="true" />
+            </column>
+            <column name="phitagusage_seventh_dataid" type="varchar">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="phitagusage_seventh_projectname" type="varchar">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="phitagusage_seventh_ownername" type="varchar">
+                <constraints nullable="true" />
+            </column>
+            <column name="phitagusage_eight_dataid" type="varchar">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="phitagusage_eight_projectname" type="varchar">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="phitagusage_eight_ownername" type="varchar">
+                <constraints nullable="true" />
+            </column>
+            <column name="phitagusage_ninth_dataid" type="varchar">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="phitagusage_ninth_projectname" type="varchar">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="phitagusage_ninth_ownername" type="varchar">
+                <constraints nullable="true" />
+            </column>
+            <column name="phitagusage_tenth_dataid" type="varchar">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="phitagusage_tenth_projectname" type="varchar">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="phitagusage_tenth_ownername" type="varchar">
+                <constraints nullable="true" />
             </column>
 
             <column name="label_set" type="varchar(255)">
