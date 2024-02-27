@@ -5,9 +5,9 @@ import useStorage from "../../../../lib/hook/useStorage";
 import { useFetchAnnotationAccess } from "../../../../lib/service/phase/PhaseResource";
 import { toast } from "react-toastify";
 import AddLexSubJudgementCommand from "../../../../lib/model/judgement/lexsubjudgement/command/AddLexSubJudgementCommand";
-import { annotateLexSub, useFetchPagedLexSubJudgements } from "../../../../lib/service/judgement/JudgementResource";
+import { CountAttemptedJudgements, annotateLexSub, useFetchPagedLexSubJudgements } from "../../../../lib/service/judgement/JudgementResource";
 import Router, { useRouter } from "next/router";
-import { fetchRandomInstance, useFetchPagedLexSubInstance } from "../../../../lib/service/instance/InstanceResource";
+import { CountAllocatedInstances, fetchRandomInstance, useFetchPagedLexSubInstance } from "../../../../lib/service/instance/InstanceResource";
 import LoadingComponent from "../../../generic/loadingcomponent";
 import UsageField from "../usage/usagefield";
 import { FiArrowRight, FiBookmark, FiChevronRight, FiEdit3, FiFeather } from "react-icons/fi";
@@ -25,33 +25,23 @@ const LexSubAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
     });
     const page = 0;
     const storage = useStorage();
-/*     const user: string | null = storage.get("USER"); */
+    
     
     const annotationAccess = useFetchAnnotationAccess(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), !!phase);
+   /*  const { data: userAnnotationCount, mutate: mutateCountJudgements } = CountAttemptedJudgements(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), !!phase);
+
     
-    const { data: useFetchPagedLexSubInstanceData, mutate: mutateUseFetchPagedLexSubInstance } = useFetchPagedLexSubInstance(
-        phase?.getId().getOwner(),
-        phase?.getId().getProject(),
-        phase?.getId().getPhase(),
-        page,
-        !!phase
-    );
-    const { data: useFetchPagedLexSubJudgementData,  mutate: mutateUseFetchPagedJudgements } = useFetchPagedLexSubJudgements(
-        phase?.getId().getOwner(),
-        phase?.getId().getProject(),
-        phase?.getId().getPhase(),
-        page,
-        !!phase
-    );
+  
+    const { data: userAllocatedInstance, mutate: mutateInstanceCount} = CountAllocatedInstances(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), !!phase);
+
+  */
 
     const handleSubmitAnnotation = () => {
-        /* mutateUseFetchPagedJudgements();
-        if(useFetchPagedLexSubInstanceData.getTotalElements() === useFetchPagedLexSubJudgementData.getTotalElements()){
-            /* user?storage.set("done", user):null; */
-       /*      toast.success("Congrats!!! You finished it all");
+        /* mutateCountJudgements();
+        if(userAllocatedInstance === userAnnotationCount){ 
             Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
-        }
-        if(useFetchPagedLexSubInstanceData.getTotalElements() !== useFetchPagedLexSubJudgementData.getTotalElements()){ */
+            toast.info("Congrats!!! You finished all the instances");
+        } */
 
         if (annotation.instance === null) {
             toast.warning("This should not happen. Please try again.");
@@ -102,9 +92,9 @@ const LexSubAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
                         judgement: "",
                         comment: "",
                     });
-                } else {
-                    toast.info("Could not fetch new annotation. Check if instances are provided for annotation.");
-                }
+                } /* else if(instance==null && userAllocatedInstance === userAnnotationCount) {
+                Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
+            } */
 
             }).catch((error) => {
                 toast.error("Could not fetch new annotation. Check if instances are provided for annotation.");
@@ -116,36 +106,47 @@ const LexSubAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
 
 
 
-    useEffect(() => {
-       
+ // Hook
+useEffect(() => {
 
-    
-            if (annotationAccess.isError) {
-                Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
-            }
-    
-            if (!annotationAccess.isError && annotationAccess.hasAccess && annotation.initialLoad) {
-                fetchRandomInstance<LexSubInstance, LexSubInstanceConstructor>(phase.getId().getOwner(), phase.getId().getProject(), phase.getId().getPhase(), (new LexSubInstanceConstructor()), storage.get)
-                    .then((instance) => {
-                        if (instance) {
-                            setAnnotation({
-                                instance: instance,
-    
-                                judgement: "",
-                                comment: "",
-                                initialLoad: false
-                            });
-                        } 
-    
-                    }).catch((error) => {
-                        toast.error("Could not fetch new annotation. Check if instances are provided for annotation.");
-                        Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
-                    });
-            }
-        
+    if (annotationAccess.isError) {
+        Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
+        return;
+    }
 
-       
-    }, [ annotationAccess, annotation.initialLoad, storage, phase]);
+   /*  if (!annotationAccess.isError && annotationAccess.hasAccess && userAllocatedInstance === userAnnotationCount) {
+        toast.info("No instances available to annotate!");
+        Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
+        return;
+    } */
+
+    if (!annotationAccess.isError && annotationAccess.hasAccess && annotation.initialLoad /* && userAllocatedInstance !== userAnnotationCount */) {
+        fetchRandomInstance<LexSubInstance, LexSubInstanceConstructor>(
+            phase.getId().getOwner(),
+            phase.getId().getProject(),
+            phase.getId().getPhase(),
+            new LexSubInstanceConstructor(),
+            storage.get
+        )
+        .then((instance) => {
+            if (instance) {
+                setAnnotation((prevAnnotation) => ({
+                    ...prevAnnotation,
+                    instance: instance,
+                    comment: "",
+                    initialLoad: false,
+                }));
+            } /* else if(instance==null && userAllocatedInstance === userAnnotationCount) {
+                Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
+            } */
+        })
+        .catch((error) => {
+            toast.error("Could not fetch new annotation. Check if instances are provided for annotation.");
+            Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
+        });
+    }
+}, [/* userAllocatedInstance, userAnnotationCount,  */annotationAccess, annotation.initialLoad, storage, phase]);
+
 
     if (!phase || !annotation.instance || annotation.initialLoad) {
         return <LoadingComponent />;
@@ -153,8 +154,8 @@ const LexSubAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
 
     return (
         <div className="w-full flex flex-col justify-between">
-            <ProgressBar minValue={0} maxValue={useFetchPagedLexSubInstanceData.getTotalElements()} currentValue={useFetchPagedLexSubJudgementData.getTotalElements()} />
-            {(phase.getTaskHead() ?? "") !== "" && (
+{/*             <ProgressBar minValue={0} maxValue={userAllocatedInstance} currentValue={userAnnotationCount} />
+ */}            {(phase.getTaskHead() ?? "") !== "" && (
                 <div className="w-half shadow-md ">
                     <div className="m-8 flex flex-row">
                         <div className="my-4">

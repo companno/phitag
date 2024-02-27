@@ -8,7 +8,7 @@ import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 
 // icons
-import { FiCreditCard, FiEdit2, FiEdit3, FiFeather, FiGlobe, FiLayers, FiSliders, FiUnderline } from "react-icons/fi";
+import { FiCreditCard, FiEdit2, FiEdit3, FiFeather, FiGlobe, FiInfo, FiLayers, FiSliders, FiUnderline } from "react-icons/fi";
 import AnnotationType from "../../../lib/model/annotationtype/model/AnnotationType";
 
 // models
@@ -28,6 +28,7 @@ import Sampling from "../../../lib/model/sampling/model/Sampling";
 import { useFetchAllStatisticAnnotationMeasureResource } from "../../../lib/service/statistic/statistisannotationmeasure/StatisticAnnotationMeasureResource";
 import StatisticAnnotationMeasure from "../../../lib/model/statistic/statisticannotationmeasure/model/StatisticAnnotationMeasure";
 import HelpButton from "../../generic/button/helpbutton";
+import IconButtonWithTooltip from "../../generic/button/iconbuttonwithtooltip";
 
 const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function, project: Project, mutateCallback: Function }> = ({ isOpen, closeModalCallback, project, mutateCallback }) => {
 
@@ -48,7 +49,8 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
         agreementStrategy: null as unknown as StatisticAnnotationMeasure,
         threshold: 0,
         description: "",
-        taskhead: ""
+        taskhead: "",
+        instancePerSample: null as unknown as number
     })
 
     const onConfirm = () => {
@@ -68,7 +70,8 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
                         agreementStrategy: null as unknown as StatisticAnnotationMeasure,
                         threshold: 0,
                         description: "",
-                        taskhead: ""
+                        taskhead: "",
+                        instancePerSample: null as unknown as number
                     });
                     mutateCallback();
                     closeModalCallback();
@@ -92,7 +95,8 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
             agreementStrategy: null as unknown as StatisticAnnotationMeasure,
             threshold: 0,
             description: "",
-            taskhead: ""
+            taskhead: "",
+            instancePerSample: null as unknown as number
         });
         closeModalCallback();
     }
@@ -108,7 +112,7 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
 
             <div className="fixed z-10 inset-0 overflow-y-auto">
                 <div className="flex items-center justify-center min-h-full">
-                    <div className="relative bg-white overflow-hidden shadow-md py-4 px-8  max-w-xl w-full"   style={{ maxHeight: "80vh", overflowY: "auto" }}  onClick={(e: any) => e.stopPropagation()}>
+                    <div className="relative bg-white overflow-hidden shadow-md py-4 px-8  max-w-xl w-full" style={{ maxHeight: "80vh", overflowY: "auto" }} onClick={(e: any) => e.stopPropagation()}>
                         <div className="mx-4">
                             <div className="flex flex-col items-left mt-6">
                                 <div className="font-black text-xl">
@@ -156,10 +160,22 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
                                 </div>
 
                                 <div className="flex flex-col items-left my-6">
-                                    <div className="font-bold text-lg">
-                                        Sampling Strategy
+                                    <div className="flex items-center">
+                                        <div className="font-bold text-lg mr-2">
+                                            Sampling Strategy
+                                        </div>
+                                        <div className="px-12">
+                                            <HelpButton
+                                                title="Help: Choosing Sampling Startegy"
+                                                tooltip="Choosing Sampling Startegy"
+                                                text="When assigning tasks to annotators, number of instances annotator will received is denoted as 'n'. Once 'n' is set, it cannot be changed. Therefore, it's crucial 
+                                                to carefully select the task sampling strategy as it will remain fixed throughout the annotation process of the phase"
+                                                reference=""
+                                                linkage={false}
+                                            />
+                                        </div>
                                     </div>
-                                    <div className="py-2 px-3 border-b-2 mt-2">
+                                    <div className="py-2 px-3 border-b-2 mt-2 flex items-center">
                                         <DropdownSelect
                                             icon={<FiSliders className="basic-svg" />}
                                             items={sampling.sampling.sort((a, b) => a.getVisiblename().localeCompare(b.getVisiblename()))}
@@ -169,7 +185,24 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
                                                 sampling: sampling
                                             })}
                                             message={modalState.sampling ? modalState.sampling.getVisiblename() : "None selected yet"} />
+                                        {modalState.sampling && (modalState.sampling.getName() === "N_SAMPLING_RANDOM_WITH_REPLACEMENT" || modalState.sampling.getName() === "N_SAMPLING_RANDOM_WITHOUT_REPLACEMENT") && (
+                                            <div className="ml-auto">
+                                                <input
+                                                    id="instancePerSample"
+                                                    name="instancePerSample"
+                                                    className="pl-1 outline-none border-2 border-gray-700 h-auto w-auto max-w-20"
+                                                    placeholder="0"
+                                                    type={"number"}
+                                                    value={modalState.instancePerSample}
+                                                    onChange={(e: any) => setModalState({
+                                                        ...modalState,
+                                                        instancePerSample: e.target.value
+                                                    })} />
+                                            </div>
+                                        )}
                                     </div>
+
+
                                 </div>
 
 
@@ -205,7 +238,7 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
                                     </div>
 
                                     <div className="py-2 px-3 border-b-2 mt-2 ">
-                                    <input
+                                        <input
                                             id="threshold"
                                             name="threshold"
                                             className="pl-3 flex flex-auto outline-none border-none w-full"
@@ -282,6 +315,7 @@ function validateAndCreatePhase(project: Project, modalState: {
     threshold: number;
     description: string;
     taskhead: string;
+    instancePerSample: number;
 }): CreatePhaseCommand | null {
     if (project === undefined || project === null) {
         toast.warning("Project is undefined. This should not happen. Please try again later.");
@@ -318,6 +352,7 @@ function validateAndCreatePhase(project: Project, modalState: {
         modalState.agreementStrategy ? modalState.agreementStrategy.getId() : "",
         modalState.threshold,
         modalState.description,
-        modalState.taskhead
+        modalState.taskhead,
+        modalState.instancePerSample
     );
 }

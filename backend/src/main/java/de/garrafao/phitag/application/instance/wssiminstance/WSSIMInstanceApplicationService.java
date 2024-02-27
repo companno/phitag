@@ -1,28 +1,5 @@
 package de.garrafao.phitag.application.instance.wssiminstance;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-
-import javax.transaction.Transactional;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.CSVRecord;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import de.garrafao.phitag.domain.instance.wssiminstance.page.WSSIMInstancePageBuilder;
 import de.garrafao.phitag.application.common.CommonService;
 import de.garrafao.phitag.application.sampling.data.SamplingEnum;
 import de.garrafao.phitag.domain.annotationprocessinformation.AnnotationProcessInformation;
@@ -35,6 +12,7 @@ import de.garrafao.phitag.domain.instance.wssiminstance.WSSIMInstanceFactory;
 import de.garrafao.phitag.domain.instance.wssiminstance.WSSIMInstanceRepository;
 import de.garrafao.phitag.domain.instance.wssiminstance.error.WSSIMInstanceAlreadyExistsException;
 import de.garrafao.phitag.domain.instance.wssiminstance.error.WSSIMInstanceNotFoundException;
+import de.garrafao.phitag.domain.instance.wssiminstance.page.WSSIMInstancePageBuilder;
 import de.garrafao.phitag.domain.instance.wssiminstance.query.WSSIMInstanceQueryBuilder;
 import de.garrafao.phitag.domain.instance.wssimtag.WSSIMTag;
 import de.garrafao.phitag.domain.instance.wssimtag.WSSIMTagRepository;
@@ -44,6 +22,23 @@ import de.garrafao.phitag.domain.phase.Phase;
 import de.garrafao.phitag.domain.phitagdata.usage.Usage;
 import de.garrafao.phitag.domain.phitagdata.usage.UsageRepository;
 import de.garrafao.phitag.domain.phitagdata.usage.error.UsageNotFoundException;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.transaction.Transactional;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class WSSIMInstanceApplicationService {
@@ -361,6 +356,65 @@ public class WSSIMInstanceApplicationService {
     }
 
     /**
+     * Generate n  sampling order for random sampling without replacement.
+     *
+     * @param phase
+     */
+    private List<String> generateNSamplingOrderWithoutReplacement(final Phase phase) {
+
+        final  int instancesPerSample = phase.getInstancePerSample();
+
+        List<String> samplingOrder = new ArrayList<>();
+
+        List<WSSIMInstance> instances = new ArrayList<>(this.commonService.findWSSIMInstanceByPhase(phase));
+        Collections.shuffle(instances);
+        int totalInstances = instances.size();
+        int index = 0;
+        while (samplingOrder.size() < instancesPerSample && index < totalInstances) {
+            WSSIMInstance instance = instances.get(index++);
+            String instanceId = instance.getId().getInstanceid();
+            if (!samplingOrder.contains(instanceId)) {
+                samplingOrder.add(instanceId);
+            }
+        }
+
+        // If not enough unique instances are available, reset the sampling order
+        if (samplingOrder.size() < instancesPerSample) {
+            // Reset the sampling order
+            samplingOrder.clear();
+            // Restart the selection process
+            index = 0;
+            while (samplingOrder.size() < instancesPerSample && index < totalInstances) {
+                WSSIMInstance  instance = instances.get(index++);
+                String instanceId = instance.getId().getInstanceid();
+                if (!samplingOrder.contains(instanceId)) {
+                    samplingOrder.add(instanceId);
+                }
+            }
+        }
+
+        return samplingOrder;
+    }
+    /**
+     * Generate n  sampling order for random sampling with replacement.
+     *
+     * @param phase
+     */
+    private List<String> generateNSamplingOrderWithReplacement(final Phase phase) {
+        final int instancesPerSample = phase.getInstancePerSample();
+        List<String> samplingOrder = new ArrayList<>();
+        List<WSSIMInstance> instances = new ArrayList<>(this.commonService.findWSSIMInstanceByPhase(phase));
+        int totalInstances = instances.size();
+        for (int i = 0; i < instancesPerSample; i++) {
+            int randomIndex = ThreadLocalRandom.current().nextInt(totalInstances);
+            WSSIMInstance instance = instances.get(randomIndex);
+            String instanceId = instance.getId().getInstanceid();
+            samplingOrder.add(instanceId);
+        }
+        return samplingOrder;
+    }
+
+    /**
      * Generate sampling tasks for a given phase and annotator
      * 
      * @param phase the phase
@@ -375,6 +429,12 @@ public class WSSIMInstanceApplicationService {
             samplingOrder = this.generateSamplingOrderWithoutReplacement(phase);
         } else if (phase.getSampling().getName().equals(SamplingEnum.SAMPLING_ID_ORDER.name())) {
             samplingOrder = this.generateSamplingIDOrder(phase);
+        }
+        else if (phase.getSampling().getName().equals(SamplingEnum.N_SAMPLING_RANDOM_WITHOUT_REPLACEMENT.name())) {
+            samplingOrder = this.generateNSamplingOrderWithoutReplacement(phase);
+        }
+        else if (phase.getSampling().getName().equals(SamplingEnum.N_SAMPLING_RANDOM_WITH_REPLACEMENT.name())) {
+            samplingOrder = this.generateNSamplingOrderWithReplacement(phase);
         }
 
         if (samplingOrder.isEmpty()) {
@@ -481,6 +541,11 @@ public class WSSIMInstanceApplicationService {
         }
 
         return instances.get(0);
+    }
+    public int countAllocatedInstanceToAnnotator(Phase phase, Annotator annotator){
+        final  AnnotationProcessInformation annotationProcessInformation = this.commonService.getAnnotationProcessInformation(annotator, phase);
+        return  annotationProcessInformation.getOrder().size();
+
     }
 
 }

@@ -23,7 +23,7 @@ import WSSIMInstance, { WSSIMInstanceConstructor } from "../../../../lib/model/i
 import UsageField from "../usage/usagefield";
 import LoadingComponent from "../../../generic/loadingcomponent";
 
-import { annotateWSSIM, countAttemptedJudgements, useFetchPagedWSSIMJudgements } from "../../../../lib/service/judgement/JudgementResource";
+import { annotateWSSIM, CountAttemptedJudgements, useFetchPagedWSSIMJudgements } from "../../../../lib/service/judgement/JudgementResource";
 import WSSIMTagField from "../wssimtag/wssimtagfield";
 import AddWSSIMJudmentCommand from "../../../../lib/model/judgement/wssimjudgement/command/AddWSSIMJudgementCommand";
 import WSSIMTagLemmasField from "../wssimtag/wssimtaglemmasfield";
@@ -62,7 +62,7 @@ const WSSIMAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
         !!phase
     );
 
-    const { data: userAnnotationCount, mutate: mutateCountJudgements } = countAttemptedJudgements(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), !!phase);
+    const { data: userAnnotationCount, mutate: mutateCountJudgements } = CountAttemptedJudgements(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), !!phase);
 
 
 

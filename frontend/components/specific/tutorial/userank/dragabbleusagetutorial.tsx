@@ -68,7 +68,6 @@ const DraggableUsageTutorial: React.FC<UsageFieldContainerProps> = ({ usages, ha
   }, [usages]);
   
   useEffect(() => {
-    console.log('Ordered Usages:', orderedUsages);
   }, [orderedUsages]); 
 
 

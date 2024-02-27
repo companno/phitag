@@ -8,27 +8,44 @@ import java.util.List;
 
 @Service
 public class UsePairPrompt {
+    /**
+     * Retrieves a list of chat messages including system, instructions, and user prompts.
+     * @param prompt The main prompt to be displayed to the user.
+     * @param firstUsage The first sentence for the user to evaluate.
+     * @param secondUsage The second sentence for the user to evaluate.
+     * @param lemma The target word for evaluation.
+     * @return A list of ChatMessage objects containing system and user messages.
+     */
     public List<ChatMessage> getChatMessages(final String prompt, final String firstUsage,
                                              final String secondUsage, final String lemma) {
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage systemMessage = new ChatMessage("system", "You are a highly trained text data annotation tool which can give subjective response.");
+
+        // System message
+        ChatMessage systemMessage = new ChatMessage("system", "You are a highly trained text data annotation tool capable of providing subjective responses.");
         messages.add(systemMessage);
 
+        // Instruction message
         ChatMessage instructionMessage = new ChatMessage("user", prompt);
         messages.add(instructionMessage);
 
+        // First usage message
         ChatMessage firstUsageMessage = new ChatMessage("user", "Sentence 1: " + firstUsage);
         messages.add(firstUsageMessage);
 
+        // Second usage message
         ChatMessage secondUsageMessage = new ChatMessage("user", "Sentence 2: " + secondUsage);
         messages.add(secondUsageMessage);
 
-        ChatMessage targetWord = new ChatMessage("user", "Targetword: " + lemma);
+        // Target word message
+        ChatMessage targetWord = new ChatMessage("user", "Target word: " + lemma);
         messages.add(targetWord);
-        ChatMessage returnType = new ChatMessage("user", "give me '''Judgement''' in '''single integer''' " +
-                "for example:if your Judgement is Identical, then give me 4 and if your judgement is not related then give 1");
+
+        // Return type instruction message
+        ChatMessage returnType = new ChatMessage("user", "Please provide a '''Judgment''' as a '''single integer'''. " +
+                "For example, if your judgment is 'Identical', then provide '4'. If your judgment is 'Unrelated', provide '1'.");
         messages.add(returnType);
 
         return messages;
     }
+
 }

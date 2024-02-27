@@ -101,9 +101,7 @@ const UseRankPairTutorialAnnotation: React.FC<IUseRankPairAnnotationInstance> = 
     };
     const filteredUsages = usages.filter(item => item.usage1 && item.usage2.getContext() !== undefined);
 
-    console.log(filteredUsages)
 
-    console.log(filteredUsages, "dd")
     return (
         <div className="w-full flex flex-col 2xl:flex-row justify-between 2xl:px-2">
             <div className="w-full flex flex-col justify-center space-y-2">

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { FiAlignLeft, FiBookmark, FiFeather } from "react-icons/fi";
 
 // Serrvice
-import { fetchRandomInstance, useFetchPagedUseRankInstance, useFetchPagedUseRankRelativeInstance } from "../../../../lib/service/instance/InstanceResource";
+import { CountAllocatedInstances, fetchRandomInstance, useFetchPagedUseRankInstance, useFetchPagedUseRankRelativeInstance } from "../../../../lib/service/instance/InstanceResource";
 import useStorage from "../../../../lib/hook/useStorage";
 
 // model
@@ -16,7 +16,7 @@ import UsageField from "../usage/usagefield";
 import { toast } from "react-toastify";
 import Router from "next/router";
 import AddUseRankJudgementCommand from "../../../../lib/model/judgement/userankjudgement/command/AddUseRankJudgementCommand";
-import { annotateUserank, annotateUserankrelative, countAttemptedJudgements, useFetchPagedUseRankJudgements } from "../../../../lib/service/judgement/JudgementResource";
+import { annotateUserank, annotateUserankrelative, CountAttemptedJudgements, useFetchPagedUseRankJudgements } from "../../../../lib/service/judgement/JudgementResource";
 import LoadingComponent from "../../../generic/loadingcomponent";
 import ProgressBar from "../progressbar/progressbar";
 import React from "react";
@@ -48,18 +48,10 @@ const UseRankRelativeAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
     const page: number = 0;
     const userankrelatveinstances = useFetchPagedUseRankRelativeInstance(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), page, !!phase);
 
-    const { data: userankjudgementsData, mutate: mutateUserankJudgements } = useFetchPagedUseRankJudgements(
-        phase?.getId().getOwner(),
-        phase?.getId().getProject(),
-        phase?.getId().getPhase(),
-        page,
-        !!phase
-    );
 
-    const { data: userAnnotationCount, mutate: mutateCountJudgements } = countAttemptedJudgements(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), !!phase);
+    const { data: userAnnotationCount, mutate: mutateCountJudgements } = CountAttemptedJudgements(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), !!phase);
 
-
-
+    const { data: userAllocatedInstance, mutate: mutateInstanceCount} = CountAllocatedInstances(phase?.getId().getOwner(), phase?.getId().getProject(), phase?.getId().getPhase(), !!phase);
 
 
     const labelArray = annotation.instance ? annotation.instance.getLabelSet() : null;
@@ -191,7 +183,6 @@ const UseRankRelativeAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
         const judgement: string = annotation.instance.getNonLabel().toString();
 
 
-        mutateUserankJudgements();
         if (userankrelatveinstances.data.getTotalElements() === userAnnotationCount) {
             toast.success("Congrats!!! You finished it all");
             Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
@@ -223,7 +214,7 @@ const UseRankRelativeAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
     }
 
     const fetchNewAnnotation = () => {
-        mutateUserankJudgements();
+        mutateCountJudgements();
         if (userankrelatveinstances.data.getTotalElements() === userAnnotationCount) {
             Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
             return;
@@ -238,10 +229,9 @@ const UseRankRelativeAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
                             instance: instance,
                             comment: "",
                         });
-                    } else {
-                        toast.info("Could not fetch new annotation. Check if instances are provided for annotation.");
+                    } else if(instance==null && userAllocatedInstance === userAnnotationCount) {
+                        Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
                     }
-
                 })
                 .catch((error) => {
                     toast.error("Could not fetch new annotation. Check if instances are provided for annotation.");
@@ -259,9 +249,8 @@ const UseRankRelativeAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
                         instance: instance,
                         comment: "",
                     });
-                } else {
-
-                    toast.info("Could not fetch new annotation. Check if instances are provided for annotation.");
+                } else if(instance==null && userAllocatedInstance === userAnnotationCount) {
+                    Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
                 }
 
             })
@@ -284,12 +273,21 @@ const UseRankRelativeAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
 
     // Hook
 
+   
     useEffect(() => {
 
         if (annotationAccess.isError) {
             Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
             return;
-        } else if (annotation.initialLoad) {
+        }
+    
+        if (!annotationAccess.isError && annotationAccess.hasAccess && userAllocatedInstance === userAnnotationCount) {
+            toast.info("No instances available to annotate!");
+            Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
+            return;
+        }
+    
+        if (!annotationAccess.isError && annotationAccess.hasAccess && annotation.initialLoad && userAllocatedInstance !== userAnnotationCount) {
             fetchRandomInstance<UseRankRelativeInstance, UseRankRelativeInstanceConstructor>(
                 phase.getId().getOwner(),
                 phase.getId().getProject(),
@@ -297,29 +295,25 @@ const UseRankRelativeAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
                 new UseRankRelativeInstanceConstructor(),
                 storage.get
             )
-                .then((instance) => {
-                    if (instance) {
-                        setAnnotation((prevAnnotation) => ({
-                            ...prevAnnotation,
-                            instance: instance,
-                            comment: "",
-                            initialLoad: false,
-                        }));
-                    } /* else {
-                                toast.info("You finished all");
-                                Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
-                            } */
-                })
-                .catch((error) => {
-                    toast.error("Could not fetch new annotation. Check if instances are provided for annotation.");
-                    Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
-                });
-
+            .then((instance) => {
+                if (instance) {
+                    setAnnotation((prevAnnotation) => ({
+                        ...prevAnnotation,
+                        instance: instance,
+                        comment: "",
+                        initialLoad: false,
+                    }));
+                } else if(instance==null && userAllocatedInstance === userAnnotationCount) {
+                    Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}/${phase.getName()}/done`);
+                }
+            })
+            .catch((error) => {
+                toast.error("Could not fetch new annotation. Check if instances are provided for annotation.");
+                Router.push(`/phi/${phase.getId().getOwner()}/${phase.getId().getProject()}`);
+            });
         }
-
-
-
-    }, [annotationAccess, annotation.initialLoad, storage, phase]);
+    }, [userAllocatedInstance, userAnnotationCount, annotationAccess, annotation.initialLoad, storage, phase]);
+    
 
 
     if (!phase || !annotation.instance || annotation.initialLoad) {

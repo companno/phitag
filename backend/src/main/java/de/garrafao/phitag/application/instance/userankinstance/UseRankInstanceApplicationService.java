@@ -1,14 +1,12 @@
 package de.garrafao.phitag.application.instance.userankinstance;
 
 import de.garrafao.phitag.application.common.CommonService;
-
 import de.garrafao.phitag.application.sampling.data.SamplingEnum;
 import de.garrafao.phitag.domain.annotationprocessinformation.AnnotationProcessInformation;
 import de.garrafao.phitag.domain.annotationprocessinformation.error.AnnotationProcessInformationException;
 import de.garrafao.phitag.domain.annotator.Annotator;
 import de.garrafao.phitag.domain.core.Query;
 import de.garrafao.phitag.domain.error.CsvParseException;
-
 import de.garrafao.phitag.domain.error.InvalidLabelException;
 import de.garrafao.phitag.domain.instance.userankinstance.UseRankInstance;
 import de.garrafao.phitag.domain.instance.userankinstance.UseRankInstanceFactory;
@@ -32,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
@@ -431,6 +430,67 @@ public class UseRankInstanceApplicationService {
             this.generateSamplingTask(phase, annotator);
         });
     }
+
+    /**
+     * Generate n  sampling order for random sampling without replacement.
+     *
+     * @param phase
+     */
+    private List<String> generateNSamplingOrderWithoutReplacement(final Phase phase) {
+
+        final  int instancesPerSample = phase.getInstancePerSample();
+
+        List<String> samplingOrder = new ArrayList<>();
+
+        List<UseRankInstance> instances = new ArrayList<>(this.commonService.findUseRankInstanceByPhase(phase));
+        Collections.shuffle(instances);
+        int totalInstances = instances.size();
+        int index = 0;
+        while (samplingOrder.size() < instancesPerSample && index < totalInstances) {
+            UseRankInstance instance = instances.get(index++);
+            String instanceId = instance.getId().getInstanceid();
+            if (!samplingOrder.contains(instanceId)) {
+                samplingOrder.add(instanceId);
+            }
+        }
+
+        // If not enough unique instances are available, reset the sampling order
+        if (samplingOrder.size() < instancesPerSample) {
+            // Reset the sampling order
+            samplingOrder.clear();
+            // Restart the selection process
+            index = 0;
+            while (samplingOrder.size() < instancesPerSample && index < totalInstances) {
+                UseRankInstance instance = instances.get(index++);
+                String instanceId = instance.getId().getInstanceid();
+                if (!samplingOrder.contains(instanceId)) {
+                    samplingOrder.add(instanceId);
+                }
+            }
+        }
+
+        return samplingOrder;
+    }
+
+    /**
+     * Generate n  sampling order for random sampling with replacement.
+     *
+     * @param phase
+     */
+    private List<String> generateNSamplingOrderWithReplacement(final Phase phase) {
+        final int instancesPerSample = phase.getInstancePerSample();
+        List<String> samplingOrder = new ArrayList<>();
+        List<UseRankInstance> instances = new ArrayList<>(this.commonService.findUseRankInstanceByPhase(phase));
+        int totalInstances = instances.size();
+        for (int i = 0; i < instancesPerSample; i++) {
+            int randomIndex = ThreadLocalRandom.current().nextInt(totalInstances);
+            UseRankInstance instance = instances.get(randomIndex);
+            String instanceId = instance.getId().getInstanceid();
+            samplingOrder.add(instanceId);
+        }
+        return samplingOrder;
+    }
+
     /**
      * Generate sampling tasks for a given phase and annotator
      *
@@ -447,7 +507,12 @@ public class UseRankInstanceApplicationService {
         } else if (phase.getSampling().getName().equals(SamplingEnum.SAMPLING_ID_ORDER.name())) {
             samplingOrder = this.generateSamplingIDOrder(phase);
         }
-
+        else if (phase.getSampling().getName().equals(SamplingEnum.N_SAMPLING_RANDOM_WITHOUT_REPLACEMENT.name())) {
+            samplingOrder = this.generateNSamplingOrderWithoutReplacement(phase);
+        }
+        else if (phase.getSampling().getName().equals(SamplingEnum.N_SAMPLING_RANDOM_WITH_REPLACEMENT.name())) {
+            samplingOrder = this.generateNSamplingOrderWithReplacement(phase);
+        }
         if (samplingOrder.isEmpty()) {
             throw new AnnotationProcessInformationException("Sampling order is empty");
         }
@@ -544,6 +609,11 @@ public class UseRankInstanceApplicationService {
         return instances.get(0);
     }
 
+    public int countAllocatedInstanceToAnnotator(Phase phase, Annotator annotator){
+        final  AnnotationProcessInformation annotationProcessInformation = this.commonService.getAnnotationProcessInformation(annotator, phase);
+        return  annotationProcessInformation.getOrder().size();
+
+    }
 
 
 }
