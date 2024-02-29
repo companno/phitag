@@ -23,13 +23,15 @@ const UsePairTutorialAnnotation: React.FC<IUsePairAnnotationInstance> = ({ insta
                 <UsageField key={1} usage={instance.getSecondusage()} />
             </div>
 
+          
             <div className="w-full 2xl:w-fit flex flex-row 2xl:flex-col 2xl:mx-16 my-8 items-center justify-between 2xl:justify-center 2xl:space-y-2">
                 {instance.getLabelSet().concat(instance.getNonLabel()).map((label) => {
                     return (
                         <div key={label}
                             className="flex shadow-md cursor-pointer hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-200 font-dm-mono-medium"
-                            onClick={() => handleSubmitAnnotation(label, judgement.comment)}>
-                            <div className="w-8 h-8 m-6 text-center text-lg">
+                            onClick={() => handleSubmitAnnotation(label, judgement.comment)}
+                            style={{ minWidth: "0", overflow: "hidden" }}>
+                            <div className="w-auto min-w-8 h-10 m-4 text-center text-lg">
                                 {label}
                             </div>
                         </div>

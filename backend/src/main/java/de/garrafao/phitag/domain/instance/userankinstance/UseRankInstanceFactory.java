@@ -14,6 +14,14 @@ public class UseRankInstanceFactory {
     private Usage thirdUsage;
     private Usage fourthUsage;
 
+    private Usage fifthUsage;
+    private Usage sixthUsage;
+    private Usage seventhUsage;
+    private Usage eightUsage;
+    private Usage ninthUsage;
+    private Usage tenthUsage;
+
+
     private String labelSet;
 
     private String nonLabel;
@@ -47,6 +55,33 @@ public class UseRankInstanceFactory {
         return this;
     }
 
+    public UseRankInstanceFactory withFifthUsage(final Usage fifthUsage) {
+        this.fifthUsage = fifthUsage;
+        return this;
+    }
+
+    public UseRankInstanceFactory withSixthUsage(final Usage sixthUsage) {
+        this.sixthUsage = sixthUsage;
+        return this;
+    }
+
+    public UseRankInstanceFactory withSeventhUsage(final Usage seventhUsage) {
+        this.seventhUsage = seventhUsage;
+        return this;
+    }
+    public UseRankInstanceFactory withEightUsage(final Usage eightUsage) {
+        this.eightUsage = eightUsage;
+        return this;
+    }
+    public UseRankInstanceFactory withNinthUsage(final Usage ninthUsage) {
+        this.ninthUsage = ninthUsage;
+        return this;
+    }
+    public UseRankInstanceFactory withTenthUsage(final Usage tenthUsage) {
+        this.tenthUsage = tenthUsage;
+        return this;
+    }
+
 
     public UseRankInstanceFactory withLabelSet(final String labelSet) {
         this.labelSet = labelSet;
@@ -59,7 +94,8 @@ public class UseRankInstanceFactory {
     }
 
     public UseRankInstance build() {
-        return new UseRankInstance(instanceId, phase, firstUsage, secondUsage, thirdUsage, fourthUsage, labelSet, nonLabel);
+        return new UseRankInstance(instanceId, phase, firstUsage, secondUsage, thirdUsage, fourthUsage,
+                fifthUsage, sixthUsage, seventhUsage, eightUsage, ninthUsage, tenthUsage, labelSet, nonLabel);
     }
 
 }

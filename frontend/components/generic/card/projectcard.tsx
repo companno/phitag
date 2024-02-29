@@ -12,11 +12,10 @@ import IconButtonOnClick from "../button/iconbuttononclick";
 
 interface IProjectCardProps {
     project: Project;
-    showAddGuideline: boolean | undefined;
 }
 
 // TODO: refactor when project
-const ProjectCard: React.FC<IProjectCardProps> = ({ project, showAddGuideline }) => {
+const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
 
 
     if (!project) {

@@ -1,14 +1,13 @@
 package de.garrafao.phitag.application.instance.userankinstance;
 
 import de.garrafao.phitag.application.common.CommonService;
-
 import de.garrafao.phitag.application.sampling.data.SamplingEnum;
 import de.garrafao.phitag.domain.annotationprocessinformation.AnnotationProcessInformation;
 import de.garrafao.phitag.domain.annotationprocessinformation.error.AnnotationProcessInformationException;
 import de.garrafao.phitag.domain.annotator.Annotator;
 import de.garrafao.phitag.domain.core.Query;
 import de.garrafao.phitag.domain.error.CsvParseException;
-
+import de.garrafao.phitag.domain.error.InvalidLabelException;
 import de.garrafao.phitag.domain.instance.userankinstance.UseRankInstance;
 import de.garrafao.phitag.domain.instance.userankinstance.UseRankInstanceFactory;
 import de.garrafao.phitag.domain.instance.userankinstance.UseRankRepository;
@@ -31,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
@@ -146,13 +146,11 @@ public class UseRankInstanceApplicationService {
     @Transactional
     public void save(final Phase phase, final MultipartFile file) {
         validateCsvFile(file);
-
         parseCsvFile(file).forEach(csvrecord -> {
             final UseRankInstance instanceData = parseRecordToUseRankInstance(phase, csvrecord);
             validateUniqueInstance(instanceData);
             this.useRankRepository.save(instanceData);
         });
-
         this.generateSamplingTasks(phase);
     }
 
@@ -258,7 +256,6 @@ public class UseRankInstanceApplicationService {
         List<String> dataIds;
         String labelSet;
         String nonLabel;
-
         try {
             instanceId = csvrecord.get("instanceID");
             dataIds = Arrays.stream(csvrecord.get("dataIDs").split(",")).collect(Collectors.toList());
@@ -267,30 +264,128 @@ public class UseRankInstanceApplicationService {
         } catch (IllegalArgumentException e) {
             throw new CsvParseException("CSV record is not valid, please check the format");
         }
+        if(dataIds.size()<2){
+            throw new CsvParseException("dataIDs must be 2 or more than 2" + dataIds.size());
+        }
+        List<String> countLabel = Arrays.stream(csvrecord.get("label_set").split(",")).collect(Collectors.toList());
 
-        if (dataIds.size() != 4) {
-            throw new CsvParseException();
+        if(countLabel.size() != dataIds.size()){
+            throw new InvalidLabelException();
         }
 
-        Usage firstUsage = this.usageRepository
-                .findByIdDataidAndIdProjectidNameAndIdProjectidOwnername(dataIds.get(0),
-                        phase.getId().getProjectid().getName(), phase.getId().getProjectid().getOwnername())
-                .orElseThrow(() -> new UsageNotFoundException("Usage not found for data id " + dataIds.get(0)));
-        Usage secondUsage = this.usageRepository
-                .findByIdDataidAndIdProjectidNameAndIdProjectidOwnername(dataIds.get(1),
-                        phase.getId().getProjectid().getName(), phase.getId().getProjectid().getOwnername())
-                .orElseThrow(() -> new UsageNotFoundException("Usage not found for data id " + dataIds.get(1)));
+        Usage firstUsage, secondUsage, thirdUsage, fourthUsage, fifthusage, sixthusage, seventhusage,
+        eightusage,ninthusage, tenthusage;
+        switch (dataIds.size()) {
+            case 2:
+                firstUsage = getUsage(dataIds.get(0), phase);
+                secondUsage = getUsage(dataIds.get(1), phase);
 
-        Usage thirdUsage = this.usageRepository
-                .findByIdDataidAndIdProjectidNameAndIdProjectidOwnername(dataIds.get(0),
-                        phase.getId().getProjectid().getName(), phase.getId().getProjectid().getOwnername())
-                .orElseThrow(() -> new UsageNotFoundException("Usage not found for data id " + dataIds.get(2)));
-        Usage fourthUsage = this.usageRepository
-                .findByIdDataidAndIdProjectidNameAndIdProjectidOwnername(dataIds.get(1),
-                        phase.getId().getProjectid().getName(), phase.getId().getProjectid().getOwnername())
-                .orElseThrow(() -> new UsageNotFoundException("Usage not found for data id " + dataIds.get(3)));
+                return new UseRankInstance(instanceId,phase,firstUsage,secondUsage,labelSet,nonLabel);
+            case 3:
+                firstUsage = getUsage(dataIds.get(0), phase);
+                secondUsage = getUsage(dataIds.get(1), phase);
+                thirdUsage = getUsage(dataIds.get(2), phase);
 
-        return new UseRankInstance(instanceId, phase, firstUsage, secondUsage, thirdUsage, fourthUsage, labelSet, nonLabel);
+                return new UseRankInstance(instanceId,phase,firstUsage,secondUsage,thirdUsage, labelSet,nonLabel);
+
+            case 4:
+                firstUsage = getUsage(dataIds.get(0), phase);
+                secondUsage = getUsage(dataIds.get(1), phase);
+                thirdUsage = getUsage(dataIds.get(2), phase);
+                fourthUsage = getUsage(dataIds.get(3), phase);
+
+                return new UseRankInstance(instanceId, phase, firstUsage, secondUsage, thirdUsage, fourthUsage, labelSet, nonLabel);
+            case 5:
+                firstUsage = getUsage(dataIds.get(0), phase);
+                secondUsage = getUsage(dataIds.get(1), phase);
+                thirdUsage = getUsage(dataIds.get(2), phase);
+                fourthUsage = getUsage(dataIds.get(3), phase);
+                fifthusage = getUsage(dataIds.get(4), phase);
+
+                return new UseRankInstance(instanceId, phase, firstUsage, secondUsage, thirdUsage, fourthUsage,
+                        fifthusage, labelSet, nonLabel);
+            case 6:
+                firstUsage = getUsage(dataIds.get(0), phase);
+                secondUsage = getUsage(dataIds.get(1), phase);
+                thirdUsage = getUsage(dataIds.get(2), phase);
+                fourthUsage = getUsage(dataIds.get(3), phase);
+                fifthusage = getUsage(dataIds.get(4), phase);
+                sixthusage = getUsage(dataIds.get(5), phase);
+
+                return new UseRankInstance(instanceId, phase, firstUsage, secondUsage,
+                        thirdUsage, fourthUsage, fifthusage,
+                        sixthusage, labelSet, nonLabel);
+            case 7:
+                firstUsage = getUsage(dataIds.get(0), phase);
+                secondUsage = getUsage(dataIds.get(1), phase);
+                thirdUsage = getUsage(dataIds.get(2), phase);
+                fourthUsage = getUsage(dataIds.get(3), phase);
+                fifthusage = getUsage(dataIds.get(4), phase);
+                sixthusage = getUsage(dataIds.get(5), phase);
+                seventhusage= getUsage(dataIds.get(6), phase);
+
+
+                return new UseRankInstance(instanceId, phase, firstUsage, secondUsage,
+                        thirdUsage, fourthUsage, fifthusage,
+                        sixthusage, seventhusage, labelSet, nonLabel);
+            case 8:
+                firstUsage = getUsage(dataIds.get(0), phase);
+                secondUsage = getUsage(dataIds.get(1), phase);
+                thirdUsage = getUsage(dataIds.get(2), phase);
+                fourthUsage = getUsage(dataIds.get(3), phase);
+                fifthusage = getUsage(dataIds.get(4), phase);
+                sixthusage = getUsage(dataIds.get(5), phase);
+                seventhusage= getUsage(dataIds.get(6), phase);
+                eightusage= getUsage(dataIds.get(7), phase);
+
+                return new UseRankInstance(instanceId, phase, firstUsage, secondUsage,
+                        thirdUsage, fourthUsage, fifthusage,
+                        sixthusage, seventhusage,
+                        eightusage, labelSet, nonLabel);
+            case 9:
+                firstUsage = getUsage(dataIds.get(0), phase);
+                secondUsage = getUsage(dataIds.get(1), phase);
+                thirdUsage = getUsage(dataIds.get(2), phase);
+                fourthUsage = getUsage(dataIds.get(3), phase);
+                fifthusage = getUsage(dataIds.get(4), phase);
+                sixthusage = getUsage(dataIds.get(5), phase);
+                seventhusage= getUsage(dataIds.get(6), phase);
+                eightusage= getUsage(dataIds.get(7), phase);
+                ninthusage= getUsage(dataIds.get(8), phase);
+
+                return new UseRankInstance(instanceId, phase, firstUsage, secondUsage,
+                        thirdUsage, fourthUsage, fifthusage,
+                        sixthusage, seventhusage,
+                        eightusage, ninthusage,
+                        labelSet, nonLabel);
+            case 10:
+                firstUsage = getUsage(dataIds.get(0), phase);
+                secondUsage = getUsage(dataIds.get(1), phase);
+                thirdUsage = getUsage(dataIds.get(2), phase);
+                fourthUsage = getUsage(dataIds.get(3), phase);
+                fifthusage = getUsage(dataIds.get(4), phase);
+                sixthusage = getUsage(dataIds.get(5), phase);
+                seventhusage= getUsage(dataIds.get(6), phase);
+                eightusage= getUsage(dataIds.get(7), phase);
+                ninthusage= getUsage(dataIds.get(8), phase);
+                tenthusage= getUsage(dataIds.get(9), phase);
+
+                return new UseRankInstance(instanceId, phase, firstUsage, secondUsage,
+                        thirdUsage, fourthUsage, fifthusage,
+                        sixthusage, seventhusage,
+                        eightusage, ninthusage, tenthusage,
+                        labelSet, nonLabel);
+
+            default:
+                throw new CsvParseException("Unexpected number of dataIDs: " + dataIds.size());
+        }
+    }
+
+    private Usage getUsage(String dataId, Phase phase) {
+        return this.usageRepository
+                .findByIdDataidAndIdProjectidNameAndIdProjectidOwnername(dataId,
+                        phase.getId().getProjectid().getName(), phase.getId().getProjectid().getOwnername())
+                .orElseThrow(() -> new UsageNotFoundException("Usage not found for data id " + dataId));
     }
 
     private void validateCsvFile(final MultipartFile file) {
@@ -335,6 +430,67 @@ public class UseRankInstanceApplicationService {
             this.generateSamplingTask(phase, annotator);
         });
     }
+
+    /**
+     * Generate n  sampling order for random sampling without replacement.
+     *
+     * @param phase
+     */
+    private List<String> generateNSamplingOrderWithoutReplacement(final Phase phase) {
+
+        final  int instancesPerSample = phase.getInstancePerSample();
+
+        List<String> samplingOrder = new ArrayList<>();
+
+        List<UseRankInstance> instances = new ArrayList<>(this.commonService.findUseRankInstanceByPhase(phase));
+        Collections.shuffle(instances);
+        int totalInstances = instances.size();
+        int index = 0;
+        while (samplingOrder.size() < instancesPerSample && index < totalInstances) {
+            UseRankInstance instance = instances.get(index++);
+            String instanceId = instance.getId().getInstanceid();
+            if (!samplingOrder.contains(instanceId)) {
+                samplingOrder.add(instanceId);
+            }
+        }
+
+        // If not enough unique instances are available, reset the sampling order
+        if (samplingOrder.size() < instancesPerSample) {
+            // Reset the sampling order
+            samplingOrder.clear();
+            // Restart the selection process
+            index = 0;
+            while (samplingOrder.size() < instancesPerSample && index < totalInstances) {
+                UseRankInstance instance = instances.get(index++);
+                String instanceId = instance.getId().getInstanceid();
+                if (!samplingOrder.contains(instanceId)) {
+                    samplingOrder.add(instanceId);
+                }
+            }
+        }
+
+        return samplingOrder;
+    }
+
+    /**
+     * Generate n  sampling order for random sampling with replacement.
+     *
+     * @param phase
+     */
+    private List<String> generateNSamplingOrderWithReplacement(final Phase phase) {
+        final int instancesPerSample = phase.getInstancePerSample();
+        List<String> samplingOrder = new ArrayList<>();
+        List<UseRankInstance> instances = new ArrayList<>(this.commonService.findUseRankInstanceByPhase(phase));
+        int totalInstances = instances.size();
+        for (int i = 0; i < instancesPerSample; i++) {
+            int randomIndex = ThreadLocalRandom.current().nextInt(totalInstances);
+            UseRankInstance instance = instances.get(randomIndex);
+            String instanceId = instance.getId().getInstanceid();
+            samplingOrder.add(instanceId);
+        }
+        return samplingOrder;
+    }
+
     /**
      * Generate sampling tasks for a given phase and annotator
      *
@@ -351,7 +507,12 @@ public class UseRankInstanceApplicationService {
         } else if (phase.getSampling().getName().equals(SamplingEnum.SAMPLING_ID_ORDER.name())) {
             samplingOrder = this.generateSamplingIDOrder(phase);
         }
-
+        else if (phase.getSampling().getName().equals(SamplingEnum.N_SAMPLING_RANDOM_WITHOUT_REPLACEMENT.name())) {
+            samplingOrder = this.generateNSamplingOrderWithoutReplacement(phase);
+        }
+        else if (phase.getSampling().getName().equals(SamplingEnum.N_SAMPLING_RANDOM_WITH_REPLACEMENT.name())) {
+            samplingOrder = this.generateNSamplingOrderWithReplacement(phase);
+        }
         if (samplingOrder.isEmpty()) {
             throw new AnnotationProcessInformationException("Sampling order is empty");
         }
@@ -448,6 +609,11 @@ public class UseRankInstanceApplicationService {
         return instances.get(0);
     }
 
+    public int countAllocatedInstanceToAnnotator(Phase phase, Annotator annotator){
+        final  AnnotationProcessInformation annotationProcessInformation = this.commonService.getAnnotationProcessInformation(annotator, phase);
+        return  annotationProcessInformation.getOrder().size();
+
+    }
 
 
 }

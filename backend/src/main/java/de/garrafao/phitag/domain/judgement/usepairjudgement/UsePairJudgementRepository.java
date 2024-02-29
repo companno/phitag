@@ -1,11 +1,10 @@
 package de.garrafao.phitag.domain.judgement.usepairjudgement;
 
-import java.util.List;
-
-import org.springframework.data.domain.Page;
-
 import de.garrafao.phitag.domain.core.PageRequestWraper;
 import de.garrafao.phitag.domain.core.Query;
+import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 public interface UsePairJudgementRepository {
 
@@ -18,5 +17,6 @@ public interface UsePairJudgementRepository {
     void delete(UsePairJudgement judgement);
 
     void batchDelete(Iterable<UsePairJudgement> judgements);
+
 
 }

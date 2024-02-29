@@ -43,6 +43,7 @@ import SingleContentLayout from "../../generic/layout/singlecontentlayout";
 import HelpButton from "../../generic/button/helpbutton";
 import { language } from "gray-matter";
 import Togglebox from "../../generic/checkbox/togglebox";
+import UsageModal from "../card/usagecard";
 
 const EditProjectModal: React.FC<{ isOpen: boolean, closeModalCallback: Function, mutateCallback: Function }> = ({ isOpen, closeModalCallback, mutateCallback }) => {
 
@@ -140,7 +141,7 @@ const EditProjectModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
         }
 
         updateProjectApi(username, projectname, updateCommand, storage.get).then(() => {
-            toast.success("Projetc updated sucesfully.");
+            toast.success("Project updated sucesfully.");
             mutateCallback();
             closeModalCallback();
 

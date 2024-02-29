@@ -5,26 +5,45 @@ import { CSS } from "@dnd-kit/utilities";
 // Usage
 import Usage from "../../../../../lib/model/phitagdata/usage/model/Usage";
 import { useSortable } from "@dnd-kit/sortable";
+import { useState } from "react";
 
 interface IProps {
     usage: Usage;
-    id: string
+    id: string,
+  
 }
 const SortableUsage: React.FC<IProps> = ({ usage, id }) => {
 
+    const [isHovered, setIsHovered] = useState(false);
 
-
-    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-        id: id
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+    } = useSortable({
+        id: id,
     });
+
     const styles = {
         transform: CSS.Transform.toString(transform),
         transition,
-        cursor: 'grab', 
+        cursor: 'grab',
+        boxShadow: ( isHovered) ? '0 0 5px 2px #36c2f9' : 'none',
     };
-    
+
+  
     return (
-        <div className=" w-full shadow-md" style={styles} ref={setNodeRef} {...attributes} {...listeners}>
+        <div
+            className="w-full shadow-md"
+            style={styles}
+            ref={setNodeRef}
+            {...attributes}
+            {...listeners}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
             <div className="m-8 flex flex-row active:transform active:scale-95" >
 
                 <div className="my-4">
@@ -57,7 +76,7 @@ export default SortableUsage;
  * 
  * @param usage usage to construct the context from
  */
-function usageContextBuilder(usage: Usage): { sentence: string, highlight: "none" | "bold" | "color" }[] {
+export function usageContextBuilder(usage: Usage): { sentence: string, highlight: "none" | "bold" | "color" }[] {
 
     const context = usage.getContext();
 
@@ -68,6 +87,8 @@ function usageContextBuilder(usage: Usage): { sentence: string, highlight: "none
         sentence: context.substring(0, usage.getIndexTargetSentenceStart()),
         highlight: "none"
     });
+
+
 
     let lastTargetTokenEnd = 0;
 

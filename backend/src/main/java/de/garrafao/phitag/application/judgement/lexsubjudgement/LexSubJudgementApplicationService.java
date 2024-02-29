@@ -1,26 +1,5 @@
 package de.garrafao.phitag.application.judgement.lexsubjudgement;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.transaction.Transactional;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.CSVRecord;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import de.garrafao.phitag.application.common.CommonMathService;
 import de.garrafao.phitag.application.judgement.lexsubjudgement.data.AddLexSubJudgementCommand;
 import de.garrafao.phitag.application.judgement.lexsubjudgement.data.DeleteLexSubJudgementCommand;
@@ -40,17 +19,36 @@ import de.garrafao.phitag.domain.judgement.lexsubjudgement.LexSubJudgement;
 import de.garrafao.phitag.domain.judgement.lexsubjudgement.LexSubJudgementRepository;
 import de.garrafao.phitag.domain.judgement.lexsubjudgement.error.LexSubJudgementException;
 import de.garrafao.phitag.domain.judgement.lexsubjudgement.query.LexSubJudgementQueryBuilder;
+import de.garrafao.phitag.domain.judgement.userankjudgement.query.UseRankJudgementQueryBuilder;
 import de.garrafao.phitag.domain.phase.Phase;
 import de.garrafao.phitag.domain.phase.error.TutorialException;
 import de.garrafao.phitag.domain.statistic.statisticannotationmeasure.StatisticAnnotationMeasureEnum;
 import de.garrafao.phitag.domain.statistic.tutorialannotationmeasurehistory.TutorialAnnotationMeasureHistory;
 import de.garrafao.phitag.domain.statistic.tutorialannotationmeasurehistory.TutorialAnnotationMeasureHistoryRepository;
-import liquibase.pro.packaged.t;
+import de.garrafao.phitag.domain.tutorial.lexsub.LexSubTutorialJudgement;
+import de.garrafao.phitag.domain.tutorial.lexsub.LexSubTutorialJudgementRepository;
+import de.garrafao.phitag.domain.tutorial.lexsub.query.LexSubTutorialJudgementQueryBuilder;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.transaction.Transactional;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class LexSubJudgementApplicationService {
 
     private final LexSubJudgementRepository lexSubJudgementRepository;
+    private final LexSubTutorialJudgementRepository lexSubTutorialJudgementRepository;
 
     private final LexSubInstanceRepository lexSubInstanceRepository;
 
@@ -71,6 +69,7 @@ public class LexSubJudgementApplicationService {
     @Autowired
     public LexSubJudgementApplicationService(
             final LexSubJudgementRepository lexSubJudgementRepository,
+            final LexSubTutorialJudgementRepository lexSubTutorialJudgementRepository,
             final LexSubInstanceRepository lexSubInstanceRepository,
             final TutorialAnnotationMeasureHistoryRepository tutorialAnnotationMeasureHistoryRepository,
 
@@ -80,6 +79,7 @@ public class LexSubJudgementApplicationService {
 
             final CommonMathService commonMathService) {
         this.lexSubJudgementRepository = lexSubJudgementRepository;
+        this.lexSubTutorialJudgementRepository = lexSubTutorialJudgementRepository;
         this.lexSubInstanceRepository = lexSubInstanceRepository;
         this.tutorialAnnotationMeasureHistoryRepository = tutorialAnnotationMeasureHistoryRepository;
 
@@ -106,6 +106,22 @@ public class LexSubJudgementApplicationService {
                 .build();
 
         return this.lexSubJudgementRepository.findByQuery(query);
+    }
+
+    /**
+     * Get all judgements for a specific phase
+     *
+     * @param phase
+     * @return List of judgements
+     */
+    public List<LexSubTutorialJudgement> findTutorialByPhase(final Phase phase) {
+        final Query query = new LexSubJudgementQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+
+        return this.lexSubTutorialJudgementRepository.findByQuery(query);
     }
 
     /**
@@ -178,6 +194,33 @@ public class LexSubJudgementApplicationService {
     }
 
     /**
+     * Get all tutorial judgements for a specific phase and annotator as paged list
+     *
+     * @param phase
+     * @param annotator
+     * @param pagesize
+     * @param pagenumber
+     * @param orderBy
+     * @return
+     */
+    public Page<LexSubTutorialJudgement> getTutorialHistory(
+            final Phase phase,
+            final Annotator annotator,
+            final int pagesize,
+            final int pagenumber,
+            final String orderBy) {
+        final Query query = new LexSubTutorialJudgementQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .withAnnotator(annotator.getId().getUsername())
+                .build();
+
+        return this.lexSubTutorialJudgementRepository.findByQueryPaged(query,
+                new PageRequestWraper(pagesize, pagenumber, orderBy));
+    }
+
+    /**
      * Export all use pair judgements for a given phase.
      * 
      * @param phase the phase
@@ -189,6 +232,39 @@ public class LexSubJudgementApplicationService {
                 "instanceID", "label", "comment", "annotator"
         };
         List<List<String>> csvData = parseJudgementsToCsvBody(resultData);
+
+        ByteArrayInputStream outputStream;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CSVPrinter csvPrinter = createCsvPrinter(csvHeader, out);
+        csvData.forEach(row -> {
+            try {
+                csvPrinter.printRecord(row);
+            } catch (Exception e) {
+                throw new CsvParseException();
+            }
+        });
+        try {
+            csvPrinter.flush();
+            outputStream = new ByteArrayInputStream(out.toByteArray());
+        } catch (Exception e) {
+            throw new CsvParseException();
+        }
+
+        return new InputStreamResource(outputStream);
+    }
+
+    /**
+     * Export all use pair judgements for a given phase.
+     *
+     * @param phase the phase
+     * @return a CSV file as {@link InputStreamResource}
+     */
+    public InputStreamResource exportTutorialJudgement(final Phase phase) {
+        List<LexSubTutorialJudgement> resultData = this.findTutorialByPhase(phase);
+        String[] csvHeader = {
+                "instanceID", "label", "comment", "annotator"
+        };
+        List<List<String>> csvData = parseTutorialJudgementsToCsvBody(resultData);
 
         ByteArrayInputStream outputStream;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -299,7 +375,7 @@ public class LexSubJudgementApplicationService {
     // Setter Command
 
     /**
-     * Add a use pair judgement.
+     * Add a lexsub judgement.
      * 
      * @param phase     the phase to which the use pair judgement belongs
      * @param annotator the annotator who created the use pair judgement
@@ -321,6 +397,27 @@ public class LexSubJudgementApplicationService {
         this.phaseStatisticApplicationService.updatePhaseStatisticForAnnotation(annotator, phase);
     }
 
+
+    /**
+     * Add a lexsub tutorial  judgement.
+     *
+     * @param phase     the phase to which the use pair judgement belongs
+     * @param annotator the annotator who created the use pair judgement
+     * @param command   the command
+     */
+    @Transactional
+    public void annotateTutorial(final Phase phase, final Annotator annotator, final AddLexSubJudgementCommand command) {
+        String instanceId = command.getInstance();
+
+        final LexSubInstance instance = this.findCorrespondingInstanceData(phase, instanceId);
+
+        final LexSubTutorialJudgement resultData = new LexSubTutorialJudgement(instance, annotator, command.getLabel(),
+                command.getComment());
+        this.lexSubTutorialJudgementRepository.save(resultData);
+
+    }
+
+
     /**
      * Add bulk use pair judgement for a given phase.
      * If the phase is a tutorial phase, the judgements are checked against the
@@ -336,6 +433,9 @@ public class LexSubJudgementApplicationService {
             final List<AddLexSubJudgementCommand> commands) {
         if (phase.isTutorial()) {
             tutorialAnnotationCorrectness(phase, annotator, commands);
+            commands.forEach(command -> {
+                this.annotateTutorial(phase, annotator, command);
+            });
             return;
         }
 
@@ -359,6 +459,28 @@ public class LexSubJudgementApplicationService {
             throw new CsvParseException(
                     "Instance ID " + instanceid + " not found or ambiguous. Please check your CSV file");
         }
+    }
+
+    /**
+     * Count all lexsub attempted judgements for a given annotator.
+     *
+     * @param annotator the annotator
+     * @param phase  Phase
+     * @return the number of use rank judgements
+     */
+    public int countAttemptedJudgements(final Phase phase,  Annotator annotator) {
+        String phaseName = phase.getId().getName();
+        String ownerName = phase.getProject().getOwner().getDisplayname();
+        String projectName = phase.getProject().getId().getName();
+        String annotatorName = annotator.getId().getUsername();
+        return (int) this.lexSubJudgementRepository.findByQueryPaged(
+                new UseRankJudgementQueryBuilder()
+                        .withProject(projectName)
+                        .withPhase(phaseName)
+                        .withOwner(ownerName)
+                        .withAnnotator(annotatorName)
+                        .build(),
+                new PageRequestWraper(1, 0)).getTotalElements();
     }
 
     /**
@@ -459,6 +581,23 @@ public class LexSubJudgementApplicationService {
         return csvBody;
     }
 
+    private List<List<String>> parseTutorialJudgementsToCsvBody(List<LexSubTutorialJudgement> judgements) {
+        List<List<String>> csvBody = new ArrayList<>();
+
+        for (LexSubTutorialJudgement judgement : judgements) {
+            List<String> csvRow = new ArrayList<>();
+
+            csvRow.add(judgement.getInstance().getId().getInstanceid());
+            csvRow.add(judgement.getLabel());
+            csvRow.add(judgement.getComment());
+            csvRow.add(judgement.getAnnotator().getId().getUsername());
+
+            csvBody.add(csvRow);
+        }
+
+        return csvBody;
+    }
+
     private Iterable<CSVRecord> parseCsvFile(final MultipartFile file) {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
@@ -508,5 +647,14 @@ public class LexSubJudgementApplicationService {
             throw new IllegalArgumentException("file is not a csv");
         }
     }
+
+    public int countJudgements(Annotator annotator, Phase phase) {
+        return (int) this.lexSubJudgementRepository.findByQueryPaged(
+                new LexSubJudgementQueryBuilder()
+                        .withAnnotator(annotator.getId().getUsername())
+                        .withPhase(phase.getId().getName()).build(),
+                new PageRequestWraper(1, 0)).getTotalElements();
+    }
+
 
 }

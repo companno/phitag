@@ -36,7 +36,10 @@ const UsePairJudgementTable: React.FC<{ phase: Phase, modalState: { open: boolea
         judgement: null as unknown as UsePairJudgement,
     });
 
+
+
     const deleteCallback = (usepairjudgement: UsePairJudgement) => {
+
         deleteUsepair(new DeleteUsePairJudgementCommand(
             usepairjudgement.getId().getOwner(),
             usepairjudgement.getId().getProject(),

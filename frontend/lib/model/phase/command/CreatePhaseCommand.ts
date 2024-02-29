@@ -13,6 +13,7 @@ export default class CreatePhaseCommand {
 
     private readonly description: string;
     private readonly taskhead: string;
+    private readonly instancePerSample: number;
 
 
     constructor (
@@ -20,7 +21,8 @@ export default class CreatePhaseCommand {
         annotationType: string, sampling: string, 
         tutorial: boolean, annotationAgreement: string, threshold: number,
         description: string,
-        taskhead: string) {
+        taskhead: string,
+        instancePerSample: number) {
         this.name = name;
         this.owner = owner;
         this.project = project;
@@ -34,6 +36,7 @@ export default class CreatePhaseCommand {
 
         this.description = description;
         this.taskhead = taskhead;
+        this.instancePerSample = instancePerSample;
     }
 
 

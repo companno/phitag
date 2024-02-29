@@ -11,7 +11,7 @@ interface IProps<T> {
 
 const DropdownSelect = <T extends SelectableItem>({ icon, items, selected, onSelectFunction, message }: IProps<T>) => {
     return (
-        <div className="w-full dropdown-selector group font-dm-mono-medium">
+        <div className="w-full dropdown-selector group font-dm-mono-medium ">
             <div className="flex flex-row cursor-pointer ">
                 <div className="self-center">
                     {icon}

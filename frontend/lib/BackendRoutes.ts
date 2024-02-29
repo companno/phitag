@@ -37,6 +37,12 @@ class BACKENDROUTES {
     public static GUIDELINE = `${BACKENDROUTES.BASE_URL}${BACKENDROUTES.API_VERSION}/guideline`;
     public static SAMPLING = `${BACKENDROUTES.BASE_URL}${BACKENDROUTES.API_VERSION}/sampling`;
     public static USECASE = `${BACKENDROUTES.BASE_URL}${BACKENDROUTES.API_VERSION}/usecase`;
+
+
+    //Computational Annotator
+    public static COMPUTATIONALANNOTATOR = `${BACKENDROUTES.BASE_URL}${BACKENDROUTES.API_VERSION}/computationalannotator`;
+    public static  OPENAIMODEL = `${BACKENDROUTES.BASE_URL}${BACKENDROUTES.API_VERSION}/computationalannotator/model`;
+
 }
 
 export default BACKENDROUTES;

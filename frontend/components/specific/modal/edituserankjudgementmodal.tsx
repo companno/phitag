@@ -16,7 +16,6 @@ import EditUseRankJudgementCommand from "../../../lib/model/judgement/userankjud
 
 interface EditUseRankJudgementModalProps {
     judgement: UseRankJudgement;
-
     isOpen: boolean;
     closeModalCallback: Function;
     mutateCallback: Function;

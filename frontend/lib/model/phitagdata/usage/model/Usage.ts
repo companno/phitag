@@ -66,12 +66,12 @@ export default class Usage {
 
     public static fromDto(dto: UsageDto): Usage {
         return new Usage(
-            UsageId.fromDto(dto.id),
-            dto.context,
-            dto.indexTargetToken,
-            dto.indexTargetSentence,
-            dto.lemma,
-            dto.group
+            UsageId?.fromDto(dto?.id),
+            dto?.context,
+            dto?.indexTargetToken,
+            dto?.indexTargetSentence,
+            dto?.lemma,
+            dto?.group
         );
     }
 
