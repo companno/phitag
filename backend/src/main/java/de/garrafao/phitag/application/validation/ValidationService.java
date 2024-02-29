@@ -1,11 +1,5 @@
 package de.garrafao.phitag.application.validation;
 
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import de.garrafao.phitag.application.common.CommonService;
 import de.garrafao.phitag.application.entitlement.data.EntitlementEnum;
 import de.garrafao.phitag.application.language.data.LanguageEnum;
@@ -25,6 +19,11 @@ import de.garrafao.phitag.domain.user.error.InvalidEmailException;
 import de.garrafao.phitag.domain.user.error.InvalidPasswordException;
 import de.garrafao.phitag.domain.visibility.error.EmptyVisibilitySelectionException;
 import de.garrafao.phitag.domain.visibility.error.VisibilityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Set;
+import java.util.regex.Pattern;
 
 /*
  * A service that provides validation functionality used or commonly implemented by other services.
@@ -34,7 +33,7 @@ import de.garrafao.phitag.domain.visibility.error.VisibilityNotFoundException;
 public class ValidationService {
 
     private final Pattern PASSWORD_PATTERN = Pattern
-            .compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$");
+            .compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}-$");
 
     private final Pattern EMAILPATTERN = Pattern.compile("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
 
