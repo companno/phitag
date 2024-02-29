@@ -1,5 +1,4 @@
 class BACKENDROUTES {
-    //private static BASE_URL = `https://phitag.ims.uni-stuttgart.de/`;
     private static BASE_URL = `http://localhost:8080`;
     private static API_VERSION = `/api/v1`;
 
