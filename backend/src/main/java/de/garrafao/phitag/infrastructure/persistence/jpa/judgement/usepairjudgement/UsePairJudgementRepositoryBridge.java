@@ -1,16 +1,15 @@
 package de.garrafao.phitag.infrastructure.persistence.jpa.judgement.usepairjudgement;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Repository;
-
 import de.garrafao.phitag.domain.core.PageRequestWraper;
 import de.garrafao.phitag.domain.core.Query;
 import de.garrafao.phitag.domain.judgement.usepairjudgement.UsePairJudgement;
 import de.garrafao.phitag.domain.judgement.usepairjudgement.UsePairJudgementRepository;
 import de.garrafao.phitag.infrastructure.persistence.jpa.judgement.usepairjudgement.query.UsePairJudgementQueryJpa;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public class UsePairJudgementRepositoryBridge implements UsePairJudgementRepository {
@@ -46,6 +45,5 @@ public class UsePairJudgementRepositoryBridge implements UsePairJudgementReposit
     public void batchDelete(Iterable<UsePairJudgement> judgements) {
 
     }
-
 
 }

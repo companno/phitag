@@ -11,18 +11,34 @@ export default class UseRankInstance implements IInstance {
     private readonly secondusage: Usage;
     private readonly thirdusage: Usage;
     private readonly fourthusage: Usage;
+    private readonly fifthusage: Usage;
+    private readonly sixthusage: Usage;
+    private readonly seventhusage: Usage;
+    private readonly eightusage: Usage;
+    private readonly ninthusage: Usage;
+    private readonly tenthusage: Usage;
+
 
     private readonly labelSet: Array<string>;
     private readonly nonLabel: string;
 
     constructor(id: UseRankInstanceId, firstUsage: Usage, secondUsage: Usage,
         thirdusage: Usage, fourthusage: Usage,
+        fifthusage: Usage, sixthusage: Usage,
+        seventhusage: Usage, eightusage: Usage,
+        ninthusage: Usage, tenthusage: Usage,
         labelSet: Array<string>, nonLabel: string) {
         this.id = id;
         this.firstusage = firstUsage;
         this.secondusage = secondUsage;
         this.thirdusage = thirdusage;
         this.fourthusage = fourthusage;
+        this.fifthusage = fifthusage;
+        this.sixthusage = sixthusage;
+        this.seventhusage = seventhusage;
+        this.eightusage = eightusage;
+        this.ninthusage = ninthusage;
+        this.tenthusage = tenthusage;
         this.labelSet = labelSet;
         this.nonLabel = nonLabel;
     }
@@ -45,7 +61,25 @@ export default class UseRankInstance implements IInstance {
     public getFourthusage(): Usage {
         return this.fourthusage;
     }
-
+    public getFifthusage(): Usage {
+        return this.fifthusage;
+    }
+    public getSixthusage(): Usage {
+        return this.sixthusage;
+    }
+    public getSeventhusage(): Usage {
+        return this.seventhusage;
+    }
+    public getEightusage(): Usage {
+        return this.eightusage;
+    }
+    public getNinthusage(): Usage {
+        return this.ninthusage;
+    }
+    public getTenthusage(): Usage {
+        return this.tenthusage;
+    }
+    
     public getLabelSet(): Array<string> {
         return this.labelSet;
     }
@@ -61,10 +95,16 @@ export default class UseRankInstance implements IInstance {
     public static fromDto(dto: UseRankInstanceDto): UseRankInstance {
         return new UseRankInstance(
             UseRankInstanceId.fromDto(dto.id),
-            Usage.fromDto(dto.firstusage),
-            Usage.fromDto(dto.secondusage),
-            Usage.fromDto(dto.thirdusage),
-            Usage.fromDto(dto.fourthusage),
+            Usage.fromDto(dto.firstusage) ?? null,
+            Usage.fromDto(dto.secondusage) ?? null,
+            Usage.fromDto(dto.thirdusage) ?? null,
+            Usage.fromDto(dto.fourthusage) ?? null,
+            Usage.fromDto(dto.fifthusage) ?? null,
+            Usage.fromDto(dto.sixthusage) ?? null,
+            Usage.fromDto(dto.seventhusage) ?? null,
+            Usage.fromDto(dto.eightusage) ?? null,
+            Usage.fromDto(dto.ninthusage) ?? null,
+            Usage.fromDto(dto.tenthusage) ?? null,
             dto.labelSet,
             dto.nonLabel
         );

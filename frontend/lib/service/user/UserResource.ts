@@ -14,6 +14,7 @@ import User from "../../model/user/model/User";
 import UserData from "../../model/user/model/UserData";
 import CreateUserCommand from "../../model/user/command/CreateUserCommand";
 import UpdateUserCommand from "../../model/user/command/UpdateUserCommand";
+import CreateProlificUserCommand from "../../model/user/command/CreateProlificUserCommnad";
 
 // Commands
 
@@ -105,6 +106,17 @@ export function useFetchPersonalData(fetch: boolean = true) {
 export async function createUser(user: CreateUserCommand) {
     return axios.post(`${BACKENDROUTES.USER}/create`, user).then(res => res.data);
 }
+
+/**
+ * Creates a new user
+ * 
+ * @param user the user to create
+ * @returns Promise 
+ */
+export async function createProlificUser(user: CreateProlificUserCommand) {
+    return axios.post(`${BACKENDROUTES.USER}/create`, user).then(res => res.data);
+}
+
 
 /**
  * Updates the current users personal data

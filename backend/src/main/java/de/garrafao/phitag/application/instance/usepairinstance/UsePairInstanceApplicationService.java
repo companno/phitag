@@ -1,30 +1,5 @@
 package de.garrafao.phitag.application.instance.usepairinstance;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.transaction.Transactional;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.CSVRecord;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import de.garrafao.phitag.domain.instance.usepairinstance.page.UsePairInstancePageBuilder;
 import de.garrafao.phitag.application.common.CommonService;
 import de.garrafao.phitag.application.sampling.data.SamplingEnum;
 import de.garrafao.phitag.domain.annotationprocessinformation.AnnotationProcessInformation;
@@ -36,11 +11,27 @@ import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstance;
 import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstanceFactory;
 import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstanceRepository;
 import de.garrafao.phitag.domain.instance.usepairinstance.error.UsePairInstanceAlreadyExistsException;
+import de.garrafao.phitag.domain.instance.usepairinstance.page.UsePairInstancePageBuilder;
 import de.garrafao.phitag.domain.instance.usepairinstance.query.UsePairInstanceQueryBuilder;
 import de.garrafao.phitag.domain.phase.Phase;
 import de.garrafao.phitag.domain.phitagdata.usage.Usage;
 import de.garrafao.phitag.domain.phitagdata.usage.UsageRepository;
 import de.garrafao.phitag.domain.phitagdata.usage.error.UsageNotFoundException;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.transaction.Transactional;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 /**
  * Service for use pairs.
@@ -343,6 +334,11 @@ public class UsePairInstanceApplicationService {
             samplingOrder = this.generateSamplingOrderWithoutReplacement(phase);
         } else if (phase.getSampling().getName().equals(SamplingEnum.SAMPLING_ID_ORDER.name())) {
             samplingOrder = this.generateSamplingIDOrder(phase);
+        }  else if (phase.getSampling().getName().equals(SamplingEnum.N_SAMPLING_RANDOM_WITHOUT_REPLACEMENT.name())) {
+            samplingOrder = this.generateNSamplingOrderWithoutReplacement(phase);
+        }
+        else if (phase.getSampling().getName().equals(SamplingEnum.N_SAMPLING_RANDOM_WITH_REPLACEMENT.name())) {
+            samplingOrder = this.generateNSamplingOrderWithReplacement(phase);
         }
 
         if (samplingOrder.isEmpty()) {
@@ -376,6 +372,68 @@ public class UsePairInstanceApplicationService {
         Collections.shuffle(samplingOrder);
         return samplingOrder;
     }
+
+
+    /**
+     * Generate n  sampling order for random sampling without replacement.
+     *
+     * @param phase
+     */
+    private List<String> generateNSamplingOrderWithoutReplacement(final Phase phase) {
+
+        final  int instancesPerSample = phase.getInstancePerSample();
+
+        List<String> samplingOrder = new ArrayList<>();
+
+        List<UsePairInstance> instances = new ArrayList<>(this.commonService.findUsePairInstanceByPhase(phase));
+        Collections.shuffle(instances);
+        int totalInstances = instances.size();
+        int index = 0;
+        while (samplingOrder.size() < instancesPerSample && index < totalInstances) {
+            UsePairInstance instance = instances.get(index++);
+            String instanceId = instance.getId().getInstanceid();
+            if (!samplingOrder.contains(instanceId)) {
+                samplingOrder.add(instanceId);
+            }
+        }
+
+        // If not enough unique instances are available, reset the sampling order
+        if (samplingOrder.size() < instancesPerSample) {
+            // Reset the sampling order
+            samplingOrder.clear();
+            // Restart the selection process
+            index = 0;
+            while (samplingOrder.size() < instancesPerSample && index < totalInstances) {
+                UsePairInstance instance = instances.get(index++);
+                String instanceId = instance.getId().getInstanceid();
+                if (!samplingOrder.contains(instanceId)) {
+                    samplingOrder.add(instanceId);
+                }
+            }
+        }
+
+        return samplingOrder;
+    }
+
+    /**
+     * Generate n  sampling order for random sampling with replacement.
+     *
+     * @param phase
+     */
+    private List<String> generateNSamplingOrderWithReplacement(final Phase phase) {
+        final int instancesPerSample = phase.getInstancePerSample();
+        List<String> samplingOrder = new ArrayList<>();
+        List<UsePairInstance> instances = new ArrayList<>(this.commonService.findUsePairInstanceByPhase(phase));
+        int totalInstances = instances.size();
+        for (int i = 0; i < instancesPerSample; i++) {
+            int randomIndex = ThreadLocalRandom.current().nextInt(totalInstances);
+            UsePairInstance instance = instances.get(randomIndex);
+            String instanceId = instance.getId().getInstanceid();
+            samplingOrder.add(instanceId);
+        }
+        return samplingOrder;
+    }
+
 
     /**
      * Generate sampling order for ID-based sampling.
@@ -416,6 +474,7 @@ public class UsePairInstanceApplicationService {
     private UsePairInstance sample(final Phase phase, final Annotator annotator) {
         AnnotationProcessInformation annotationProcessInformation;
 
+
         try {
             annotationProcessInformation = this.commonService.getAnnotationProcessInformation(annotator, phase);
         } catch (AnnotationProcessInformationException e) {
@@ -448,6 +507,13 @@ public class UsePairInstanceApplicationService {
         }
 
         return instances.get(0);
+    }
+
+
+    public int countAllocatedInstanceToAnnotator(Phase phase, Annotator annotator){
+        final  AnnotationProcessInformation annotationProcessInformation = this.commonService.getAnnotationProcessInformation(annotator, phase);
+        return  annotationProcessInformation.getOrder().size();
+
     }
 
 }

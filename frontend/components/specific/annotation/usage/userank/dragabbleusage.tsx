@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   DndContext,
+  Over,
   closestCenter,
 } from '@dnd-kit/core';
 import {
@@ -19,16 +20,30 @@ interface UsageFieldContainerProps {
   }[];
 
   handleUsagesReordered: Function;
+  containerSize: Number;
 }
 
-const DraggableUsage: React.FC<UsageFieldContainerProps> = ({ usages, handleUsagesReordered }) => {
+const DraggableUsage: React.FC<UsageFieldContainerProps> = ({ usages, handleUsagesReordered, containerSize }) => {
   const [orderedUsages, setOrderedUsages] = useState(usages);
+  const [containerHeight, setContainerHeight] = useState(containerSize);
+
+
+  const verticalSortingStrategy = ({ over, active }: { over: Over; active: any }) => {
+    if (!over) return false; // No container to sort over
+
+    // Calculate the vertical distance between the active and over containers
+    const offsetY = over.rect.top - active.rect.top;
+
+    // Only allow vertical movement (up or down)
+    return Math.abs(offsetY) > Math.abs(active.rect.width / 2);
+  };
 
   const handleDragEnd = (event: any) => {
     if (!event) {
       return;
     }
     const { active, over } = event;
+
     if (active.id !== over.id) {
       setOrderedUsages((items) => {
         const activeIndex = items.findIndex((item) => item.key === active.id);
@@ -40,16 +55,24 @@ const DraggableUsage: React.FC<UsageFieldContainerProps> = ({ usages, handleUsag
       });
     }
   };
+  useEffect(() => {
+    if (containerSize) {
+      setContainerHeight(containerSize);
+    }
+  }, [containerSize]);
+
+
 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <div className="p-3" style={{ width: '100%' }}>
+      <div className="p-3" style={{ width: '100%', height: `${containerHeight}px`, overflowY: 'auto' }}>
         <SortableContext
           items={orderedUsages.map((item) => item.key)}
           strategy={verticalListSortingStrategy}
         >
           {orderedUsages.map((usage, index) => (
-            <SortableUsage key={usage.key} id={usage.key} usage={usage.usage} />
+            <SortableUsage key={usage.key} id={usage.key} usage={usage.usage}
+            />
           ))}
         </SortableContext>
       </div>

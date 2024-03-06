@@ -1,16 +1,35 @@
 package de.garrafao.phitag.application.judgement.wssimjudgement;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.transaction.Transactional;
-
+import de.garrafao.phitag.application.common.CommonMathService;
+import de.garrafao.phitag.application.judgement.wssimjudgement.data.AddWSSIMJudgementCommand;
+import de.garrafao.phitag.application.judgement.wssimjudgement.data.DeleteWSSIMJudgementCommand;
+import de.garrafao.phitag.application.judgement.wssimjudgement.data.EditWSSIMJudgementCommand;
+import de.garrafao.phitag.application.statistics.annotatostatistic.AnnotatorStatisticApplicationService;
+import de.garrafao.phitag.application.statistics.phasestatistic.PhaseStatisticApplicationService;
+import de.garrafao.phitag.application.statistics.userstatistic.UserStatisticApplicationService;
+import de.garrafao.phitag.domain.annotator.Annotator;
+import de.garrafao.phitag.domain.authentication.error.AccessDenidedException;
+import de.garrafao.phitag.domain.core.PageRequestWraper;
+import de.garrafao.phitag.domain.core.Query;
+import de.garrafao.phitag.domain.error.CsvParseException;
+import de.garrafao.phitag.domain.instance.wssiminstance.WSSIMInstance;
+import de.garrafao.phitag.domain.instance.wssiminstance.WSSIMInstanceRepository;
+import de.garrafao.phitag.domain.instance.wssiminstance.query.WSSIMInstanceQueryBuilder;
+import de.garrafao.phitag.domain.judgement.userankjudgement.query.UseRankJudgementQueryBuilder;
+import de.garrafao.phitag.domain.judgement.wssimjudgement.WSSIMJudgement;
+import de.garrafao.phitag.domain.judgement.wssimjudgement.WSSIMJudgementRepository;
+import de.garrafao.phitag.domain.judgement.wssimjudgement.error.WSSIMJudgementException;
+import de.garrafao.phitag.domain.judgement.wssimjudgement.page.WSSIMJudgementPageBuilder;
+import de.garrafao.phitag.domain.judgement.wssimjudgement.query.WSSIMJudgementQueryBuilder;
+import de.garrafao.phitag.domain.phase.Phase;
+import de.garrafao.phitag.domain.phase.error.TutorialException;
+import de.garrafao.phitag.domain.statistic.statisticannotationmeasure.StatisticAnnotationMeasureEnum;
+import de.garrafao.phitag.domain.statistic.tutorialannotationmeasurehistory.TutorialAnnotationMeasureHistory;
+import de.garrafao.phitag.domain.statistic.tutorialannotationmeasurehistory.TutorialAnnotationMeasureHistoryRepository;
+import de.garrafao.phitag.domain.tutorial.wssim.WSSIMTutorialJudgement;
+import de.garrafao.phitag.domain.tutorial.wssim.WSSIMTutorialJudgementRepository;
+import de.garrafao.phitag.domain.tutorial.wssim.page.WSSIMTutorialJudgementPageBuilder;
+import de.garrafao.phitag.domain.tutorial.wssim.query.WSSIMTutorialJudgementQueryBuilder;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -21,36 +40,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import de.garrafao.phitag.application.statistics.annotatostatistic.AnnotatorStatisticApplicationService;
-import de.garrafao.phitag.application.statistics.phasestatistic.PhaseStatisticApplicationService;
-import de.garrafao.phitag.application.statistics.userstatistic.UserStatisticApplicationService;
-import de.garrafao.phitag.domain.judgement.wssimjudgement.page.WSSIMJudgementPageBuilder;
-import de.garrafao.phitag.application.common.CommonMathService;
-import de.garrafao.phitag.application.judgement.wssimjudgement.data.AddWSSIMJudgementCommand;
-import de.garrafao.phitag.application.judgement.wssimjudgement.data.DeleteWSSIMJudgementCommand;
-import de.garrafao.phitag.application.judgement.wssimjudgement.data.EditWSSIMJudgementCommand;
-import de.garrafao.phitag.domain.annotator.Annotator;
-import de.garrafao.phitag.domain.authentication.error.AccessDenidedException;
-import de.garrafao.phitag.domain.core.PageRequestWraper;
-import de.garrafao.phitag.domain.core.Query;
-import de.garrafao.phitag.domain.error.CsvParseException;
-import de.garrafao.phitag.domain.instance.wssiminstance.WSSIMInstance;
-import de.garrafao.phitag.domain.instance.wssiminstance.WSSIMInstanceRepository;
-import de.garrafao.phitag.domain.instance.wssiminstance.query.WSSIMInstanceQueryBuilder;
-import de.garrafao.phitag.domain.judgement.wssimjudgement.WSSIMJudgement;
-import de.garrafao.phitag.domain.judgement.wssimjudgement.WSSIMJudgementRepository;
-import de.garrafao.phitag.domain.judgement.wssimjudgement.error.WSSIMJudgementException;
-import de.garrafao.phitag.domain.judgement.wssimjudgement.query.WSSIMJudgementQueryBuilder;
-import de.garrafao.phitag.domain.phase.Phase;
-import de.garrafao.phitag.domain.phase.error.TutorialException;
-import de.garrafao.phitag.domain.statistic.statisticannotationmeasure.StatisticAnnotationMeasureEnum;
-import de.garrafao.phitag.domain.statistic.tutorialannotationmeasurehistory.TutorialAnnotationMeasureHistory;
-import de.garrafao.phitag.domain.statistic.tutorialannotationmeasurehistory.TutorialAnnotationMeasureHistoryRepository;
+import javax.transaction.Transactional;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class WSSIMJudgementApplicationService {
 
     private final WSSIMJudgementRepository wssimJudgementRepository;
+
+    private final WSSIMTutorialJudgementRepository wssimTutorialJudgementRepository;
 
     private final WSSIMInstanceRepository wssimInstanceRepository;
 
@@ -69,6 +70,7 @@ public class WSSIMJudgementApplicationService {
     @Autowired
     public WSSIMJudgementApplicationService(
             final WSSIMJudgementRepository wssimJudgementRepository,
+            final WSSIMTutorialJudgementRepository wssimTutorialJudgementRepository,
             final WSSIMInstanceRepository wssimInstanceRepository,
             final TutorialAnnotationMeasureHistoryRepository tutorialAnnotationMeasureHistoryRepository,
 
@@ -77,6 +79,7 @@ public class WSSIMJudgementApplicationService {
             final PhaseStatisticApplicationService phaseStatisticApplicationService,
             final CommonMathService commonMathService) {
         this.wssimJudgementRepository = wssimJudgementRepository;
+        this.wssimTutorialJudgementRepository = wssimTutorialJudgementRepository;
         this.wssimInstanceRepository = wssimInstanceRepository;
         this.tutorialAnnotationMeasureHistoryRepository = tutorialAnnotationMeasureHistoryRepository;
 
@@ -94,6 +97,21 @@ public class WSSIMJudgementApplicationService {
      * @param phase
      * @return {@link WSSIMJudgement} list
      */
+    public List<WSSIMTutorialJudgement> findTutorialByPhase(final Phase phase) {
+        final Query query = new WSSIMTutorialJudgementQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+        return this.wssimTutorialJudgementRepository.findByQuery(query);
+    }
+
+    /**
+     * Get all WSSIM Judgements for a given phase
+     *
+     * @param phase
+     * @return {@link WSSIMJudgement} list
+     */
     public List<WSSIMJudgement> findByPhase(final Phase phase) {
         final Query query = new WSSIMJudgementQueryBuilder()
                 .withOwner(phase.getId().getProjectid().getOwnername())
@@ -102,6 +120,7 @@ public class WSSIMJudgementApplicationService {
                 .build();
         return this.wssimJudgementRepository.findByQuery(query);
     }
+
 
     /**
      * Get all WSSIM Judgements for a given phase as a paged list
@@ -143,6 +162,32 @@ public class WSSIMJudgementApplicationService {
                 .withAnnotator(annotator.getId().getUsername())
                 .build();
         return this.wssimJudgementRepository.findByQuery(query);
+    }
+
+    /**
+     * Get history of WSSIM Tutorial Judgements for a given annotator
+     *
+     * @param phase     The phase.
+     * @param annotator The annotator.
+     * @return {@link WSSIMJudgement} list
+     */
+    public Page<WSSIMTutorialJudgement> getTutorialHistory(
+            final Phase phase,
+            final Annotator annotator,
+            final int pagesize,
+            final int pagenumber,
+            final String orderBy) {
+        final Query query = new WSSIMTutorialJudgementQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .withAnnotator(annotator.getId().getUsername())
+                .build();
+        return this.wssimTutorialJudgementRepository.findByQueryPaged(query, new WSSIMTutorialJudgementPageBuilder()
+                .withPageSize(pagesize)
+                .withPageNumber(pagenumber)
+                .withOrderBy(orderBy)
+                .build());
     }
 
     /**
@@ -203,6 +248,39 @@ public class WSSIMJudgementApplicationService {
 
         return new InputStreamResource(outputStream);
     }
+    /**
+     * Export all use pair judgements for a given phase.
+     *
+     * @param phase the phase
+     * @return a CSV file as {@link InputStreamResource}
+     */
+    public InputStreamResource exportWSSIMTutorialJudgement(final Phase phase) {
+        List<WSSIMTutorialJudgement> resultData = this.findTutorialByPhase(phase);
+        String[] csvHeader = {
+                "instanceID", "label", "comment", "annotator"
+        };
+        List<List<String>> csvData = parseWSSIMTutorialJudgementToCsvBody(resultData);
+
+        ByteArrayInputStream outputStream;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CSVPrinter csvPrinter = createCsvPrinter(csvHeader, out);
+        csvData.forEach(row -> {
+            try {
+                csvPrinter.printRecord(row);
+            } catch (Exception e) {
+                throw new CsvParseException();
+            }
+        });
+        try {
+            csvPrinter.flush();
+            outputStream = new ByteArrayInputStream(out.toByteArray());
+        } catch (Exception e) {
+            throw new CsvParseException();
+        }
+
+        return new InputStreamResource(outputStream);
+    }
+
 
     /**
      * Count all use pair judgements for a given annotator.
@@ -230,6 +308,28 @@ public class WSSIMJudgementApplicationService {
                 new WSSIMJudgementQueryBuilder()
                         .withAnnotator(annotator.getId().getUsername())
                         .withPhase(phase.getId().getName()).build(),
+                new PageRequestWraper(1, 0)).getTotalElements();
+    }
+
+    /**
+     * Count all use wssim attempted judgements for a given annotator.
+     *
+     * @param annotator the annotator
+     * @param phase  Phase
+     * @return the number of use rank judgements
+     */
+    public int countAttemptedJudgements(final Phase phase,  Annotator annotator) {
+        String phaseName = phase.getId().getName();
+        String ownerName = phase.getProject().getOwner().getDisplayname();
+        String projectName = phase.getProject().getId().getName();
+        String annotatorName = annotator.getId().getUsername();
+        return (int) this.wssimJudgementRepository.findByQueryPaged(
+                new UseRankJudgementQueryBuilder()
+                        .withProject(projectName)
+                        .withPhase(phaseName)
+                        .withOwner(ownerName)
+                        .withAnnotator(annotatorName)
+                        .build(),
                 new PageRequestWraper(1, 0)).getTotalElements();
     }
 
@@ -349,6 +449,24 @@ public class WSSIMJudgementApplicationService {
     }
 
     /**
+     * Add a use pair judgement.
+     *
+     * @param phase     the phase to which the use pair judgement belongs
+     * @param annotator the annotator who created the use pair judgement
+     * @param command   the command
+     */
+    @Transactional
+    public void annotateTutorial(final Phase phase, final Annotator annotator, final AddWSSIMJudgementCommand command) {
+        final WSSIMInstance instance = this.findCorrespondingInstanceData(phase, command.getInstance());
+       // validateAddWSSIMJudgementCommand(instance, command);
+
+        final WSSIMTutorialJudgement resultData = new WSSIMTutorialJudgement(instance, annotator, command.getLabel(),
+                command.getComment());
+        this.wssimTutorialJudgementRepository.save(resultData);
+    }
+
+
+    /**
      * Add bulk use pair judgement for a given phase.
      * If the phase is a tutorial phase, the judgements are checked against the
      * tutorial judgements and if they are correct, the tutorial phase is marked as
@@ -363,6 +481,9 @@ public class WSSIMJudgementApplicationService {
             final List<AddWSSIMJudgementCommand> commands) {
         if (phase.isTutorial()) {
             tutorialAnnotationCorrectness(phase, annotator, commands);
+            commands.forEach(command -> {
+                this.annotateTutorial(phase, annotator, command);
+            });
             return;
         }
 
@@ -472,6 +593,22 @@ public class WSSIMJudgementApplicationService {
         List<List<String>> csvBody = new ArrayList<>();
 
         for (WSSIMJudgement data : wssimJudgements) {
+            List<String> csvRow = new ArrayList<>();
+
+            csvRow.add(data.getWSSIMInstance().getId().getInstanceid());
+            csvRow.add(data.getLabel());
+            csvRow.add(data.getComment());
+            csvRow.add(data.getAnnotator().getId().getUsername());
+
+            csvBody.add(csvRow);
+        }
+
+        return csvBody;
+    }
+    private List<List<String>> parseWSSIMTutorialJudgementToCsvBody(List<WSSIMTutorialJudgement> judgements) {
+        List<List<String>> csvBody = new ArrayList<>();
+
+        for (WSSIMTutorialJudgement data : judgements) {
             List<String> csvRow = new ArrayList<>();
 
             csvRow.add(data.getWSSIMInstance().getId().getInstanceid());

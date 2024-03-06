@@ -43,7 +43,7 @@ export default class UseRankInstanceId implements IInstanceId {
 
 }
 
-export class UsePairInstanceIdConstructor implements IInstanceIdConstructor {
+export class UseRankInstanceIdConstructor implements IInstanceIdConstructor {
     fromDto(dto: UseRankInstanceIdDto): UseRankInstanceId {
         return UseRankInstanceId.fromDto(dto);
     }

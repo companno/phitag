@@ -16,6 +16,9 @@ import UsePairTutorial from "../../../../../components/specific/tutorial/usepair
 import ANNOTATIONTYPES from "../../../../../lib/AnnotationTypes";
 import WSSIMTutorial from "../../../../../components/specific/tutorial/wssim/wssimtutorial";
 import LexSubTutorial from "../../../../../components/specific/tutorial/lexsub/lexsubtutorial";
+import UseRankTutorial from "../../../../../components/specific/tutorial/userank/useranktutorial";
+import UseRankRelativeTutorial from "../../../../../components/specific/tutorial/userankrelative/userankrelativetutorial";
+import UseRankPairTutorial from "../../../../../components/specific/tutorial/userankpair/userankpairtutorial";
 
 // Helper
 
@@ -68,6 +71,17 @@ const TutorialPage: NextPage = () => {
     if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_LEXSUB) {
         return <LexSubTutorial phase={phase.phase} />;
     }
+    if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_USERANK) {
+        return <UseRankTutorial phase={phase.phase} />;
+    }
+    if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_USERANK_RELATIVE) {
+        return <UseRankRelativeTutorial phase={phase.phase} />;
+    }
+    if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_USERANK_PAIR) {
+        return <UseRankPairTutorial phase={phase.phase} />;
+    }
+
+
 
     return (
         <FullLoadingPage headtitle="Annotate" />

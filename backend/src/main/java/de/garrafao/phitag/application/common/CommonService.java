@@ -5,6 +5,8 @@ import de.garrafao.phitag.application.authentication.AuthenticationApplicationSe
 import de.garrafao.phitag.application.judgement.lexsubjudgement.LexSubJudgementApplicationService;
 import de.garrafao.phitag.application.judgement.usepairjudgement.UsePairJudgementApplicationService;
 import de.garrafao.phitag.application.judgement.userankjudgement.UseRankJudgementApplicationService;
+import de.garrafao.phitag.application.judgement.userankpairjudgement.UseRankPairJudgementApplicationService;
+import de.garrafao.phitag.application.judgement.userankrelativejudgement.UseRankRelativeJudgementApplicationService;
 import de.garrafao.phitag.application.judgement.wssimjudgement.WSSIMJudgementApplicationService;
 import de.garrafao.phitag.domain.annotationprocessinformation.AnnotationProcessInformation;
 import de.garrafao.phitag.domain.annotationprocessinformation.AnnotationProcessInformationRepository;
@@ -48,6 +50,12 @@ import de.garrafao.phitag.domain.instance.usepairinstance.query.UsePairInstanceQ
 import de.garrafao.phitag.domain.instance.userankinstance.UseRankInstance;
 import de.garrafao.phitag.domain.instance.userankinstance.UseRankRepository;
 import de.garrafao.phitag.domain.instance.userankinstance.query.UseRankInstanceQueryBuilder;
+import de.garrafao.phitag.domain.instance.userankpairinstances.UseRankPairInstance;
+import de.garrafao.phitag.domain.instance.userankpairinstances.UseRankPairRepository;
+import de.garrafao.phitag.domain.instance.userankpairinstances.query.UseRankPairInstanceQueryBuilder;
+import de.garrafao.phitag.domain.instance.userankrelative.UseRankRelativeInstance;
+import de.garrafao.phitag.domain.instance.userankrelative.UseRankRelativeInstanceRepository;
+import de.garrafao.phitag.domain.instance.userankrelative.query.UseRankRelativeInstanceQueryBuilder;
 import de.garrafao.phitag.domain.instance.wssiminstance.WSSIMInstance;
 import de.garrafao.phitag.domain.instance.wssiminstance.WSSIMInstanceRepository;
 import de.garrafao.phitag.domain.instance.wssiminstance.query.WSSIMInstanceQueryBuilder;
@@ -160,6 +168,10 @@ public class CommonService {
 
 
     private  final UseRankRepository useRankRepository;
+
+    private  final UseRankRelativeInstanceRepository useRankRelativeInstanceRepository;
+    private  final UseRankPairRepository useRankPairInstanceRepository;
+
     private final WSSIMTagRepository wssimTagRepository;
 
     private final WSSIMInstanceRepository wssimInstanceRepository;
@@ -184,6 +196,10 @@ public class CommonService {
     private final UsePairJudgementApplicationService usePairJudgementApplicationService;
 
     private final UseRankJudgementApplicationService useRankJudgementApplicationService;
+
+    private final UseRankRelativeJudgementApplicationService useRankRelativeJudgementApplicationService;
+
+    private final UseRankPairJudgementApplicationService useRankPairJudgementApplicationService;
 
     private final WSSIMJudgementApplicationService wssimJudgementApplicationService;
 
@@ -219,6 +235,9 @@ public class CommonService {
             final StatisticAnnotationMeasureRepository statisticAnnotationMeasureRepository,
 
             final UsePairInstanceRepository usePairInstanceRepository,
+            final UseRankRelativeInstanceRepository useRankRelativeInstanceRepository,
+            final UseRankPairRepository useRankPairInstanceRepository,
+
             final WSSIMTagRepository wssimTagRepository,
             final WSSIMInstanceRepository wssimInstanceRepository,
             final LexSubInstanceRepository lexSubInstanceRepository,
@@ -236,7 +255,9 @@ public class CommonService {
             final UseRankJudgementRepository useRankJudgementRepository,
             final LexSubJudgementRepository lexSubJudgementRepository,
             final WSSIMJudgementRepository wssimJudgementRepository,
-            final UseRankJudgementApplicationService useRankJudgementApplicationService) {
+            final UseRankJudgementApplicationService useRankJudgementApplicationService,
+            final UseRankRelativeJudgementApplicationService useRankRelativeJudgementApplicationService,
+            final UseRankPairJudgementApplicationService useRankPairJudgementApplicationService) {
         this.userRepository = userRepository;
         this.projectRepository = projectRepository;
         this.annotatorRepository = annotatorRepository;
@@ -259,6 +280,9 @@ public class CommonService {
         this.statisticAnnotationMeasureRepository = statisticAnnotationMeasureRepository;
 
         this.usePairInstanceRepository = usePairInstanceRepository;
+        this.useRankRelativeInstanceRepository = useRankRelativeInstanceRepository;
+        this.useRankPairInstanceRepository = useRankPairInstanceRepository;
+
         this.wssimTagRepository = wssimTagRepository;
         this.wssimInstanceRepository = wssimInstanceRepository;
         this.lexSubInstanceRepository = lexSubInstanceRepository;
@@ -276,6 +300,8 @@ public class CommonService {
         this.lexSubJudgementRepository = lexSubJudgementRepository;
         this.wssimJudgementRepository = wssimJudgementRepository;
         this.useRankJudgementApplicationService = useRankJudgementApplicationService;
+        this.useRankRelativeJudgementApplicationService = useRankRelativeJudgementApplicationService;
+        this.useRankPairJudgementApplicationService = useRankPairJudgementApplicationService;
     }
 
     // Methods
@@ -533,6 +559,10 @@ public class CommonService {
             return this.findUseRankInstanceByPhase(phase).stream()
                     .map(IInstance.class::cast).collect(Collectors.toList());
         }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK_RELATIVE.name())) {
+            return this.findUseRankInstanceByPhase(phase).stream()
+                    .map(IInstance.class::cast).collect(Collectors.toList());
+        }
         if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             if (!additional)
                 return this.findWSSIMInstanceByPhase(phase).stream()
@@ -563,6 +593,12 @@ public class CommonService {
         }
         if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
             return this.countUseRankInstanceByPhase(phase);
+        }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK_RELATIVE.name())) {
+            return this.countUseRankRelativeInstanceByPhase(phase);
+        }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK_PAIR.name())) {
+            return this.countUseRankPairInstanceByPhase(phase);
         }
         if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             if (!additional)
@@ -637,6 +673,41 @@ public class CommonService {
                 .getTotalElements();
     }
 
+    /**
+     * Get number of use rank relative instances for a given phase.
+     *
+     * @param phase The phase.
+     * @return The number of {@link UseRankInstance} for the given phase.
+     */
+    public long countUseRankRelativeInstanceByPhase(final Phase phase) {
+        final Query query = new UseRankRelativeInstanceQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+        return this.useRankRelativeInstanceRepository.findByQueryPaged(query, new PageRequestWraper(1, 0, null))
+                .getTotalElements();
+    }
+
+
+    /**
+     * Get number of use rank pair instances for a given phase.
+     *
+     * @param phase The phase.
+     * @return The number of {@link UseRankInstance} for the given phase.
+     */
+    public long countUseRankPairInstanceByPhase(final Phase phase) {
+        final Query query = new UseRankPairInstanceQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+        return this.useRankPairInstanceRepository.findByQueryPaged(query, new PageRequestWraper(1, 0, null))
+                .getTotalElements();
+    }
+
+
+
 
     /**
      * Get all use rank instances for a given phase.
@@ -652,6 +723,37 @@ public class CommonService {
                 .build();
         return this.useRankRepository.findByQuery(query);
     }
+
+    /**
+     * Get all use rank instances for a given phase.
+     *
+     * @param phase The phase.
+     * @return A list of all {@link UseRankInstance} for the given phase.
+     */
+    public List<UseRankRelativeInstance> findUseRankRelativeInstanceByPhase(final Phase phase) {
+        final Query query = new UseRankRelativeInstanceQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+        return this.useRankRelativeInstanceRepository.findByQuery(query);
+    }
+
+    /**
+     * Get all use rank instances for a given phase.
+     *
+     * @param phase The phase.
+     * @return A list of all {@link UseRankInstance} for the given phase.
+     */
+    public List<UseRankPairInstance> findUseRankPairInstanceByPhase(final Phase phase) {
+        final Query query = new UseRankPairInstanceQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+        return this.useRankPairInstanceRepository.findByQuery(query);
+    }
+
 
     /**
      * Delete all use rank instances for a given phase.
@@ -840,6 +942,15 @@ public class CommonService {
     public long countJudgementsOfPhase(final Phase phase) {
         if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             return this.usePairJudgementApplicationService.findByPhase(phase, 1, 0, null).getTotalElements();
+        }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
+            return this.useRankJudgementApplicationService.findByPhase(phase, 1, 0, null).getTotalElements();
+        }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK_RELATIVE.name())) {
+            return this.useRankRelativeJudgementApplicationService.findByPhase(phase, 1, 0, null).getTotalElements();
+        }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK_PAIR.name())) {
+            return this.useRankPairJudgementApplicationService.findByPhase(phase, 1, 0, null).getTotalElements();
         }
         if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             return this.wssimJudgementApplicationService.findByPhase(phase, 1, 0, null).getTotalElements();

@@ -163,7 +163,7 @@ public class PhaseApplicationService {
 
         final Phase phaseEntity = this.commonService.getPhase(owner, project, phase);
 
-        this.validationService.phaseAnnotationAccess(requester, phaseEntity);
+            this.validationService.phaseAnnotationAccess(requester, phaseEntity);
 
         return true;
     }
@@ -226,6 +226,7 @@ public class PhaseApplicationService {
                         sampling,
                         command.getDescription(),
                         command.getTaskhead(),
+                        command.getInstancePerSample(),
                         command.isTutorial(),
                         statisticAnnotationMeasure,
                         annotationAgreement));

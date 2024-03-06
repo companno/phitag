@@ -55,15 +55,6 @@ const ProjectTabBar: React.FC<{}> = ({}) => {
             });
     }
 
-    const editProject = () => {
-        const router = useRouter();
-        const { user: username, project: projectname } = router.query as { user: string, project: string };
-
-        const project = useFetchProject(username, projectname, router.isReady);
-        console.log(project)
-
-    }
-
     return (
         <div className="w-full flex flex-col 2xl:flex-row justify-between">
 

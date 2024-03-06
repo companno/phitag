@@ -2,20 +2,16 @@
 import Head from 'next/head'
 import Image from "next/image";
 import Link from "next/link";
-import path from 'path'
 
 // Images
-import prolific from "../../../../../../../public/image/prolific.png";
-import tags24x7 from "../../../../../../../public/image/tags24x7.png";
+import prolific from "../../../../../../../public/image/prolific-logo.png"
+import tags24x7 from "../../../../../../../public/image/tags24x7-logo.png";
 
 
 // Custom Components
 import BasicNavbar from '../../../../../../../components/specific/navbar/basicnavbar';
 import BasicFooter from '../../../../../../../components/specific/navbar/basicfooter';
-import { useRef } from 'react'
-import logo from "../public/image/logo.png";
-import BasicLayout from '../../../../../../../components/generic/layout/basiclayout';
-import CenteredLayout from '../../../../../../../components/generic/layout/centeredlayout';
+
 import Router, { useRouter } from 'next/router';
 
 

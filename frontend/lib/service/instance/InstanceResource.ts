@@ -26,6 +26,10 @@ import { error } from "console";
 import { toast } from "react-toastify";
 import UseRankInstanceDto from "../../model/instance/userankinstance/dto/UseRankInstanceDto";
 import PagedUseRankInstance from "../../model/instance/userankinstance/model/PagedUseRankInstance";
+import UseRankRelativeInstanceDto from "../../model/instance/userankreltiveinstance/dto/UseRankRelativeInstanceDto";
+import PagedUseRankRelativeInstance from "../../model/instance/userankreltiveinstance/model/PagedUseRankRelativeInstance";
+import UseRankPairInstanceDto from "../../model/instance/userankpairinstance/dto/UseRankPairInstanceDto";
+import PagedUseRankPairInstance from "../../model/instance/userankpairinstance/model/PagedUseRankPageInstance";
 
 /**
  * Returns all instances of a phase
@@ -124,6 +128,73 @@ export function useFetchPagedUseRankInstance(owner: string, project: string, pha
         mutate: mutate
     }
 }
+
+/**
+ * Returns all use rank relatve instances of a phase as a page.
+ * 
+ * @param owner owner of the project
+ * @param project project name
+ * @param phase phase name in the project
+ * @param constructor data class to be converted to (implements fromDto, i.e. the convertion function)
+ * @param additional if additional data should be fetched (e.g. wssim )
+ * 
+ * @param page page number
+ * @param fetch if data should be fetched
+ * @returns paged list of all instances
+ */
+export function useFetchPagedUseRankRelativeInstance(owner: string, project: string, phase: string, page: number = 0, fetch: boolean = true) {
+    const { get } = useStorage();
+    const token = get('JWT') ?? '';
+
+    const queryPhaseDataFetcher = (url: string) => axios.get<PagedGenericDto<UseRankRelativeInstanceDto>>(url, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(res => res.data)
+
+    const { data, error, mutate } = useSWR(fetch ? `${BACKENDROUTES.INSTANCE}/paged?owner=${owner}&project=${project}&phase=${phase}&additional=${false}&page=${page}` : null, queryPhaseDataFetcher)
+
+    return {
+        data: data ? PagedUseRankRelativeInstance.fromDto(data) : PagedUseRankRelativeInstance.empty(),
+        isLoading: !error && !data,
+        isError: error,
+        mutate: mutate
+    }
+}
+
+/**
+ * Returns all use rank pair instances of a phase as a page.
+ * 
+ * @param owner owner of the project
+ * @param project project name
+ * @param phase phase name in the project
+ * @param constructor data class to be converted to (implements fromDto, i.e. the convertion function)
+ * @param additional if additional data should be fetched (e.g. wssim )
+ * 
+ * @param page page number
+ * @param fetch if data should be fetched
+ * @returns paged list of all instances
+ */
+export function useFetchPagedUseRankPairInstance(owner: string, project: string, phase: string, page: number = 0, fetch: boolean = true) {
+    const { get } = useStorage();
+    const token = get('JWT') ?? '';
+
+    const queryPhaseDataFetcher = (url: string) => axios.get<PagedGenericDto<UseRankPairInstanceDto>>(url, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(res => res.data)
+
+    const { data, error, mutate } = useSWR(fetch ? `${BACKENDROUTES.INSTANCE}/paged?owner=${owner}&project=${project}&phase=${phase}&additional=${false}&page=${page}` : null, queryPhaseDataFetcher)
+    return {
+        data: data ? PagedUseRankPairInstance.fromDto(data) : PagedUseRankPairInstance.empty(),
+        isLoading: !error && !data,
+        isError: error,
+        mutate: mutate
+    }
+}
+
+
 
 /**
  * Returns all WSSIM instances of a phase as a page.

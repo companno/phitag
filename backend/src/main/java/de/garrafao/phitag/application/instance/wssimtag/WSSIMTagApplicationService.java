@@ -1,15 +1,14 @@
 package de.garrafao.phitag.application.instance.wssimtag;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.transaction.Transactional;
-
+import de.garrafao.phitag.domain.core.Query;
+import de.garrafao.phitag.domain.error.CsvParseException;
+import de.garrafao.phitag.domain.instance.wssimtag.WSSIMTag;
+import de.garrafao.phitag.domain.instance.wssimtag.WSSIMTagRepository;
+import de.garrafao.phitag.domain.instance.wssimtag.error.WSSIMTagAlreadyExistsException;
+import de.garrafao.phitag.domain.instance.wssimtag.error.WSSIMTagNotFoundException;
+import de.garrafao.phitag.domain.instance.wssimtag.page.WSSIMTagPageBuilder;
+import de.garrafao.phitag.domain.instance.wssimtag.query.WSSIMTagQueryBuilder;
+import de.garrafao.phitag.domain.phase.Phase;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -20,15 +19,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import de.garrafao.phitag.domain.instance.wssimtag.page.WSSIMTagPageBuilder;
-import de.garrafao.phitag.domain.core.Query;
-import de.garrafao.phitag.domain.error.CsvParseException;
-import de.garrafao.phitag.domain.instance.wssimtag.WSSIMTag;
-import de.garrafao.phitag.domain.instance.wssimtag.WSSIMTagRepository;
-import de.garrafao.phitag.domain.instance.wssimtag.error.WSSIMTagAlreadyExistsException;
-import de.garrafao.phitag.domain.instance.wssimtag.error.WSSIMTagNotFoundException;
-import de.garrafao.phitag.domain.instance.wssimtag.query.WSSIMTagQueryBuilder;
-import de.garrafao.phitag.domain.phase.Phase;
+import javax.transaction.Transactional;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class WSSIMTagApplicationService {
@@ -258,5 +252,7 @@ public class WSSIMTagApplicationService {
             throw new WSSIMTagAlreadyExistsException();
         }
     }
+
+
 
 }

@@ -20,9 +20,6 @@ export default class Phase implements SelectableItem {
     private readonly code: string;
 
 
-
-
-
     private readonly status: string;
 
     private readonly tutorialrequirements: Array<Pair<string, boolean>>;

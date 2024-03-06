@@ -1,11 +1,11 @@
 package de.garrafao.phitag.application.instance.usepairinstance.data;
 
-import java.util.List;
-
 import de.garrafao.phitag.application.instance.data.IInstanceDto;
 import de.garrafao.phitag.application.phitagdata.usage.data.UsageDto;
 import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstance;
 import lombok.Getter;
+
+import java.util.List;
 
 @Getter
 public class UsePairInstanceDto implements IInstanceDto {
@@ -18,7 +18,7 @@ public class UsePairInstanceDto implements IInstanceDto {
     private final List<String> labelSet;
     private final String nonLabel;
 
-    private UsePairInstanceDto(
+    public UsePairInstanceDto(
             final UsePairInstanceIdDto id,
             final UsageDto firstusage,
             final UsageDto secondusage,

@@ -10,7 +10,12 @@ export default interface UseRankInstanceDto extends IInstanceDto {
     readonly secondusage: UsageDto;
     readonly thirdusage: UsageDto;
     readonly fourthusage: UsageDto;
-
+    readonly fifthusage: UsageDto;
+    readonly sixthusage: UsageDto;
+    readonly seventhusage: UsageDto;
+    readonly eightusage: UsageDto;
+    readonly ninthusage: UsageDto;
+    readonly tenthusage: UsageDto;
 
     readonly labelSet: Array<string>;
     readonly nonLabel: string;

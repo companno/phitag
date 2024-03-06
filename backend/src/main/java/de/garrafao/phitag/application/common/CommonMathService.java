@@ -1,25 +1,16 @@
 package de.garrafao.phitag.application.common;
 
-import java.util.List;
-
+import de.garrafao.phitag.application.common.error.AgreementStatisticException;
+import de.garrafao.phitag.domain.statistic.statisticannotationmeasure.StatisticAnnotationMeasureEnum;
 import org.dkpro.statistics.agreement.IAgreementMeasure;
 import org.dkpro.statistics.agreement.InsufficientDataException;
-import org.dkpro.statistics.agreement.coding.CodingAnnotationStudy;
-import org.dkpro.statistics.agreement.coding.CohenKappaAgreement;
-import org.dkpro.statistics.agreement.coding.FleissKappaAgreement;
-import org.dkpro.statistics.agreement.coding.HubertKappaAgreement;
-import org.dkpro.statistics.agreement.coding.KrippendorffAlphaAgreement;
-import org.dkpro.statistics.agreement.coding.PercentageAgreement;
-import org.dkpro.statistics.agreement.coding.RandolphKappaAgreement;
-import org.dkpro.statistics.agreement.coding.ScottPiAgreement;
+import org.dkpro.statistics.agreement.coding.*;
 import org.dkpro.statistics.agreement.distance.IntervalDistanceFunction;
 import org.dkpro.statistics.agreement.distance.NominalDistanceFunction;
-import org.dkpro.statistics.agreement.distance.OrdinalDistanceFunction;
 import org.dkpro.statistics.agreement.distance.RatioDistanceFunction;
 import org.springframework.stereotype.Service;
 
-import de.garrafao.phitag.application.common.error.AgreementStatisticException;
-import de.garrafao.phitag.domain.statistic.statisticannotationmeasure.StatisticAnnotationMeasureEnum;
+import java.util.List;
 
 /**
  * Service for common math operations for e.g. annotations
@@ -104,7 +95,9 @@ public class CommonMathService {
                 agreementMeasure = new KrippendorffAlphaAgreement(study, new NominalDistanceFunction());
                 break;
             case KRIPPENDORFF_ALPHA_ORDINAL:
-                agreementMeasure = new KrippendorffAlphaAgreement(study, new OrdinalDistanceFunction());
+                //agreementMeasure = new KrippendorffAlphaAgreement(study, new OrdinalDistanceFunction());
+                agreementMeasure = new KrippendorffAlphaAgreement(study, new OrdinalDistanceFunctionWithDoubles());
+
                 break;
             case KRIPPENDORFF_ALPHA_RATIO:
                 agreementMeasure = new KrippendorffAlphaAgreement(study, new RatioDistanceFunction());

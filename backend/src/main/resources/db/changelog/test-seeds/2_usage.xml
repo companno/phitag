@@ -42,6 +42,57 @@
             <column name="lemma" value="ball_nn" />
             <column name="phitaggroup" value="" />
         </insert>
+        <insert tableName="phitagusage">
+            <column name="dataid" value="3" />
+            <column name="projectname" value="project-0" />
+            <column name="ownername" value="user-0" />
+
+            <column name="context" value="The ball is green and white." />
+            <column name="indices_target_token" value="4:8" />
+            <column name="indices_target_sentence" value="0:16" />
+            <column name="lemma" value="ball_nn" />
+            <column name="phitaggroup" value="" />
+        </insert>
+
+        <insert tableName="phitagusage">
+            <column name="dataid" value="4" />
+            <column name="projectname" value="project-0" />
+            <column name="ownername" value="user-0" />
+
+            <column name="context" value="The ball is round." />
+            <column name="indices_target_token" value="4:8" />
+            <column name="indices_target_sentence" value="0:16" />
+            <column name="lemma" value="ball_nn" />
+            <column name="phitaggroup" value="" />
+        </insert>
+
+        <insert tableName="phitagusage">
+            <column name="dataid" value="5" />
+            <column name="projectname" value="project-0" />
+            <column name="ownername" value="user-0" />
+
+            <column name="context" value="The ball is red." />
+            <column name="indices_target_token" value="4:8" />
+            <column name="indices_target_sentence" value="0:16" />
+            <column name="lemma" value="ball_nn" />
+            <column name="phitaggroup" value="" />
+        </insert>
+
+        <insert tableName="phitagusage">
+            <column name="dataid" value="6" />
+            <column name="projectname" value="project-0" />
+            <column name="ownername" value="user-0" />
+
+            <column name="context" value="The ball is black ." />
+            <column name="indices_target_token" value="4:8" />
+            <column name="indices_target_sentence" value="0:16" />
+            <column name="lemma" value="ball_nn" />
+            <column name="phitaggroup" value="" />
+        </insert>
+
+
+
+
 
         <!-- Private Project -->
 
