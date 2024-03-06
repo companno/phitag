@@ -1,5 +1,5 @@
 class BACKENDROUTES {
-    private static BASE_URL = `http://localhost:8080`;
+    private static BASE_URL = `/phitag-backend`;
     private static API_VERSION = `/api/v1`;
 
     public static AUTHENTICATION = `${BACKENDROUTES.BASE_URL}${BACKENDROUTES.API_VERSION}/authentication`;
