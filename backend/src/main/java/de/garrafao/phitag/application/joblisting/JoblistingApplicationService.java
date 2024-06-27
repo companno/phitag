@@ -107,7 +107,7 @@ public class JoblistingApplicationService {
         this.validateCreateJoblistingCommand(command);
 
         this.joblistingRepository
-                .save(new Joblisting(command.getName(), project,command.getPhase(), command.isOpen(), command.getDescription()));
+                .save(new Joblisting(command.getName(), project, command.isOpen(), command.getDescription()));
     }
 
     /**
@@ -146,6 +146,7 @@ public class JoblistingApplicationService {
         } else {
             joblisting.getWaitinglist().add(requester);
         }
+
     }
 
     /**

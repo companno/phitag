@@ -16,6 +16,4 @@ public interface LexSubJudgementRepository {
     LexSubJudgement save(LexSubJudgement judgement);
 
     void delete(LexSubJudgement judgement);
-
-    void batchDelete(Iterable<LexSubJudgement> judgements);
 }

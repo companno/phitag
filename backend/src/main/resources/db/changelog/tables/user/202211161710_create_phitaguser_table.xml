@@ -32,9 +32,6 @@
             <column name="description" type="varchar">
                 <constraints unique="false" nullable="false" />
             </column>
-            <column name="prolific_id" type="varchar">
-                <constraints unique="false" nullable="true" />
-            </column>
 
             <column name="isbot" type="bool" defaultValueBoolean="false">
                 <constraints nullable="false" />
@@ -55,7 +52,6 @@
             <column name="credentials_non_expired" type="bool" defaultValueBoolean="true">
                 <constraints nullable="false" />
             </column>
-
         </createTable>
     </changeSet>
 </databaseChangeLog>

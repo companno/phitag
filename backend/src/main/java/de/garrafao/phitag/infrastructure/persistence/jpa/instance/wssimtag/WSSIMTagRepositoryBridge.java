@@ -44,5 +44,5 @@ public class WSSIMTagRepositoryBridge implements WSSIMTagRepository {
     public WSSIMTag save(WSSIMTag instanceData) {
         return this.wssimTagRepositoryJpa.save(instanceData);
     }
-
+    
 }

@@ -129,14 +129,7 @@ public class UserApplicationService {
         validateCreateCommand(command);
 
         final Set<Role> roles = new HashSet<>();
-        if (command.getProlific_id() != null
-                && !command.getProlific_id().isBlank()
-                && !command.getProlific_id().isEmpty()) {
-            roles.add(this.commonService.getRole(RoleEnum.ROLE_PROLIFIC.name()));
-        } else {
-            roles.add(this.commonService.getRole(RoleEnum.ROLE_USER.name()));
-
-        }
+        roles.add(this.commonService.getRole(RoleEnum.ROLE_USER.name()));
 
         final Visibility visibility = this.commonService.getVisibility(VisibilityEnum.VISIBILITY_PUBLIC.name());
         final Usecase usecase = this.commonService.getUsecase(command.getUsecase());
@@ -144,8 +137,8 @@ public class UserApplicationService {
         final Set<Language> languages = new HashSet<>();
         command.getLanguages().forEach(language -> languages.add(this.commonService.getLanguage(language)));
 
-        final User entity = this.userRepository.save(new User(command.getUsername(),command.getEmail(),
-                passwordEncoder.encode(command.getPassword()), roles, usecase, visibility, languages, command.getProlific_id()));
+        final User entity = this.userRepository.save(new User(command.getUsername(), command.getEmail(),
+                passwordEncoder.encode(command.getPassword()), roles, usecase, visibility, languages));
 
         this.userStatisticApplicationService.initializeUserStatistic(entity);
     }
@@ -169,7 +162,6 @@ public class UserApplicationService {
     // Validation methods
 
     private void validateCreateCommand(final CreateUserCommand command) {
-
         validationService.name(command.getUsername()).email(command.getEmail()).password(command.getPassword())
                 .languageSet(command.getLanguages());
 

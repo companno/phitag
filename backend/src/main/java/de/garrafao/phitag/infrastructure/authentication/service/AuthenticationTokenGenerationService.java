@@ -32,6 +32,7 @@ public class AuthenticationTokenGenerationService implements IAuthenticationToke
         Validate.notNull(jwtAuthenticationKey, "JwtAuthenticationKey must not be null");
 
         List<String> roles = user.getRoles().stream().map(Role::getName).toList();
+
         String token = Jwts.builder()
                 .setSubject(user.getUsername())
                 .claim("roles", roles)
@@ -41,6 +42,5 @@ public class AuthenticationTokenGenerationService implements IAuthenticationToke
 
         return new AuthenticationToken(token);
     }
-
 
 }

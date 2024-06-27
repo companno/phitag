@@ -13,7 +13,7 @@ import org.springframework.data.jpa.domain.Specification;
 import de.garrafao.phitag.domain.core.Query;
 import de.garrafao.phitag.domain.core.QueryComponent;
 import de.garrafao.phitag.domain.judgement.usepairjudgement.UsePairJudgement;
-import de.garrafao.phitag.domain.judgement.common.query.*;
+import de.garrafao.phitag.domain.judgement.usepairjudgement.query.*;
 import de.garrafao.phitag.infrastructure.persistence.jpa.core.SpecificationCombiner;
 
 public class UsePairJudgementQueryJpa implements Specification<UsePairJudgement> {

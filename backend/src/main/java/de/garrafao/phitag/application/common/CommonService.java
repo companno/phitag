@@ -1,10 +1,18 @@
 package de.garrafao.phitag.application.common;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import de.garrafao.phitag.application.annotationtype.data.AnnotationTypeEnum;
 import de.garrafao.phitag.application.authentication.AuthenticationApplicationService;
 import de.garrafao.phitag.application.judgement.lexsubjudgement.LexSubJudgementApplicationService;
 import de.garrafao.phitag.application.judgement.usepairjudgement.UsePairJudgementApplicationService;
-import de.garrafao.phitag.application.judgement.userankjudgement.UseRankJudgementApplicationService;
 import de.garrafao.phitag.application.judgement.wssimjudgement.WSSIMJudgementApplicationService;
 import de.garrafao.phitag.domain.annotationprocessinformation.AnnotationProcessInformation;
 import de.garrafao.phitag.domain.annotationprocessinformation.AnnotationProcessInformationRepository;
@@ -45,9 +53,6 @@ import de.garrafao.phitag.domain.instance.lexsub.query.LexSubInstanceQueryBuilde
 import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstance;
 import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstanceRepository;
 import de.garrafao.phitag.domain.instance.usepairinstance.query.UsePairInstanceQueryBuilder;
-import de.garrafao.phitag.domain.instance.userankinstance.UseRankInstance;
-import de.garrafao.phitag.domain.instance.userankinstance.UseRankRepository;
-import de.garrafao.phitag.domain.instance.userankinstance.query.UseRankInstanceQueryBuilder;
 import de.garrafao.phitag.domain.instance.wssiminstance.WSSIMInstance;
 import de.garrafao.phitag.domain.instance.wssiminstance.WSSIMInstanceRepository;
 import de.garrafao.phitag.domain.instance.wssiminstance.query.WSSIMInstanceQueryBuilder;
@@ -55,13 +60,6 @@ import de.garrafao.phitag.domain.instance.wssimtag.WSSIMTag;
 import de.garrafao.phitag.domain.instance.wssimtag.WSSIMTagRepository;
 import de.garrafao.phitag.domain.instance.wssimtag.query.WSSIMTagQueryBuilder;
 import de.garrafao.phitag.domain.judgement.IJudgement;
-import de.garrafao.phitag.domain.judgement.lexsubjudgement.LexSubJudgement;
-import de.garrafao.phitag.domain.judgement.lexsubjudgement.LexSubJudgementRepository;
-import de.garrafao.phitag.domain.judgement.usepairjudgement.UsePairJudgement;
-import de.garrafao.phitag.domain.judgement.usepairjudgement.UsePairJudgementRepository;
-import de.garrafao.phitag.domain.judgement.userankjudgement.UseRankJudgement;
-import de.garrafao.phitag.domain.judgement.userankjudgement.UseRankJudgementRepository;
-import de.garrafao.phitag.domain.judgement.wssimjudgement.WSSIMJudgementRepository;
 import de.garrafao.phitag.domain.language.Language;
 import de.garrafao.phitag.domain.language.LanguageRepository;
 import de.garrafao.phitag.domain.language.error.LanguageNotFoundException;
@@ -95,13 +93,6 @@ import de.garrafao.phitag.domain.user.error.UserNotExistsException;
 import de.garrafao.phitag.domain.visibility.Visibility;
 import de.garrafao.phitag.domain.visibility.VisibilityRepository;
 import de.garrafao.phitag.domain.visibility.error.VisibilityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * A service that provides common functionality used or commonly implemented by
@@ -158,22 +149,11 @@ public class CommonService {
 
     private final UsePairInstanceRepository usePairInstanceRepository;
 
-
-    private  final UseRankRepository useRankRepository;
     private final WSSIMTagRepository wssimTagRepository;
 
     private final WSSIMInstanceRepository wssimInstanceRepository;
 
     private final LexSubInstanceRepository lexSubInstanceRepository;
-
-    //Judgement Repository
-    private final UsePairJudgementRepository usePairJudgementRepository;
-
-    private final UseRankJudgementRepository useRankJudgementRepository;
-
-    private final LexSubJudgementRepository lexSubJudgementRepository;
-
-    private final WSSIMJudgementRepository wssimJudgementRepository;
 
     // Instance information repository
 
@@ -183,8 +163,6 @@ public class CommonService {
 
     private final UsePairJudgementApplicationService usePairJudgementApplicationService;
 
-    private final UseRankJudgementApplicationService useRankJudgementApplicationService;
-
     private final WSSIMJudgementApplicationService wssimJudgementApplicationService;
 
     private final LexSubJudgementApplicationService lexSubJudgementApplicationService;
@@ -192,7 +170,6 @@ public class CommonService {
     // Authentication application service
 
     private final AuthenticationApplicationService authenticationApplicationService;
-
 
     // Constructor
     @Autowired
@@ -223,20 +200,13 @@ public class CommonService {
             final WSSIMInstanceRepository wssimInstanceRepository,
             final LexSubInstanceRepository lexSubInstanceRepository,
 
-
             final AnnotationProcessInformationRepository annotationProcessInformationRepository,
 
             final UsePairJudgementApplicationService usePairJudgementApplicationService,
             final WSSIMJudgementApplicationService wssimJudgementApplicationService,
             final LexSubJudgementApplicationService lexSubJudgementApplicationService,
 
-            final AuthenticationApplicationService authenticationApplicationService,
-            final UseRankRepository useRankRepository,
-            final UsePairJudgementRepository usePairJudgementRepository,
-            final UseRankJudgementRepository useRankJudgementRepository,
-            final LexSubJudgementRepository lexSubJudgementRepository,
-            final WSSIMJudgementRepository wssimJudgementRepository,
-            final UseRankJudgementApplicationService useRankJudgementApplicationService) {
+            final AuthenticationApplicationService authenticationApplicationService) {
         this.userRepository = userRepository;
         this.projectRepository = projectRepository;
         this.annotatorRepository = annotatorRepository;
@@ -270,12 +240,6 @@ public class CommonService {
         this.lexSubJudgementApplicationService = lexSubJudgementApplicationService;
 
         this.authenticationApplicationService = authenticationApplicationService;
-        this.useRankRepository = useRankRepository;
-        this.usePairJudgementRepository = usePairJudgementRepository;
-        this.useRankJudgementRepository = useRankJudgementRepository;
-        this.lexSubJudgementRepository = lexSubJudgementRepository;
-        this.wssimJudgementRepository = wssimJudgementRepository;
-        this.useRankJudgementApplicationService = useRankJudgementApplicationService;
     }
 
     // Methods
@@ -529,10 +493,6 @@ public class CommonService {
             return this.findUsePairInstanceByPhase(phase).stream()
                     .map(IInstance.class::cast).collect(Collectors.toList());
         }
-        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
-            return this.findUseRankInstanceByPhase(phase).stream()
-                    .map(IInstance.class::cast).collect(Collectors.toList());
-        }
         if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             if (!additional)
                 return this.findWSSIMInstanceByPhase(phase).stream()
@@ -549,7 +509,6 @@ public class CommonService {
         return new ArrayList<>();
     }
 
-
     /**
      * Get the number of instances for a given phase.
      * 
@@ -560,9 +519,6 @@ public class CommonService {
     public long countInstancesOfPhase(final Phase phase, final boolean additional) {
         if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             return this.countUsePairInstanceByPhase(phase);
-        }
-        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
-            return this.countUseRankInstanceByPhase(phase);
         }
         if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             if (!additional)
@@ -593,19 +549,6 @@ public class CommonService {
     }
 
     /**
-     * Delete all use pair instances for a given phase.
-     *
-     * @param phase The phase..
-     */
-
-    public void deleteUsePairInstanceByPhase(final Phase phase){
-        final List<UsePairInstance> usePairInstances = this.findUsePairInstanceByPhase(phase);
-        if(!usePairInstances.isEmpty()){
-            this.usePairInstanceRepository.delete(usePairInstances);
-        }
-     }
-
-    /**
      * Get number of use pair instances for a given phase.
      * 
      * @param phase The phase.
@@ -619,51 +562,6 @@ public class CommonService {
                 .build();
         return this.usePairInstanceRepository.findByQueryPaged(query, new PageRequestWraper(1, 0, null))
                 .getTotalElements();
-    }
-
-    /**
-     * Get number of use rank instances for a given phase.
-     *
-     * @param phase The phase.
-     * @return The number of {@link UseRankInstance} for the given phase.
-     */
-    public long countUseRankInstanceByPhase(final Phase phase) {
-        final Query query = new UseRankInstanceQueryBuilder()
-                .withOwner(phase.getId().getProjectid().getOwnername())
-                .withProject(phase.getId().getProjectid().getName())
-                .withPhase(phase.getId().getName())
-                .build();
-        return this.useRankRepository.findByQueryPaged(query, new PageRequestWraper(1, 0, null))
-                .getTotalElements();
-    }
-
-
-    /**
-     * Get all use rank instances for a given phase.
-     *
-     * @param phase The phase.
-     * @return A list of all {@link UseRankInstance} for the given phase.
-     */
-    public List<UseRankInstance> findUseRankInstanceByPhase(final Phase phase) {
-        final Query query = new UseRankInstanceQueryBuilder()
-                .withOwner(phase.getId().getProjectid().getOwnername())
-                .withProject(phase.getId().getProjectid().getName())
-                .withPhase(phase.getId().getName())
-                .build();
-        return this.useRankRepository.findByQuery(query);
-    }
-
-    /**
-     * Delete all use rank instances for a given phase.
-     *
-     * @param phase The phase.
-     */
-    public void deleteUseRankInstanceByPhase(final Phase phase){
-        final List<UseRankInstance> useRankInstances = this.findUseRankInstanceByPhase(phase);
-        if(!useRankInstances.isEmpty()){
-            this.useRankRepository.delete(useRankInstances);
-
-        }
     }
 
     /**
@@ -697,9 +595,6 @@ public class CommonService {
                 .getTotalElements();
     }
 
-
-
-
     /**
      * Get all WSSIMTags for a given phase.
      * 
@@ -730,9 +625,6 @@ public class CommonService {
         return this.wssimTagRepository.findByQueryPaged(query, new PageRequestWraper(1, 0, null))
                 .getTotalElements();
     }
-
-
-
 
     /**
      * Get all LexSub instances for a given phase.
@@ -767,7 +659,6 @@ public class CommonService {
                 .getTotalElements();
     }
 
-
     /**
      * Get all judgements for a given phase.
      * 
@@ -779,10 +670,6 @@ public class CommonService {
             return this.usePairJudgementApplicationService.findByPhase(phase).stream()
                     .map(IJudgement.class::cast).collect(Collectors.toList());
         }
-        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
-            return this.useRankJudgementApplicationService.findByPhase(phase).stream()
-                    .map(IJudgement.class::cast).collect(Collectors.toList());
-        }
         if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             return this.wssimJudgementApplicationService.findByPhase(phase).stream()
                     .map(IJudgement.class::cast).collect(Collectors.toList());
@@ -790,42 +677,6 @@ public class CommonService {
         if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
             return this.lexSubJudgementApplicationService.findByPhase(phase).stream()
                     .map(IJudgement.class::cast).collect(Collectors.toList());
-        }
-
-        return new ArrayList<>();
-    }
-
-    /**
-     * Delete all judgements for a given phase.
-     *
-     * @param phase The phase.
-
-     */
-    public List<IJudgement> deleteAllJudgementOfPhase(final Phase phase) {
-        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
-          final List<UsePairJudgement> judgements = this.usePairJudgementApplicationService.findByPhase(phase);
-          if(!judgements.isEmpty()){
-              this.usePairJudgementRepository.batchDelete(judgements);
-          }
-        }
-        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USERANK.name())) {
-            final List<UseRankJudgement> judgements = this.useRankJudgementApplicationService.findByPhase(phase);
-            if (!judgements.isEmpty()) {
-                this.useRankJudgementRepository.batchDelete(judgements);
-            }
-        }
-
-        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
-            final List<UseRankJudgement> judgements = this.useRankJudgementApplicationService.findByPhase(phase);
-            if(!judgements.isEmpty()){
-                this.useRankJudgementRepository.batchDelete(judgements);
-            }
-        }
-        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_LEXSUB.name())) {
-           final List<LexSubJudgement> judgements = this.lexSubJudgementApplicationService.findByPhase(phase);
-           if(!judgements.isEmpty()){
-               this.lexSubJudgementRepository.batchDelete(judgements);
-           }
         }
 
         return new ArrayList<>();

@@ -8,7 +8,7 @@ import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 
 // icons
-import { FiCreditCard, FiEdit2, FiEdit3, FiFeather, FiGlobe, FiLayers, FiSliders, FiUnderline } from "react-icons/fi";
+import { FiEdit2, FiFeather, FiGlobe, FiLayers, FiSliders, FiUnderline } from "react-icons/fi";
 import AnnotationType from "../../../lib/model/annotationtype/model/AnnotationType";
 
 // models
@@ -27,7 +27,6 @@ import { useFetchAllSamplingMethods } from "../../../lib/service/sampling/Sampli
 import Sampling from "../../../lib/model/sampling/model/Sampling";
 import { useFetchAllStatisticAnnotationMeasureResource } from "../../../lib/service/statistic/statistisannotationmeasure/StatisticAnnotationMeasureResource";
 import StatisticAnnotationMeasure from "../../../lib/model/statistic/statisticannotationmeasure/model/StatisticAnnotationMeasure";
-import HelpButton from "../../generic/button/helpbutton";
 
 const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function, project: Project, mutateCallback: Function }> = ({ isOpen, closeModalCallback, project, mutateCallback }) => {
 
@@ -48,7 +47,6 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
         agreementStrategy: null as unknown as StatisticAnnotationMeasure,
         threshold: 0,
         description: "",
-        taskhead: ""
     })
 
     const onConfirm = () => {
@@ -68,7 +66,6 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
                         agreementStrategy: null as unknown as StatisticAnnotationMeasure,
                         threshold: 0,
                         description: "",
-                        taskhead: ""
                     });
                     mutateCallback();
                     closeModalCallback();
@@ -92,7 +89,6 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
             agreementStrategy: null as unknown as StatisticAnnotationMeasure,
             threshold: 0,
             description: "",
-            taskhead: ""
         });
         closeModalCallback();
     }
@@ -108,7 +104,7 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
 
             <div className="fixed z-10 inset-0 overflow-y-auto">
                 <div className="flex items-center justify-center min-h-full">
-                    <div className="relative bg-white overflow-hidden shadow-md py-4 px-8  max-w-xl w-full"   style={{ maxHeight: "80vh", overflowY: "auto" }}  onClick={(e: any) => e.stopPropagation()}>
+                    <div className="relative bg-white overflow-hidden shadow-md py-4 px-8  max-w-xl w-full" onClick={(e: any) => e.stopPropagation()}>
                         <div className="mx-4">
                             <div className="flex flex-col items-left mt-6">
                                 <div className="font-black text-xl">
@@ -219,25 +215,6 @@ const CreatePhaseModal: React.FC<{ isOpen: boolean, closeModalCallback: Function
                                             })} />
                                     </div>
                                 </div>
-                                <div className="flex flex-col items-left my-6">
-                                    <div className="font-bold text-lg">
-                                        Task Head
-                                    </div>
-                                    <div className="flex items-center border-b-2 py-2 px-3 mt-2">
-                                        <FiEdit3 className='basic-svg' />
-                                        <input
-                                            id="taskhead"
-                                            name="taskhead"
-                                            className="pl-3 flex flex-auto outline-none border-none"
-                                            placeholder="Task Heading"
-                                            type={"text"}
-                                            value={modalState.taskhead}
-                                            onChange={(e: any) => setModalState({
-                                                ...modalState,
-                                                taskhead: e.target.value
-                                            })} />
-                                    </div>
-                                </div>
 
                                 <div className="flex flex-col items-left my-6">
                                     <div className="font-bold text-lg">
@@ -281,7 +258,6 @@ function validateAndCreatePhase(project: Project, modalState: {
     agreementStrategy: StatisticAnnotationMeasure;
     threshold: number;
     description: string;
-    taskhead: string;
 }): CreatePhaseCommand | null {
     if (project === undefined || project === null) {
         toast.warning("Project is undefined. This should not happen. Please try again later.");
@@ -317,7 +293,6 @@ function validateAndCreatePhase(project: Project, modalState: {
         modalState.isTutorial,
         modalState.agreementStrategy ? modalState.agreementStrategy.getId() : "",
         modalState.threshold,
-        modalState.description,
-        modalState.taskhead
+        modalState.description
     );
 }

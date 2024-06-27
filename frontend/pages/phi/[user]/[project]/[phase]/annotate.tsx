@@ -14,7 +14,6 @@ import SingleContentLayout from "../../../../../components/generic/layout/single
 import LinkHead from "../../../../../components/generic/linker/linkhead";
 import FullLoadingPage from "../../../../../components/pages/fullloadingpage";
 import UsePairAnnotation from "../../../../../components/specific/annotation/usepair/usepairannotation";
-import UseRankAnnotation from "../../../../../components/specific/annotation/userank/usernakannotation";
 import WSSIMAnnotation from "../../../../../components/specific/annotation/wssim/wssimannotation";
 import ANNOTATIONTYPES from "../../../../../lib/AnnotationTypes";
 
@@ -106,48 +105,6 @@ const AnnotatePage: NextPage = () => {
             </Layout>
         );
     }
-
-    if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_USERANK) {
-        return (
-            <Layout>
-
-                <Head>
-                    <title>PhiTag : {phase.phase.getName()} : Annotate </title>
-                </Head>
-
-                <SingleContentLayout>
-
-                    <LinkHead icon={<FiEdit3 className="stroke-2" />}
-                        links={[
-                            {
-                                href: `/phi/${username}`,
-                                name: username,
-                            },
-                            {
-                                href: `/phi/${username}/${projectname}`,
-                                name: projectname,
-                            },
-                            {
-                                href: `/phi/${username}/${projectname}/${phasename}`,
-                                name: phasename,
-                            },
-                            {
-                                href: `/phi/${username}/${projectname}/${phasename}/annotate`,
-                                name: "Annotate",
-                            }
-                        ]}
-                    />
-
-
-                    <div className="mt-2 xl:mt-10">
-                        <UseRankAnnotation phase={phase.phase} />
-                    </div>
-
-                </SingleContentLayout>
-            </Layout>
-        );
-    }
-
 
     if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_WSSIM) {
         return (

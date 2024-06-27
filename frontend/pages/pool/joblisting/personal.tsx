@@ -185,6 +185,7 @@ const PersonalJoblistingPage: NextPage = () => {
                     }
                 </div>
             </ContentLayout>
+
             <CreateJoblistingModal isOpen={createModalState.isOpen} closeModalCallback={closeCreateModalCallback} mutateCallback={joblisting.mutate} />
 
             <AddUserFromWaitingListModal isOpen={addModalState.isOpen} closeModalCallback={closeAddModalCallback} joblisting={addModalState.joblisting} mutateCallback={() => {}} />

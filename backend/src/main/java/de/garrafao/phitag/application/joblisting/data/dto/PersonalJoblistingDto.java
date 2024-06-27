@@ -12,17 +12,15 @@ public class PersonalJoblistingDto {
     private final JoblistingIdDto id;
 
     private final String displayname;
-    private final String phase;
 
     private final boolean open;
     private final String description;
     private final List<String> waitinglist; // usernames
 
-    private PersonalJoblistingDto(final JoblistingIdDto id, final String displayname, final String phase, final boolean open, final String description,
+    private PersonalJoblistingDto(final JoblistingIdDto id, final String displayname, final boolean open, final String description,
             final List<String> waitinglist) {
         this.id = id;
         this.displayname = displayname;
-        this.phase = phase;
         this.open = open;
         this.description = description;
         this.waitinglist = waitinglist;
@@ -33,8 +31,7 @@ public class PersonalJoblistingDto {
                 .collect(Collectors.toList());
         return new PersonalJoblistingDto(
                 JoblistingIdDto.from(joblisting.getId()),
-                joblisting.getDisplayname(),
-                joblisting.getPhase(),
+                joblisting.getDisplayname(),                
                 joblisting.isOpen(),
                 joblisting.getDescription(),
                 waitinglist);

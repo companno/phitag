@@ -46,9 +46,4 @@ public class LexSubInstanceRepositoryBridge implements LexSubInstanceRepository 
         return this.lexSubInstanceRepositoryJpa.save(instanceData);
     }
 
-    @Override
-    public void delete(Iterable<LexSubInstance> instanceData) {
-        this.lexSubInstanceRepositoryJpa.deleteInBatch(instanceData);
-    }
-
 }

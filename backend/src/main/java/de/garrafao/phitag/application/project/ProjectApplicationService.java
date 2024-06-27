@@ -1,14 +1,19 @@
 package de.garrafao.phitag.application.project;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import de.garrafao.phitag.application.statistics.annotatostatistic.AnnotatorStatisticApplicationService;
+import de.garrafao.phitag.application.statistics.projectstatic.ProjectStatisticApplicationService;
+import de.garrafao.phitag.application.statistics.userstatistic.UserStatisticApplicationService;
 import de.garrafao.phitag.application.common.CommonService;
 import de.garrafao.phitag.application.entitlement.data.EntitlementEnum;
 import de.garrafao.phitag.application.project.data.CreateProjectCommand;
 import de.garrafao.phitag.application.project.data.ProjectDto;
 import de.garrafao.phitag.application.project.data.ProjectNameRestrictionEnum;
-import de.garrafao.phitag.application.project.data.UpdateProjectCommand;
-import de.garrafao.phitag.application.statistics.annotatostatistic.AnnotatorStatisticApplicationService;
-import de.garrafao.phitag.application.statistics.projectstatic.ProjectStatisticApplicationService;
-import de.garrafao.phitag.application.statistics.userstatistic.UserStatisticApplicationService;
 import de.garrafao.phitag.application.validation.ValidationService;
 import de.garrafao.phitag.application.visibility.data.VisibilityEnum;
 import de.garrafao.phitag.domain.annotator.Annotator;
@@ -25,11 +30,6 @@ import de.garrafao.phitag.domain.project.error.ProjectNameRestrictionException;
 import de.garrafao.phitag.domain.project.query.ProjectQueryBuilder;
 import de.garrafao.phitag.domain.user.User;
 import de.garrafao.phitag.domain.visibility.Visibility;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 public class ProjectApplicationService {
@@ -53,7 +53,6 @@ public class ProjectApplicationService {
     private final CommonService commonService;
 
     private final ValidationService validationService;
-
 
     // Other
 
@@ -96,8 +95,8 @@ public class ProjectApplicationService {
     /**
      * Get public projects of a user
      * 
-     * @param authenticationToken fetch user information from authentication token
-     * @param owner owner of the project
+     * @param authenticationToken
+     * @param owner
      * @return list of {@ProjectDto}
      */
     public List<ProjectDto> getPublicProjectOfUserDtos(final String authenticationToken, final String owner) {
@@ -202,37 +201,10 @@ public class ProjectApplicationService {
     }
 
     /**
-     * Update a project.
-     *
-     * @param authenticationToken the authentication token of the requesting user
-     * @param command fields which user want to update
-     * @param owner  owner of the project
-     * @param project name of the project which user owner want to update
-
-     */
-
-    @Transactional
-    public void update(final String authenticationToken,final String project, final String owner, UpdateProjectCommand command){
-
-        //fetching user information
-        final User requester = this.commonService.getUserByAuthenticationToken(authenticationToken);
-
-        //check project is exist or not
-        final Project existingProject = this.commonService.getProject(owner, project);
-
-        //checking user has right to  update a project or not
-        this.validationService.projectAccess(requester, existingProject);
-
-        //Update the project
-       this.validateUpdateCommand(existingProject, command);
-    }
-
-
-    /**
      * Delete a project.
      * 
-     * @param authenticationToken fetching user information form authentication token
-     * @param  projectName name of project
+     * @param authenticationToken
+     * @param command
      */
     @Transactional
     public void delete(final String authenticationToken, final String projectName) {
@@ -244,25 +216,9 @@ public class ProjectApplicationService {
         } catch (Exception e) {
             throw new AccessDenidedException("Only the owner of a project can delete it.");
         }
-     /*   final List<Phase> phases = this.commonService.getPhasesOfProject(project);
-        final List<Annotator> annotators = this.commonService.getAnnotatorsOfProject(owner.getUsername(), projectName);
-        if (!phases.isEmpty() && !annotators.isEmpty()) {
-            for (Phase phase : phases) {
-                this.phaseApplicationService.deletePhase(authenticationToken, owner.getUsername(), project.getId().getName(),
-                        phase.getDisplayname());
-            }
-
-            for (Annotator annotator : annotators) {
-               this.annotatorRepository.delete(annotator);
-            }
-        }**/
 
         this.projectRepository.delete(project);
     }
-
-
-
-
 
     // Validators
 
@@ -281,27 +237,6 @@ public class ProjectApplicationService {
 
         if (ProjectNameRestrictionEnum.contains(command.getName().toLowerCase())) {
             throw new ProjectNameRestrictionException();
-        }
-
-    }
-
-    private void validateUpdateCommand(final Project project, final UpdateProjectCommand command){
-        if (command.getNewname() != null && !command.getNewname().isEmpty() && !command.getNewname().isBlank()) {
-            project.setDisplayname(command.getNewname());
-        }
-        if (command.getNewdescription() != null && !command.getNewdescription().isEmpty() && !command.getNewdescription().isBlank()) {
-            project.setDescription(command.getNewdescription());
-        }
-        if(command.getLanguage() != null && !command.getLanguage().isEmpty() && !command.getLanguage().isBlank()){
-            Language language = this.commonService.getLanguage(command.getLanguage());
-            project.setLanguage(language);
-        }
-        if(command.getVisibility() !=null && !command.getVisibility().isEmpty() && !command.getVisibility().isBlank()){
-            Visibility visibility = this.commonService.getVisibility(command.getVisibility());
-            project.setVisibility(visibility);
-        }
-        if (command.getActive() != null) {
-            project.setActive(command.getActive());
         }
 
     }

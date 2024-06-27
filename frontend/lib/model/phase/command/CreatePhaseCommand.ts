@@ -12,15 +12,12 @@ export default class CreatePhaseCommand {
     private readonly threshold: number;
 
     private readonly description: string;
-    private readonly taskhead: string;
-
 
     constructor (
         name: string, owner: string, project: string, 
         annotationType: string, sampling: string, 
         tutorial: boolean, annotationAgreement: string, threshold: number,
-        description: string,
-        taskhead: string) {
+        description: string) {
         this.name = name;
         this.owner = owner;
         this.project = project;
@@ -33,7 +30,6 @@ export default class CreatePhaseCommand {
         this.threshold = threshold;
 
         this.description = description;
-        this.taskhead = taskhead;
     }
 
 

@@ -19,5 +19,4 @@ public interface ProjectRepository {
     Project save(Project project);
 
     void delete(Project project);
-
 }

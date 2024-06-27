@@ -151,6 +151,7 @@ const JoblistingPage: NextPage = () => {
                         </div>
                     </div>
 
+
                     {
                         joblistings.isLoading ? <LoadingComponent /> :
                             <div className={"joblist-grid"}>

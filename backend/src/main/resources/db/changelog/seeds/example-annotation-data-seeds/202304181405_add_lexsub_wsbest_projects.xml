@@ -80,7 +80,6 @@
             <column name="projectname" value="Example-Project-LEXSUB"/>
             <column name="ownername" value="Example-User"/>
             <column name="displayname" value="Example-LEXSUB-Annotation-Joblisting"/>
-            <column name="phasename" value="Example-LEXSUB-Annotation-Joblisting"/>
             <column name="open" value="true"/>
             <column name="active" value="true"/>
             <column name="description" value="This is an example job listing for lexical substitution annotation. It is used to show how the job listing feature works."/>
@@ -91,7 +90,6 @@
             <column name="projectname" value="Example-Project-WSBEST"/>
             <column name="ownername" value="Example-User"/>
             <column name="displayname" value="Example-WSBEST-Annotation-Joblisting"/>
-            <column name="phasename" value="Example-LEXSUB-Annotation-Joblisting"/>
             <column name="open" value="true"/>
             <column name="active" value="true"/>
             <column name="description" value="This is an example job listing for WSBEST annotation. It is used to show how the job listing feature works."/>

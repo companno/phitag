@@ -4,8 +4,6 @@ public enum RoleEnum {
     
     ROLE_ADMIN("ROLE_ADMIN"),
     ROLE_USER("ROLE_USER"),
-    ROLE_PROLIFIC("ROLE_PROLIFIC"),
-
     ROLE_BOT("ROLE_BOT");
 
     private final String name;

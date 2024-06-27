@@ -1,12 +1,24 @@
 package de.garrafao.phitag.application.phase;
 
-import de.garrafao.phitag.application.common.CommonService;
-import de.garrafao.phitag.application.instance.InstanceApplicationService;
-import de.garrafao.phitag.application.judgement.JudgementApplicationService;
-import de.garrafao.phitag.application.phase.data.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import de.garrafao.phitag.application.statistics.annotatostatistic.AnnotatorStatisticApplicationService;
 import de.garrafao.phitag.application.statistics.phasestatistic.PhaseStatisticApplicationService;
 import de.garrafao.phitag.application.statistics.userstatistic.UserStatisticApplicationService;
+import de.garrafao.phitag.application.common.CommonService;
+import de.garrafao.phitag.application.phase.data.AddRequirementsCommand;
+import de.garrafao.phitag.application.phase.data.CreatePhaseCommand;
+import de.garrafao.phitag.application.phase.data.PhaseDto;
+import de.garrafao.phitag.application.phase.data.PhaseNameRestrictionEnum;
+import de.garrafao.phitag.application.phase.data.StartComputationalAnnotationCommand;
+import de.garrafao.phitag.application.phase.data.TutorialHistoryDto;
 import de.garrafao.phitag.application.validation.ValidationService;
 import de.garrafao.phitag.domain.annotationtype.AnnotationType;
 import de.garrafao.phitag.domain.annotator.Annotator;
@@ -15,7 +27,11 @@ import de.garrafao.phitag.domain.helper.Pair;
 import de.garrafao.phitag.domain.phase.Phase;
 import de.garrafao.phitag.domain.phase.PhaseRepository;
 import de.garrafao.phitag.domain.phase.data.PhaseStatusEnum;
-import de.garrafao.phitag.domain.phase.error.*;
+import de.garrafao.phitag.domain.phase.error.ComputationalAnnotationException;
+import de.garrafao.phitag.domain.phase.error.PhaseAlreadyExistsException;
+import de.garrafao.phitag.domain.phase.error.PhaseNameRestrictionException;
+import de.garrafao.phitag.domain.phase.error.PhaseUpdateException;
+import de.garrafao.phitag.domain.phase.error.TutorialException;
 import de.garrafao.phitag.domain.project.Project;
 import de.garrafao.phitag.domain.sampling.Sampling;
 import de.garrafao.phitag.domain.statistic.statisticannotationmeasure.StatisticAnnotationMeasure;
@@ -25,13 +41,6 @@ import de.garrafao.phitag.domain.status.TaskStatusEnum;
 import de.garrafao.phitag.domain.tasks.Task;
 import de.garrafao.phitag.domain.tasks.TaskRepository;
 import de.garrafao.phitag.domain.user.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PhaseApplicationService {
@@ -46,16 +55,11 @@ public class PhaseApplicationService {
 
     // Services
 
-    private final JudgementApplicationService judgementApplicationService;
-
-    private final InstanceApplicationService instanceApplicationService;
-
     private final UserStatisticApplicationService userStatisticApplicationService;
 
     private final AnnotatorStatisticApplicationService annotatorStatisticApplicationService;
 
     private final PhaseStatisticApplicationService phaseStatisticApplicationService;
-
 
     // Common services
 
@@ -71,8 +75,6 @@ public class PhaseApplicationService {
             final TaskRepository taskRepository,
             final TutorialAnnotationMeasureHistoryRepository tutorialAnnotationMeasureHistoryRepository,
 
-            final JudgementApplicationService judgementApplicationService,
-            final InstanceApplicationService instanceApplicationService,
             final UserStatisticApplicationService userStatisticApplicationService,
             final AnnotatorStatisticApplicationService annotatorStatisticApplicationService,
             final PhaseStatisticApplicationService phaseStatisticApplicationService,
@@ -81,8 +83,6 @@ public class PhaseApplicationService {
         this.phaseRepository = phaseRepository;
         this.taskRepository = taskRepository;
         this.tutorialAnnotationMeasureHistoryRepository = tutorialAnnotationMeasureHistoryRepository;
-        this.judgementApplicationService = judgementApplicationService;
-        this.instanceApplicationService = instanceApplicationService;
 
         this.userStatisticApplicationService = userStatisticApplicationService;
         this.annotatorStatisticApplicationService = annotatorStatisticApplicationService;
@@ -158,9 +158,7 @@ public class PhaseApplicationService {
      */
     public boolean hasAccessToAnnotate(final String authenticationToken, final String owner, final String project,
             final String phase) {
-
         final User requester = this.commonService.getUserByAuthenticationToken(authenticationToken);
-
         final Phase phaseEntity = this.commonService.getPhase(owner, project, phase);
 
         this.validationService.phaseAnnotationAccess(requester, phaseEntity);
@@ -225,7 +223,6 @@ public class PhaseApplicationService {
                         annotationType,
                         sampling,
                         command.getDescription(),
-                        command.getTaskhead(),
                         command.isTutorial(),
                         statisticAnnotationMeasure,
                         annotationAgreement));
@@ -237,46 +234,6 @@ public class PhaseApplicationService {
         this.phaseStatisticApplicationService.initializePhaseStatistic(entity);
 
     }
-    @Transactional
-    public void deletePhase(final String authenticationToken, final String owner,
-                            final String project, final String phase) {
-
-
-        final User user = this.commonService.getUserByAuthenticationToken(authenticationToken);
-        final Project projectEntity = this.commonService.getProject(owner, project);
-        this.validationService.projectAdminAccess(user, projectEntity);
-
-        final Phase phaseEntity = this.commonService.getPhase(owner, project, phase);
-
-
-        //possibilities of bugs, check later
-      /**  final  List<IJudgement> judgements = this.commonService.getJudgementsOfPhase(phaseEntity);
-        final  List<IInstance> instances = this.commonService.getInstancesOfPhase(phaseEntity, false);
-
-        if (!phaseEntity.getDisplayname().isEmpty()) {
-            if (!judgements.isEmpty()) {
-                this.commonService.deleteAllJudgementOfPhase(phaseEntity);
-            }
-            if (!instances.isEmpty()) {
-                this.commonService.deleteAllInstancesOfPhase(phaseEntity);
-            }*/
-        this.phaseRepository.delete(phaseEntity);
-
-
-    }
-
-    @Transactional
-    public void createCode(final String authenticationToken, final String owner, final String project,
-                           final String phase, final String code) {
-        final User requester = this.commonService.getUserByAuthenticationToken(authenticationToken);
-        final Project projectEntity = this.commonService.getProject(owner, project);
-        final Phase phaseEntity = this.commonService.getPhase(owner, project, phase);
-        this.validationService.projectAccess(requester, projectEntity);
-
-        if(phaseEntity!=null){
-            phaseEntity.setCode(code);
-        }
-    }
 
     /**
      * Close Phase
@@ -287,7 +244,7 @@ public class PhaseApplicationService {
      * @param phase               The name of the phase.
      */
     @Transactional
-    public void updatePhaseStatus(final String authenticationToken, final String owner, final String project,
+    public void close(final String authenticationToken, final String owner, final String project,
             final String phase) {
         final User requester = this.commonService.getUserByAuthenticationToken(authenticationToken);
         final Project projectEntity = this.commonService.getProject(owner, project);
@@ -299,13 +256,13 @@ public class PhaseApplicationService {
             throw new TutorialException("Tutorial phase can not be closed.");
         }
 
-        if(phaseEntity.getStatus().equals(PhaseStatusEnum.CLOSED.name())){
-            phaseEntity.setStatus(PhaseStatusEnum.OPEN);
+        if (phaseEntity.getStatus().equals(PhaseStatusEnum.CLOSED.name())) {
+            throw new PhaseUpdateException("Phase is already closed.");
         }
-        else {
-            phaseEntity.setStatus(PhaseStatusEnum.CLOSED);
-        }
+
+        phaseEntity.setStatus(PhaseStatusEnum.CLOSED);
         this.phaseRepository.save(phaseEntity);
+
         // create a task to update the phase statistics
         this.phaseStatisticApplicationService.createPhaseStatisticTask(phaseEntity);
 
@@ -313,12 +270,6 @@ public class PhaseApplicationService {
         for (final Annotator annotator : this.commonService.getAnnotatorsOfProject(owner, project)) {
             this.annotatorStatisticApplicationService.createAnnotatorStatisticTask(annotator);
         }
-
-        /*
-        if (phaseEntity.getStatus().equals(PhaseStatusEnum.CLOSED.name())) {
-            throw new PhaseUpdateException("Phase is already closed.");
-        }
-         **/
 
     }
 
@@ -350,37 +301,6 @@ public class PhaseApplicationService {
         });
 
         phaseEntity.setTutorialRequirements(tutorials);
-        this.phaseRepository.save(phaseEntity);
-    }
-
-    /**
-     * Delete requirements from a phase.
-     *
-     * @param authenticationToken The authentication token of the user.
-     * @param owner   owner of the project.
-     * @param project   name of the project.
-     * @param phase   name of the project.
-     * @param requirements   requirements to delete
-     */
-    @Transactional
-    public void deleteRequirements(final String authenticationToken, final String owner,
-                                   final String project, final String phase, final String requirements) {
-        final User user = this.commonService.getUserByAuthenticationToken(authenticationToken);
-        final Project projectEntity = this.commonService.getProject(owner, project);
-        final Phase phaseEntity = this.commonService.getPhase(owner, project, phase);
-
-        this.validationService.projectAdminAccess(user, projectEntity);
-
-        // Get the current tutorial requirements
-        final List<Phase> currentTutorials = phaseEntity.getTutorialRequirements();
-
-        // Use a single removeIf statement to remove tutorials based on their names
-        currentTutorials.removeIf(tutorialPhase -> requirements.contains(tutorialPhase.getDisplayname()));
-
-        // Update the phase entity with the modified list of tutorial requirements
-        phaseEntity.setTutorialRequirements(currentTutorials);
-
-        // Save the updated phase entity
         this.phaseRepository.save(phaseEntity);
     }
 

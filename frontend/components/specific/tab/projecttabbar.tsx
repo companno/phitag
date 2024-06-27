@@ -1,18 +1,17 @@
 //React Modules
-import React, { FC, useState } from "react";
+import React, { FC } from "react";
 
 //Next Modules
 import Link from 'next/link'
-import  { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import HelpButton from "../../generic/button/helpbutton";
 import { useFetchSelfEntitlement } from "../../../lib/service/annotator/AnnotatorResource";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { FiTrash2 } from "react-icons/fi";
 import IconButtonOnClick from "../../generic/button/iconbuttononclick";
 import ENTITLEMENTS from "../../../lib/model/entitlement/Entitlements";
-import { deleteProject, useFetchProject } from "../../../lib/service/project/ProjectResource";
+import { deleteProject } from "../../../lib/service/project/ProjectResource";
 import useStorage from "../../../lib/hook/useStorage";
 import { toast } from "react-toastify";
-import EditProjectModal from "../modal/editprojectmodal";
 
 interface IPropsTab {
     href: string;
@@ -20,16 +19,13 @@ interface IPropsTab {
     isSelected: boolean;
 }
 
-const ProjectTabBar: React.FC<{}> = ({}) => {
+const ProjectTabBar: React.FC<{}> = () => {
 
     const storage = useStorage();
     const router = useRouter();
     const path = router.pathname;
 
     const { user: username, project: projectname } = router.query as { user: string, project: string };
-
-
-    const project = useFetchProject(username, projectname, router.isReady);
 
     const isSelectedOverview = path == "/phi/[user]/[project]";
     const isSelectedData = path == "/phi/[user]/[project]/data";
@@ -42,26 +38,14 @@ const ProjectTabBar: React.FC<{}> = ({}) => {
 
     const entitlement = useFetchSelfEntitlement(username, projectname, router.isReady);
 
-        // modals
-        const [showEditProjectModal, setShowEditProjectModal] = useState(false);
-
     const deleteProjectFn = () => {
         deleteProject(projectname, storage.get)
-            .then(() => {
-                toast.success("Project deleted.");
-                router.push(`/phi/${username}`);
-            }).catch((err) => {
-                toast.error("An error occurred while deleting the project.");
-            });
-    }
-
-    const editProject = () => {
-        const router = useRouter();
-        const { user: username, project: projectname } = router.query as { user: string, project: string };
-
-        const project = useFetchProject(username, projectname, router.isReady);
-        console.log(project)
-
+        .then(() => {
+            toast.success("Project deleted.");
+            router.push(`/phi/${username}`);
+        }).catch((err) => {
+            toast.error("An error occurred while deleting the project.");
+        });
     }
 
     return (
@@ -72,18 +56,10 @@ const ProjectTabBar: React.FC<{}> = ({}) => {
                 <Tab href={`${urlprefix}/data`} title="Data" isSelected={isSelectedData} />
                 <Tab href={`${urlprefix}/annotator`} title="Annotator" isSelected={isSelectedAnnotator} />
                 <Tab href={`${urlprefix}/task`} title="Tasks" isSelected={isSelectedTask} />
-                <Tab href={`${urlprefix}/statistic`} title="Statistics" isSelected={isSelectedStatistic} />
+                <Tab href={`${urlprefix}/statistic`} title="Statistic" isSelected={isSelectedStatistic} />
             </div>
 
             <div className="flex flex-row my-2 mx-4 self-end 2xl:self-center space-x-4">
-                {(entitlement.entitlement === ENTITLEMENTS.ADMIN && username === storage.get("USER")) &&
-                    <IconButtonOnClick
-                        tooltip="Edit Project"
-                        icon={<FiEdit className="basic-svg" />}
-                        onClick={() => setShowEditProjectModal(true)} 
-                       
-                    />
-                }
 
                 {(entitlement.entitlement === ENTITLEMENTS.ADMIN && username === storage.get("USER")) &&
                     <IconButtonOnClick
@@ -109,10 +85,6 @@ const ProjectTabBar: React.FC<{}> = ({}) => {
                 />
 
             </div>
-
-         <EditProjectModal  isOpen={showEditProjectModal} closeModalCallback={() => {
-                setShowEditProjectModal(false);
-            }}  mutateCallback={project.mutate}/>
         </div>
 
     );

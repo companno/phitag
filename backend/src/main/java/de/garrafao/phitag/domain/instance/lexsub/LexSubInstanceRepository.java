@@ -17,6 +17,4 @@ public interface LexSubInstanceRepository {
     Optional<LexSubInstance> findByIdInstanceidAndIdPhaseidNameAndIdPhaseidProjectidNameAndIdPhaseidProjectidOwnername(final String instanceId, final String phaseName, final String projectName, final String ownerName);
 
     LexSubInstance save(LexSubInstance instanceData);
-
-    void delete(Iterable<LexSubInstance> instanceData);
 }

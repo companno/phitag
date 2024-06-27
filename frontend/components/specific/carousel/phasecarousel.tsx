@@ -43,13 +43,8 @@ const PhaseCarousel: React.FC<{ project: Project }> = ({ project }) => {
     // data
     const phases = useFetchPhases(project?.getId().getOwner(), project?.getId().getName(), searchFilter.annotationType?.getName(), searchFilter.tutorial, !!project);
     const entitlement = useFetchSelfEntitlement(project?.getId().getOwner(), project?.getId().getName(), !!project);
-    const annotationTypes = useFetchAllAnnotationTypes();
+    const annotationTypes = useFetchAllAnnotationTypes()
 
-    const refreshCallback = async() =>{
-        
-        await phases.mutate();
-
-    }
 
     // modal
     const [modalState, setModalState] = useState({

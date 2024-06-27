@@ -1,7 +1,6 @@
 import JoblistingIdDto from "./JoblistingIdDto";
 
 export default interface PersonalJoblistingDto {
-    phase: string;
     
     readonly id: JoblistingIdDto;
 

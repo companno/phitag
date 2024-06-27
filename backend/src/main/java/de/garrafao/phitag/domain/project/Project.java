@@ -2,7 +2,6 @@ package de.garrafao.phitag.domain.project;
 
 import javax.persistence.*;
 
-import lombok.Setter;
 import org.apache.commons.lang3.Validate;
 
 import de.garrafao.phitag.domain.language.Language;
@@ -13,9 +12,7 @@ import lombok.Getter;
 @Entity
 @Table(name = "phitagproject")
 @Getter
-@Setter
 public class Project {
-
 
     // IDs of the project and the owner as composite key
     @EmbeddedId
@@ -35,7 +32,7 @@ public class Project {
     @ManyToOne
     @JoinColumn(name = "phitagvisibility_name")
     private Visibility visibility;
-
+    
     @ManyToOne
     @JoinColumn(name = "phitaglanguage_name", nullable = false)
     private Language language;
@@ -55,7 +52,7 @@ public class Project {
         Validate.notNull(visibility);
         Validate.notNull(language);
         Validate.notNull(description);
-
+        
         this.id = new ProjectId(name, owner.getUsername());
         this.owner = owner;
 
@@ -91,7 +88,5 @@ public class Project {
     public int hashCode() {
         return this.id.hashCode();
     }
-
-
 
 }

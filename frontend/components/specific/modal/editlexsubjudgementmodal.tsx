@@ -10,7 +10,7 @@ import { FiEdit3, FiFeather } from "react-icons/fi";
 import useStorage from "../../../lib/hook/useStorage";
 
 // model
-import { editLexSub, editUsepair} from "../../../lib/service/judgement/JudgementResource";
+import { editLexSub, editUsepair } from "../../../lib/service/judgement/JudgementResource";
 import DropdownSelect from "../../generic/dropdown/dropdownselect";
 import DummySelectable from "../../../lib/model/dummy/DummySelectable";
 import LexSubJudgement from "../../../lib/model/judgement/lexsubjudgement/model/LexSubJudgement";

@@ -41,10 +41,9 @@ const ProjectPage: NextPage = () => {
     const authenticated = useAuthenticated();
     const router = useRouter();
     const { user: username, project: projectname } = router.query as { user: string, project: string };
-    const project = useFetchProject(username, projectname, router.isReady);
 
+    const project = useFetchProject(username, projectname, router.isReady);
     const entitlement = useFetchSelfEntitlement(username, projectname, !project.isLoading && !project.isError);
-    
 
 
     useEffect(() => {
@@ -72,6 +71,7 @@ const ProjectPage: NextPage = () => {
 
 
             <SingleContentLayout>
+
                 <LinkHead icon={<FiFolder className="stroke-2" />}
                     links={[
                         {
@@ -84,6 +84,8 @@ const ProjectPage: NextPage = () => {
                         }
                     ]}
                 />
+
+
                 <ProjectTabBar />
 
                 <div className="mt-10 mx-auto max-w-7xl">
@@ -101,6 +103,8 @@ const ProjectPage: NextPage = () => {
                             <ProjectOverviewCard project={project.project} />
                         </div>
                     </div>
+
+
 
                     <div className="my-8">
                         <PhaseCarousel project={project.project} />

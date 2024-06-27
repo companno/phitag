@@ -6,12 +6,8 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Data
-@Getter
-@Setter
 @Embeddable
 public class ProjectId implements Serializable {
 
@@ -46,8 +42,6 @@ public class ProjectId implements Serializable {
         ProjectId other = (ProjectId) obj;
         return name.equals(other.name) && ownername.equals(other.ownername);
     }
-
-
 
     @Override
     public String toString() {

@@ -47,9 +47,4 @@ public class PhaseRepositoryBridge implements PhaseRepository {
         return this.phaseRepositoryJpa.save(phase);
     }
 
-    @Override
-    public void delete(final Phase phase) {
-        this.phaseRepositoryJpa.delete(phase);
-    }
-
 }

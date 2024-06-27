@@ -2,7 +2,16 @@ package de.garrafao.phitag.domain.phase;
 
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
+import javax.persistence.Table;
 
 import org.apache.commons.lang3.Validate;
 
@@ -45,13 +54,6 @@ public class Phase {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "task_head")
-    private String taskhead;
-
-    @Setter
-    @Column(name = "code")
-    private String code;
-
     @Column(name = "isTutorial", nullable = false)
     private boolean isTutorial;
 
@@ -82,14 +84,13 @@ public class Phase {
     private Double statisticAnnotationMeasureThreshold;
     
 
-    @ManyToMany(mappedBy = "completedTutorials",cascade = CascadeType.REMOVE)
+    @ManyToMany(mappedBy = "completedTutorials")
     private List<Annotator> annotators; 
 
     Phase() {
     }
 
-    public Phase(final String name, final Project project, final AnnotationType annotationType, final Sampling sampling,
-                 final String description, final String taskhead) {
+    public Phase(final String name, final Project project, final AnnotationType annotationType, final Sampling sampling, final String description) {
         Validate.notEmpty(name);        
         Validate.matchesPattern(name, "^[a-zA-Z0-9-]+$");
 
@@ -103,26 +104,18 @@ public class Phase {
         this.sampling = sampling;
         
         this.description = description;
-        this.taskhead = taskhead;
         this.isTutorial = false;
 
         this.status = PhaseStatusEnum.OPEN.name();
     }
 
-    public Phase(final String name, final Project project, final AnnotationType annotationType, final Sampling sampling,
-                 final String description, final String taskhead, final boolean isTutorial) {
-        this(name, project, annotationType, sampling, description, taskhead);
+    public Phase(final String name, final Project project, final AnnotationType annotationType, final Sampling sampling, final String description, final boolean isTutorial) {
+        this(name, project, annotationType, sampling, description);
         this.isTutorial = isTutorial;
     }
 
-    public Phase(final String code){
-        this.code = code;
-    }
-
-    public Phase(final String name, final Project project, final AnnotationType annotationType,
-                 final Sampling sampling, final String description, final String taskhead,
-                 final boolean isTutorial, final StatisticAnnotationMeasure statisticAnnotationMeasure, final Double statisticAnnotationMeasureThreshold) {
-        this(name, project, annotationType, sampling, description, taskhead, isTutorial);
+    public Phase(final String name, final Project project, final AnnotationType annotationType, final Sampling sampling, final String description, final boolean isTutorial, final StatisticAnnotationMeasure statisticAnnotationMeasure, final Double statisticAnnotationMeasureThreshold) {
+        this(name, project, annotationType, sampling, description, isTutorial);
         this.statisticAnnotationMeasure = statisticAnnotationMeasure;
         this.statisticAnnotationMeasureThreshold = statisticAnnotationMeasureThreshold;
     }

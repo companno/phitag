@@ -11,6 +11,4 @@ export default interface UserDto {
     readonly languages: Array<LanguageDto>;
     readonly annotationTypes: Array<AnnotationTypeDto>;
     readonly description: string;
-    readonly prolific_id: string;
-
 }

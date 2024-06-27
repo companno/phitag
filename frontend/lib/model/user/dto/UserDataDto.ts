@@ -14,5 +14,4 @@ export default interface UserDataDto {
     
     readonly languages: Array<LanguageDto>;
     readonly description: string;
-    readonly prolific_id: string;
 }

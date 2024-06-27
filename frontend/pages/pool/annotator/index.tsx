@@ -67,6 +67,7 @@ const HumanPool: NextPage = () => {
             <Head>
                 <title>PhiTag: User Overview</title>
             </Head>
+
             <ContentLayout>
                 <div className='flex flex-col w-full'>
 
@@ -123,6 +124,7 @@ const HumanPool: NextPage = () => {
                             </div>
                         </div>
                     </div>
+
 
                     {
                         users.isLoading ? <LoadingComponent /> :

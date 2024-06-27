@@ -15,15 +15,11 @@ public final class CreateUserCommand {
     private final String usecase;
     private final Set<String> languages;
 
-    private final String prolific_id;
-
-
     private final boolean privacypolicyAccepted;
     private final boolean ofLegalAge;
 
-
     public CreateUserCommand(final String username, final String email, final String password, final String usecase,
-            final Set<String> languages, final String prolific_id, final boolean privacypolicyAccepted, final boolean ofLegalAge) {
+            final Set<String> languages, final boolean privacypolicyAccepted, final boolean ofLegalAge) {
         Validate.notBlank(username, "username must not be blank");
         Validate.notBlank(email, "email must not be blank");
         Validate.notBlank(password, "password must not be blank");
@@ -37,12 +33,9 @@ public final class CreateUserCommand {
         this.password = password;
 
         this.usecase = usecase;
-        this.prolific_id = prolific_id;
         this.languages = languages;
 
         this.privacypolicyAccepted = privacypolicyAccepted;
         this.ofLegalAge = ofLegalAge;
-
     }
-
 }

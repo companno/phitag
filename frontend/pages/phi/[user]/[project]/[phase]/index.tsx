@@ -23,7 +23,6 @@ import LinkHead from "../../../../../components/generic/linker/linkhead";
 import { FiLayers } from "react-icons/fi";
 import { useFetchComputationAnnotatorsOfPhase } from "../../../../../lib/service/annotator/AnnotatorResource";
 import { useFetchAllSamplingMethods } from "../../../../../lib/service/sampling/SamplingResource";
-import { route } from "next/dist/server/router";
 
 
 const PhasePage: NextPage = () => {
@@ -34,6 +33,7 @@ const PhasePage: NextPage = () => {
     const authenticated = useAuthenticated();
     const router = useRouter();
     const { user: username, project: projectname, phase: phasename } = router.query as { user: string, project: string, phase: string };
+
     const phase = useFetchPhase(username, projectname, phasename, router.isReady);
     const annotator = useFetchComputationAnnotatorsOfPhase(username, projectname, phasename, router.isReady)
 

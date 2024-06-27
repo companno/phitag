@@ -3,7 +3,6 @@ package de.garrafao.phitag.domain.instance.usepairinstance;
 import java.util.List;
 import java.util.Optional;
 
-import de.garrafao.phitag.domain.phase.Phase;
 import org.springframework.data.domain.Page;
 
 import de.garrafao.phitag.domain.core.PageRequestWraper;
@@ -19,6 +18,5 @@ public interface UsePairInstanceRepository {
     
     UsePairInstance save(UsePairInstance instanceData);
 
-    void delete(Iterable<UsePairInstance> instanceData);
 
 }

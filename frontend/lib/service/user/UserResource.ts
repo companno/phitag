@@ -60,8 +60,8 @@ export function useFetchUser(username: any, fetch: boolean = true) {
         headers: { "Authorization": `Bearer ${token}` }
     }).then(res => res.data)
 
-
     const { data, error, mutate } = useSWR(fetch ? `${BACKENDROUTES.USER}/find?username=${username}` : null, singleUserFetcher)
+
     return {
         user: data ? User.fromDto(data) : null,
         isLoading: username === undefined || !error && !data,

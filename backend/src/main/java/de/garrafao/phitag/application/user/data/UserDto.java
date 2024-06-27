@@ -21,8 +21,6 @@ public class UserDto {
     private final Set<LanguageDto> languages;
     private final Set<AnnotationTypeDto> annotationTypes;
     private final String description;
-    private final String prolific_id;
-
 
     private UserDto(@NonNull final String username,
             @NonNull final String displayname,
@@ -30,8 +28,7 @@ public class UserDto {
             @NonNull final Boolean isbot,
             @NonNull final Set<LanguageDto> languages,
             @NonNull final Set<AnnotationTypeDto> annotationTypes,
-            final String description,
-                    final String prolific_id) {
+            final String description) {
         this.username = username;
         this.displayname = displayname;
 
@@ -41,7 +38,6 @@ public class UserDto {
         this.languages = languages;
         this.annotationTypes = annotationTypes;
         this.description = description;
-        this.prolific_id = prolific_id;
     }
 
     public static UserDto from(@NonNull final User user) {
@@ -52,8 +48,7 @@ public class UserDto {
                 user.isIsbot(),
                 user.getLanguages().stream().map(LanguageDto::from).collect(Collectors.toSet()),
                 user.getAnnotationTypes().stream().map(AnnotationTypeDto::from).collect(Collectors.toSet()),
-                user.getDescription(),
-                user.getProlific_id());
+                user.getDescription());
     }
 
 }

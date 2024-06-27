@@ -22,9 +22,6 @@
             <column name="displayname" type="varchar">
                 <constraints nullable="false" />
             </column>
-            <column name="phasename" type="varchar">
-                <constraints nullable="false" />
-            </column>
 
             <column name="open" type="bool">
                 <constraints nullable="false" />
@@ -37,6 +34,7 @@
             <column name="description" type="varchar">
                 <constraints nullable="false" />
             </column>
+
         </createTable>
 
         <addForeignKeyConstraint
