@@ -112,12 +112,12 @@ const UsePairAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
         <div className="w-full flex flex-col justify-between">
             {/* randomize usages */}
             {true ?
-                <div className="w-full flex flex-col justify-center space-y-4 ">
+                <div className="w-full flex flex-row justify-center space-y-4 ">
                     <UsageField key={0} usage={annotation.instance.getFirstusage()} />
                     <UsageField key={1} usage={annotation.instance.getSecondusage()} />
                 </div>
                 :
-                <div className="w-full flex flex-col justify-center space-y-4 ">
+                <div className="w-full flex flex-row justify-center space-y-4 ">
                     <UsageField key={0} usage={annotation.instance.getSecondusage()} />
                     <UsageField key={1} usage={annotation.instance.getFirstusage()} />
                 </div>
