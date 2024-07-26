@@ -12,13 +12,17 @@ export default class UsePairInstance implements IInstance {
 
     private readonly labelSet: Array<string>;
     private readonly nonLabel: string;
+    private readonly lemma: string; 
+    private readonly group: string;
 
-    constructor(id: UsePairInstanceId, firstUsage: Usage, secondUsage: Usage, labelSet: Array<string>, nonLabel: string) {
+    constructor(id: UsePairInstanceId, firstUsage: Usage, secondUsage: Usage, labelSet: Array<string>, nonLabel: string, lemma: string, group: string) {
         this.id = id;
         this.firstusage = firstUsage;
         this.secondusage = secondUsage;
         this.labelSet = labelSet;
         this.nonLabel = nonLabel;
+        this.lemma = lemma;
+        this.group = group;
     }
 
     public getId(): UsePairInstanceId {
@@ -45,13 +49,23 @@ export default class UsePairInstance implements IInstance {
         return this.labelSet.concat(this.nonLabel);
     }
 
+    public getlemma(): string {
+        return this.lemma;
+    }
+
+    public getgroup(): string {
+        return this.group;
+    }
+
     public static fromDto(dto: UsePairInstanceDto): UsePairInstance {
         return new UsePairInstance(
             UsePairInstanceId.fromDto(dto.id),
             Usage.fromDto(dto.firstusage),
             Usage.fromDto(dto.secondusage),
             dto.labelSet,
-            dto.nonLabel
+            dto.nonLabel,
+            dto.lemma,
+            dto.group
         );
     }
 }

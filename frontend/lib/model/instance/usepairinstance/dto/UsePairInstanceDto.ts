@@ -3,6 +3,8 @@ import IInstanceDto from "../../dto/IInstanceDto";
 import UsePairInstanceIdDto from "./UsePairInstanceIdDto";
 
 export default interface UsePairInstanceDto extends IInstanceDto {
+    group: string;
+    lemma: string;
 
     readonly id: UsePairInstanceIdDto;
 
