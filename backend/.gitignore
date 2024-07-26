@@ -7,8 +7,8 @@
 
 ### Database
 **/resources/db/changelog/db.changelog-master.xml
-**/resources/db/changelog/computational-annotator-seeds
-**/resources/db/changelog/corpus-seeds
+#**/resources/db/changelog/computational-annotator-seeds
+#**/resources/db/changelog/corpus-seeds
 **/resources/db/changelog/seeds/admin
 
 ## Other
