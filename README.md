@@ -12,6 +12,9 @@ The main technology-stack of PhiTag is based on [Spring](http://spring.io/) and 
 
 A running version of PhiTag is available at [https://phitag.ims.uni-stuttgart.de/](https://phitag.ims.uni-stuttgart.de/). Please note, as this is a development version, it is not guaranteed to be stable and data might be lost at any time.
 
+To sucessfully run PhiTag you also have to create some additional foldes within your Phitag backend Folder. backend/target/classes/db/changelog within the changelog folder you will also have to create tow folders. computational-annotator-seeds and corpus-seeds. Within both of them you will have to add another empty folder called Test. In addition to that you will have to add some folders in the frontend. frontend/public/font/DMMono then you will have to download the DmMono font and extrakt them into your DMMono folder. After you have done that you should be able to sucessfully run Phitag.
+
+
 ## License
 Shield: [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
 
