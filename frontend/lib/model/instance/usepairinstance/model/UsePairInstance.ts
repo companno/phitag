@@ -3,6 +3,7 @@ import { IInstance, IInstanceConstructor } from "../../model/IInstance";
 import UsePairInstanceDto from "../dto/UsePairInstanceDto";
 import UsePairInstanceId from "./UsePairInstanceId";
 
+
 export default class UsePairInstance implements IInstance {
 
     readonly id: UsePairInstanceId;
@@ -12,17 +13,21 @@ export default class UsePairInstance implements IInstance {
 
     private readonly labelSet: Array<string>;
     private readonly nonLabel: string;
-    private readonly lemma: string; 
-    private readonly group: string;
+    private readonly Lemma1: string; 
+    private readonly Lemma2: string;
+    private readonly Group1: string;
+    private readonly Group2: string;
 
-    constructor(id: UsePairInstanceId, firstUsage: Usage, secondUsage: Usage, labelSet: Array<string>, nonLabel: string, lemma: string, group: string) {
+    constructor(id: UsePairInstanceId, firstUsage: Usage, secondUsage: Usage, labelSet: Array<string>, nonLabel: string, Lemma1: string, Lemma2: string, Group1: string, Group2: string) {
         this.id = id;
         this.firstusage = firstUsage;
         this.secondusage = secondUsage;
         this.labelSet = labelSet;
         this.nonLabel = nonLabel;
-        this.lemma = lemma;
-        this.group = group;
+        this.Lemma1 = Lemma1;
+        this.Lemma2 = Lemma2;
+        this.Group1 = Group1;
+        this.Group2 = Group2;
     }
 
     public getId(): UsePairInstanceId {
@@ -49,12 +54,20 @@ export default class UsePairInstance implements IInstance {
         return this.labelSet.concat(this.nonLabel);
     }
 
-    public getlemma(): string {
-        return this.lemma;
+    public getLemma1(): string {
+        return this.Lemma1;
     }
 
-    public getgroup(): string {
-        return this.group;
+    public getLemma2(): string {
+        return this.Lemma2;
+    }
+
+    public getGroup1(): string {
+        return this.Group1;
+    }
+
+    public getGroup2(): string {
+        return this.Group2;
     }
 
     public static fromDto(dto: UsePairInstanceDto): UsePairInstance {
@@ -64,8 +77,12 @@ export default class UsePairInstance implements IInstance {
             Usage.fromDto(dto.secondusage),
             dto.labelSet,
             dto.nonLabel,
-            dto.lemma,
-            dto.group
+            Usage.fromDto(dto.firstusage).getLemma(),
+            Usage.fromDto(dto.secondusage).getLemma(),
+            Usage.fromDto(dto.firstusage).getGroup(),
+            Usage.fromDto(dto.secondusage).getGroup(),
+            
+           
         );
     }
 }

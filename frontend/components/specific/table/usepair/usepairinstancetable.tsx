@@ -72,7 +72,7 @@ const UsePairInstanceTable: React.FC<{ phase: Phase, modalState: { openData: boo
                                         {usepairinstance.getId().getInstanceId()}
                                     </td>
 
-                                    <td className="px-6 py-4 overflow-auto font-dm-mono-light">
+                                    <td className="px-6 py-4  font-dm-mono-light">
                                         <span key={i} className="tooltip group w-fit">
                                             {getFormatedUsage(usepairinstance.getFirstusage())}
                                             <div className="tooltip-container group-hover:scale-100">
@@ -83,7 +83,7 @@ const UsePairInstanceTable: React.FC<{ phase: Phase, modalState: { openData: boo
                                         </span>
                                     </td>
 
-                                    <td className="px-6 py-4 overflow-auto font-dm-mono-light">
+                                    <td className="px-6 py-4  font-dm-mono-light">
                                         <span key={i} className="tooltip group w-fit">
                                             {getFormatedUsage(usepairinstance.getSecondusage())}
                                             <div className="tooltip-container group-hover:scale-100">

@@ -18,6 +18,7 @@ import Router from "next/router";
 import AddUsePairJudgementCommand from "../../../../lib/model/judgement/usepairjudgement/command/AddUsePairJudgementCommand";
 import { annotateUsepair } from "../../../../lib/service/judgement/JudgementResource";
 import LoadingComponent from "../../../generic/loadingcomponent";
+import Usage from "../../../../lib/model/phitagdata/usage/model/Usage";
 
 
 const UsePairAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
@@ -110,8 +111,31 @@ const UsePairAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
 
     return (
         <div className="w-full flex flex-col justify-between">
+                        <thead className="font-bold text-lg">
+                            <tr>
+                               <th scope="col"
+                                    className="FirstLemma">
+                                    Category: <div>{annotation.instance.getLemma1()}</div>
+                                </th>
+                                <th scope="col"
+                                    className="FirstGroup">
+                                    Character: <div>{annotation.instance.getGroup1()}</div>
+                                </th>
+                                <th scope="col"
+                                    className="SecondLemma">
+                                    Category: <div>{annotation.instance.getLemma2()}</div>
+                                </th>
+                                <th scope="col"
+                                    className="SecondGroup">
+                                    Character: <div>{annotation.instance.getGroup2()}</div>
+                                </th>
+                            </tr>
+                        </thead> 
+
+                    
             {/* randomize usages */}
             {true ?
+                
                 <div className="w-full flex flex-row justify-center space-y-4 ">
                     <UsageField key={0} usage={annotation.instance.getFirstusage()} />
                     <UsageField key={1} usage={annotation.instance.getSecondusage()} />

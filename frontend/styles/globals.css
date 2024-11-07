@@ -7,6 +7,30 @@ span.inline{
   font-weight: bold;
 }
 
+
+
+.FirstLemma{
+  position: relative;
+  left: 50px
+}
+
+.FirstGroup{
+  position: relative;
+  left: 150px
+}
+
+
+
+.SecondLemma{
+  position: relative;
+  left: 300px
+}
+
+.SecondGroup{
+  position: relative;
+  left: 450px
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
