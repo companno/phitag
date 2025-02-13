@@ -153,7 +153,7 @@ const UsePairAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
                         <div key={label}
                             className="flex shadow-md cursor-pointer hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-200 font-dm-mono-medium"
                             onClick={() => handleSubmitAnnotation(label)}>
-                            <div className="w-8 h-8 m-6 text-center text-lg">
+                            <div className="h-8 m-6 text-center text-lg">
                                 {label}
                             </div>
                         </div>
