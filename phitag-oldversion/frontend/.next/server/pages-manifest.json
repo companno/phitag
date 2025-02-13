@@ -1,7 +1,0 @@
-{
-  "/_app": "pages/_app.js",
-  "/_document": "pages/_document.js",
-  "/_error": "pages/_error.js",
-  "/phi/[user]/[project]/[phase]/annotate": "pages/phi/[user]/[project]/[phase]/annotate.js",
-  "/404": "pages/404.js"
-}
