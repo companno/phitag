@@ -17,9 +17,12 @@ import IDeleteJudgementCommand from "../../model/judgement/command/IDeleteJudgem
 import PagedGenericDto from "../../model/interfaces/PagedGenericDto";
 import UsePairJudgement from "../../model/judgement/usepairjudgement/model/UsePairJudgement";
 import PagedUsePairJudgement from "../../model/judgement/usepairjudgement/model/PagedUsePairJudgement";
+import UseTripleJudgement from "../../model/judgement/usetriplejudgement/model/UseTripleJudgement";
+import PagedUseTripleJudgement from "../../model/judgement/usetriplejudgement/model/PagedUseTripleJudgement";
 import WSSIMJudgementDto from "../../model/judgement/wssimjudgement/dto/WSSIMJudgementDto";
 import PagedWSSIMJudgement from "../../model/judgement/wssimjudgement/model/PagedWSSIMJudgement";
 import UsePairJudgementDto from "../../model/judgement/usepairjudgement/dto/UsePairJudgementDto";
+import UseTripleJudgementDto from "../../model/judgement/usetriplejudgement/dto/UseTripleJudgementDto";
 import LexSubJudgementDto from "../../model/judgement/lexsubjudgement/dto/LexSubJudgementDto";
 import PagedLexSubJudgement from "../../model/judgement/lexsubjudgement/model/PagedLexSubJudgement";
 
@@ -77,6 +80,36 @@ export function useFetchPagedUsePairJudgements(owner: string, project: string, p
 
     return {
         data: data ? PagedUsePairJudgement.fromDto(data) : PagedUsePairJudgement.empty(),
+        isLoading: !error && !data,
+        isError: error,
+        mutate: mutate
+    }
+}
+
+/** 
+ * Fetches all use triple judgements of a phase paged
+ * 
+ * @param owner owner of the project
+ * @param project project name
+ * @param phase phase name in the project
+ * @param page page number
+ * @param fetch if data should be fetched
+ * @returns list of all judgements
+ */
+export function useFetchPagedUseTripleJudgements(owner: string, project: string, phase: string, page: number, fetch: boolean = true) {
+    const { get } = useStorage();
+    const token = get('JWT') ?? '';
+
+    const queryPhaseDataFetcher = (url: string) => axios.get<PagedGenericDto<UseTripleJudgementDto>>(url, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(res => res.data);
+
+    const { data, error, mutate } = useSWR(fetch ? `${BACKENDROUTES.JUDGEMENT}/paged?owner=${owner}&project=${project}&phase=${phase}&page=${page}` : null, queryPhaseDataFetcher)
+
+    return {
+        data: data ? PagedUseTripleJudgement.fromDto(data) : PagedUseTripleJudgement.empty(),
         isLoading: !error && !data,
         isError: error,
         mutate: mutate
@@ -199,6 +232,36 @@ export function useFetchPagedHistoryUsePairJudgements(owner: string, project: st
 
     return {
         data: data ? PagedUsePairJudgement.fromDto(data) : PagedUsePairJudgement.empty(),
+        isLoading: !error && !data,
+        isError: error,
+        mutate: mutate
+    }
+}
+
+/** 
+ * Fetches all use triple judgements of a user paged
+ * 
+ * @param owner owner of the project
+ * @param project project name
+ * @param phase phase name in the project
+ * @param page page number
+ * @param fetch if data should be fetched
+ * @returns list of all judgements
+ */
+export function useFetchPagedHistoryUseTripleJudgements(owner: string, project: string, phase: string, page: number, fetch: boolean = true) {
+    const { get } = useStorage();
+    const token = get('JWT') ?? '';
+
+    const queryPhaseDataFetcher = (url: string) => axios.get<PagedGenericDto<UseTripleJudgementDto>>(url, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(res => res.data);
+
+    const { data, error, mutate } = useSWR(fetch ? `${BACKENDROUTES.JUDGEMENT}/history/personal/paged?owner=${owner}&project=${project}&phase=${phase}&page=${page}` : null, queryPhaseDataFetcher)
+
+    return {
+        data: data ? PagedUseTripleJudgement.fromDto(data) : PagedUseTripleJudgement.empty(),
         isLoading: !error && !data,
         isError: error,
         mutate: mutate
@@ -336,6 +399,22 @@ export function editUsepair(command: IEditJudgementCommand, get: Function = () =
 }
 
 /**
+ * Edit use triple judgement
+ * 
+ * @param command command containing the judgement
+ * @param get storage hook
+ */
+export function editUsetriple(command: IEditJudgementCommand, get: Function = () => { }) {
+    const token = get('JWT') ?? '';
+
+    return axios.post(`${BACKENDROUTES.JUDGEMENT}/edit/usetriple`, command,
+        {
+            headers: { "Authorization": `Bearer ${token}` },
+        }
+    ).then(res => res.data);
+}
+
+/**
  * Edit WSSIM judgement
  * 
  * @param command command containing the judgement
@@ -381,6 +460,22 @@ export function deleteUsepair(command: IDeleteJudgementCommand, get: Function = 
     const token = get('JWT') ?? '';
 
     return axios.post(`${BACKENDROUTES.JUDGEMENT}/delete/usepair`, command,
+        {
+            headers: { "Authorization": `Bearer ${token}` },
+        }
+    ).then(res => res.data);
+}
+
+/**
+ * Delete Use Triple judgement
+ * 
+ * @param command command containing the judgement
+ * @param get storage hook
+ */
+export function deleteUsetriple(command: IDeleteJudgementCommand, get: Function = () => { }) {
+    const token = get('JWT') ?? '';
+
+    return axios.post(`${BACKENDROUTES.JUDGEMENT}/delete/usetriple`, command,
         {
             headers: { "Authorization": `Bearer ${token}` },
         }
@@ -446,6 +541,36 @@ export function bulkAnnotateUsepair(commands: IAddJudgementCommand[], get: Funct
     const token = get('JWT') ?? '';
 
     return axios.post(`${BACKENDROUTES.JUDGEMENT}/annotate/usepair/bulk`, commands,
+        {
+            headers: { "Authorization": `Bearer ${token}` },
+        }
+    ).then(res => res.data);
+}
+
+/** 
+ * Add a judgement to the phase (i.e. annotate an instance of a phase)
+ * 
+ * @param command command containing the judgement
+ * @returns Promise
+ */
+export function annotateUsetriple(command: IAddJudgementCommand, get: Function = () => { }) {
+    const token = get('JWT') ?? '';
+
+    return axios.post(`${BACKENDROUTES.JUDGEMENT}/annotate/usetriple`, command,
+        {
+            headers: { "Authorization": `Bearer ${token}` },
+        }
+    ).then(res => res.data);
+
+}
+
+/**
+ * Add a bulk of judgements to the phase (i.e. annotate instances of a phase)
+ */
+export function bulkAnnotateUsetriple(commands: IAddJudgementCommand[], get: Function = () => { }) {
+    const token = get('JWT') ?? '';
+
+    return axios.post(`${BACKENDROUTES.JUDGEMENT}/annotate/usetriple/bulk`, commands,
         {
             headers: { "Authorization": `Bearer ${token}` },
         }

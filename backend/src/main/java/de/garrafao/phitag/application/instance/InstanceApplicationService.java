@@ -20,6 +20,8 @@ import de.garrafao.phitag.application.instance.lexsubinstance.LexSubInstanceAppl
 import de.garrafao.phitag.application.instance.lexsubinstance.data.LexSubInstanceDto;
 import de.garrafao.phitag.application.instance.usepairinstance.UsePairInstanceApplicationService;
 import de.garrafao.phitag.application.instance.usepairinstance.data.UsePairInstanceDto;
+import de.garrafao.phitag.application.instance.usetripleinstance.UseTripleInstanceApplicationService;
+import de.garrafao.phitag.application.instance.usetripleinstance.data.UseTripleInstanceDto;
 import de.garrafao.phitag.application.instance.wssiminstance.WSSIMInstanceApplicationService;
 import de.garrafao.phitag.application.instance.wssiminstance.data.WSSIMInstanceDto;
 import de.garrafao.phitag.application.instance.wssimtag.WSSIMTagApplicationService;
@@ -29,6 +31,7 @@ import de.garrafao.phitag.domain.annotationtype.error.AnnotationTypeNotFoundExce
 import de.garrafao.phitag.domain.annotator.Annotator;
 import de.garrafao.phitag.domain.instance.lexsub.LexSubInstance;
 import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstance;
+import de.garrafao.phitag.domain.instance.usetripleinstance.UseTripleInstance;
 import de.garrafao.phitag.domain.instance.wssiminstance.WSSIMInstance;
 import de.garrafao.phitag.domain.instance.wssimtag.WSSIMTag;
 import de.garrafao.phitag.domain.phase.Phase;
@@ -47,6 +50,8 @@ public class InstanceApplicationService {
 
     private final UsePairInstanceApplicationService usePairInstanceApplicationService;
 
+    private final UseTripleInstanceApplicationService useTripleInstanceApplicationService;
+
     private final WSSIMInstanceApplicationService wssimInstanceApplicationService;
 
     private final WSSIMTagApplicationService wssimTagApplicationService;
@@ -61,6 +66,7 @@ public class InstanceApplicationService {
             final ValidationService validationService,
 
             final UsePairInstanceApplicationService usePairInstanceApplicationService,
+            final UseTripleInstanceApplicationService useTripleInstanceApplicationService,
             final WSSIMInstanceApplicationService wssimInstanceApplicationService,
             final WSSIMTagApplicationService wssimTagApplicationService,
             final LexSubInstanceApplicationService lexSubInstanceApplicationService) {
@@ -68,6 +74,7 @@ public class InstanceApplicationService {
         this.validationService = validationService;
 
         this.usePairInstanceApplicationService = usePairInstanceApplicationService;
+        this.useTripleInstanceApplicationService = useTripleInstanceApplicationService;
         this.wssimInstanceApplicationService = wssimInstanceApplicationService;
         this.wssimTagApplicationService = wssimTagApplicationService;
         this.lexSubInstanceApplicationService = lexSubInstanceApplicationService;
@@ -97,6 +104,10 @@ public class InstanceApplicationService {
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             this.usePairInstanceApplicationService.findByPhase(phaseEntity)
                     .forEach(usePairInstance -> instanceDtos.add(UsePairInstanceDto.from(usePairInstance)));
+        }
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USETRIPLE.name())) {
+            this.useTripleInstanceApplicationService.findByPhase(phaseEntity)
+                    .forEach(useTripleInstance -> instanceDtos.add(UseTripleInstanceDto.from(useTripleInstance)));
         }
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             if (additional) {
@@ -143,6 +154,16 @@ public class InstanceApplicationService {
                     size, page, order);
             pagedInstanceDto = new PagedInstanceDto(
                     pagedInstance.getContent().stream().map(UsePairInstanceDto::from).collect(Collectors.toList()),
+                    pagedInstance.getNumber(),
+                    pagedInstance.getSize(),
+                    pagedInstance.getTotalElements(),
+                    pagedInstance.getTotalPages());
+
+        } else if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USETRIPLE.name())) {
+            Page<UseTripleInstance> pagedInstance = this.useTripleInstanceApplicationService.findByPhasePaged(phaseEntity,
+                    size, page, order);
+            pagedInstanceDto = new PagedInstanceDto(
+                    pagedInstance.getContent().stream().map(UseTripleInstanceDto::from).collect(Collectors.toList()),
                     pagedInstance.getNumber(),
                     pagedInstance.getSize(),
                     pagedInstance.getTotalElements(),
@@ -226,6 +247,11 @@ public class InstanceApplicationService {
                     .from(this.usePairInstanceApplicationService.getAnnotationInstance(phaseEntity, annotator));
         }
 
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USETRIPLE.name())) {
+            return UseTripleInstanceDto
+                    .from(this.useTripleInstanceApplicationService.getAnnotationInstance(phaseEntity, annotator));
+        }
+
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             return WSSIMInstanceDto
                     .from(this.wssimInstanceApplicationService.getAnnotationInstance(phaseEntity, annotator));
@@ -259,6 +285,10 @@ public class InstanceApplicationService {
 
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             return this.usePairInstanceApplicationService.exportUsePairInstance(phaseEntity);
+        }
+
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USETRIPLE.name())) {
+            return this.useTripleInstanceApplicationService.exportUseTripleInstance(phaseEntity);
         }
 
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
@@ -299,6 +329,11 @@ public class InstanceApplicationService {
 
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             this.usePairInstanceApplicationService.save(phaseEntity, file);
+            return;
+        }
+
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USETRIPLE.name())) {
+            this.useTripleInstanceApplicationService.save(phaseEntity, file);
             return;
         }
 
@@ -350,6 +385,11 @@ public class InstanceApplicationService {
 
         if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             this.usePairInstanceApplicationService.generateInstances(phaseEntity, labels, nonLabel);
+            return;
+        }
+
+        if (phaseEntity.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USETRIPLE.name())) {
+            this.useTripleInstanceApplicationService.generateInstances(phaseEntity, labels, nonLabel);
             return;
         }
 

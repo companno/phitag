@@ -17,6 +17,8 @@ import PagedGenericDto from "../../model/interfaces/PagedGenericDto";
 import PagedGeneric from "../../model/interfaces/PagedGeneric";
 import PagedUsePairInstance from "../../model/instance/usepairinstance/model/PagedUsePairInstance";
 import UsePairInstanceDto from "../../model/instance/usepairinstance/dto/UsePairInstanceDto";
+import PagedUseTripleInstance from "../../model/instance/usetripleinstance/model/PagedUseTripleInstance";
+import UseTripleInstanceDto from "../../model/instance/usetripleinstance/dto/UseTripleInstanceDto";
 import WSSIMInstanceDto from "../../model/instance/wssiminstance/dto/WSSIMInstanceDto";
 import PagedWSSIMInstance from "../../model/instance/wssiminstance/model/PagedWSSIMInstance";
 import PagedWSSIMTag from "../../model/instance/wssimtag/model/PagedWSSIMTag";
@@ -81,6 +83,39 @@ export function useFetchPagedUsePairInstance(owner: string, project: string, pha
 
     return {
         data: data ? PagedUsePairInstance.fromDto(data) : PagedUsePairInstance.empty(),
+        isLoading: !error && !data,
+        isError: error,
+        mutate: mutate
+    }
+}
+
+/**
+ * Returns all use triple instances of a phase as a page.
+ * 
+ * @param owner owner of the project
+ * @param project project name
+ * @param phase phase name in the project
+ * @param constructor data class to be converted to (implements fromDto, i.e. the convertion function)
+ * @param additional if additional data should be fetched (e.g. wssim )
+ * 
+ * @param page page number
+ * @param fetch if data should be fetched
+ * @returns paged list of all instances
+ */
+export function useFetchPagedUseTripleInstance(owner: string, project: string, phase: string, page: number = 0, fetch: boolean = true) {
+    const { get } = useStorage();
+    const token = get('JWT') ?? '';
+
+    const queryPhaseDataFetcher = (url: string) => axios.get<PagedGenericDto<UseTripleInstanceDto>>(url, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(res => res.data)
+
+    const { data, error, mutate } = useSWR(fetch ? `${BACKENDROUTES.INSTANCE}/paged?owner=${owner}&project=${project}&phase=${phase}&additional=${false}&page=${page}` : null, queryPhaseDataFetcher)
+
+    return {
+        data: data ? PagedUseTripleInstance.fromDto(data) : PagedUseTripleInstance.empty(),
         isLoading: !error && !data,
         isError: error,
         mutate: mutate

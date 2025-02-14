@@ -13,6 +13,7 @@ import de.garrafao.phitag.application.annotationtype.data.AnnotationTypeEnum;
 import de.garrafao.phitag.application.authentication.AuthenticationApplicationService;
 import de.garrafao.phitag.application.judgement.lexsubjudgement.LexSubJudgementApplicationService;
 import de.garrafao.phitag.application.judgement.usepairjudgement.UsePairJudgementApplicationService;
+import de.garrafao.phitag.application.judgement.usetriplejudgement.UseTripleJudgementApplicationService;
 import de.garrafao.phitag.application.judgement.wssimjudgement.WSSIMJudgementApplicationService;
 import de.garrafao.phitag.domain.annotationprocessinformation.AnnotationProcessInformation;
 import de.garrafao.phitag.domain.annotationprocessinformation.AnnotationProcessInformationRepository;
@@ -53,6 +54,9 @@ import de.garrafao.phitag.domain.instance.lexsub.query.LexSubInstanceQueryBuilde
 import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstance;
 import de.garrafao.phitag.domain.instance.usepairinstance.UsePairInstanceRepository;
 import de.garrafao.phitag.domain.instance.usepairinstance.query.UsePairInstanceQueryBuilder;
+import de.garrafao.phitag.domain.instance.usetripleinstance.UseTripleInstance;
+import de.garrafao.phitag.domain.instance.usetripleinstance.UseTripleInstanceRepository;
+import de.garrafao.phitag.domain.instance.usetripleinstance.query.UseTripleInstanceQueryBuilder;
 import de.garrafao.phitag.domain.instance.wssiminstance.WSSIMInstance;
 import de.garrafao.phitag.domain.instance.wssiminstance.WSSIMInstanceRepository;
 import de.garrafao.phitag.domain.instance.wssiminstance.query.WSSIMInstanceQueryBuilder;
@@ -149,6 +153,8 @@ public class CommonService {
 
     private final UsePairInstanceRepository usePairInstanceRepository;
 
+    private final UseTripleInstanceRepository useTripleInstanceRepository;
+
     private final WSSIMTagRepository wssimTagRepository;
 
     private final WSSIMInstanceRepository wssimInstanceRepository;
@@ -162,6 +168,8 @@ public class CommonService {
     // Judgement application service
 
     private final UsePairJudgementApplicationService usePairJudgementApplicationService;
+
+    private final UseTripleJudgementApplicationService useTripleJudgementApplicationService;
 
     private final WSSIMJudgementApplicationService wssimJudgementApplicationService;
 
@@ -196,6 +204,7 @@ public class CommonService {
             final StatisticAnnotationMeasureRepository statisticAnnotationMeasureRepository,
 
             final UsePairInstanceRepository usePairInstanceRepository,
+            final UseTripleInstanceRepository useTripleInstanceRepository,
             final WSSIMTagRepository wssimTagRepository,
             final WSSIMInstanceRepository wssimInstanceRepository,
             final LexSubInstanceRepository lexSubInstanceRepository,
@@ -203,6 +212,7 @@ public class CommonService {
             final AnnotationProcessInformationRepository annotationProcessInformationRepository,
 
             final UsePairJudgementApplicationService usePairJudgementApplicationService,
+            final UseTripleJudgementApplicationService useTripleJudgementApplicationService,
             final WSSIMJudgementApplicationService wssimJudgementApplicationService,
             final LexSubJudgementApplicationService lexSubJudgementApplicationService,
 
@@ -229,6 +239,7 @@ public class CommonService {
         this.statisticAnnotationMeasureRepository = statisticAnnotationMeasureRepository;
 
         this.usePairInstanceRepository = usePairInstanceRepository;
+        this.useTripleInstanceRepository = useTripleInstanceRepository;
         this.wssimTagRepository = wssimTagRepository;
         this.wssimInstanceRepository = wssimInstanceRepository;
         this.lexSubInstanceRepository = lexSubInstanceRepository;
@@ -236,6 +247,7 @@ public class CommonService {
         this.annotationProcessInformationRepository = annotationProcessInformationRepository;
 
         this.usePairJudgementApplicationService = usePairJudgementApplicationService;
+        this.useTripleJudgementApplicationService = useTripleJudgementApplicationService;
         this.wssimJudgementApplicationService = wssimJudgementApplicationService;
         this.lexSubJudgementApplicationService = lexSubJudgementApplicationService;
 
@@ -493,6 +505,10 @@ public class CommonService {
             return this.findUsePairInstanceByPhase(phase).stream()
                     .map(IInstance.class::cast).collect(Collectors.toList());
         }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USETRIPLE.name())) {
+            return this.findUseTripleInstanceByPhase(phase).stream()
+                    .map(IInstance.class::cast).collect(Collectors.toList());
+        }
         if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             if (!additional)
                 return this.findWSSIMInstanceByPhase(phase).stream()
@@ -519,6 +535,9 @@ public class CommonService {
     public long countInstancesOfPhase(final Phase phase, final boolean additional) {
         if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             return this.countUsePairInstanceByPhase(phase);
+        }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USETRIPLE.name())) {
+            return this.countUseTripleInstanceByPhase(phase);
         }
         if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             if (!additional)
@@ -561,6 +580,37 @@ public class CommonService {
                 .withPhase(phase.getId().getName())
                 .build();
         return this.usePairInstanceRepository.findByQueryPaged(query, new PageRequestWraper(1, 0, null))
+                .getTotalElements();
+    }
+
+    /**
+     * Get all use triple instances for a given phase.
+     * 
+     * @param phase The phase.
+     * @return A list of all {@link UseTripleInstance} for the given phase.
+     */
+    public List<UseTripleInstance> findUseTripleInstanceByPhase(final Phase phase) {
+        final Query query = new UseTripleInstanceQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+        return this.useTripleInstanceRepository.findByQuery(query);
+    }
+
+    /**
+     * Get number of use triple instances for a given phase.
+     * 
+     * @param phase The phase.
+     * @return The number of {@link UseTripleInstance} for the given phase.
+     */
+    public long countUseTripleInstanceByPhase(final Phase phase) {
+        final Query query = new UseTripleInstanceQueryBuilder()
+                .withOwner(phase.getId().getProjectid().getOwnername())
+                .withProject(phase.getId().getProjectid().getName())
+                .withPhase(phase.getId().getName())
+                .build();
+        return this.useTripleInstanceRepository.findByQueryPaged(query, new PageRequestWraper(1, 0, null))
                 .getTotalElements();
     }
 
@@ -670,6 +720,10 @@ public class CommonService {
             return this.usePairJudgementApplicationService.findByPhase(phase).stream()
                     .map(IJudgement.class::cast).collect(Collectors.toList());
         }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USETRIPLE.name())) {
+            return this.useTripleJudgementApplicationService.findByPhase(phase).stream()
+                    .map(IJudgement.class::cast).collect(Collectors.toList());
+        }
         if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             return this.wssimJudgementApplicationService.findByPhase(phase).stream()
                     .map(IJudgement.class::cast).collect(Collectors.toList());
@@ -691,6 +745,9 @@ public class CommonService {
     public long countJudgementsOfPhase(final Phase phase) {
         if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USEPAIR.name())) {
             return this.usePairJudgementApplicationService.findByPhase(phase, 1, 0, null).getTotalElements();
+        }
+        if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_USETRIPLE.name())) {
+            return this.useTripleJudgementApplicationService.findByPhase(phase, 1, 0, null).getTotalElements();
         }
         if (phase.getAnnotationType().getName().equals(AnnotationTypeEnum.ANNOTATIONTYPE_WSSIM.name())) {
             return this.wssimJudgementApplicationService.findByPhase(phase, 1, 0, null).getTotalElements();

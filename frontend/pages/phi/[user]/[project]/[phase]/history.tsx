@@ -27,6 +27,7 @@ import Layout from "../../../../../components/generic/layout/layout";
 import SingleContentLayout from "../../../../../components/generic/layout/singlecontentlayout";
 import { useFetchSelfEntitlement } from "../../../../../lib/service/annotator/AnnotatorResource";
 import UsePairJudgementHistoryTable from "../../../../../components/specific/table/usepair/usepairjudgementhistorytable";
+import UseTripleJudgementHistoryTable from "../../../../../components/specific/table/usetriple/usetriplejudgementhistorytable";
 import WSSIMJudgementHistoryTable from "../../../../../components/specific/table/wssim/wssimjudgementhistorytable";
 import LinkHead from "../../../../../components/generic/linker/linkhead";
 import { FiLayers } from "react-icons/fi";
@@ -109,6 +110,54 @@ const AnnotationHistory: NextPage = () => {
                     <div className="m-8">
                         {/* @ts-ignore */}
                         <UsePairJudgementHistoryTable phase={phase.phase} />
+                    </div>
+
+                </SingleContentLayout>
+            </Layout>
+
+        );
+    }
+
+    if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_USETRIPLE) {
+
+        return (
+            <Layout>
+
+                <Head>
+                    <title>PhiTag : {phase.phase.getName()} : History </title>
+                </Head>
+
+
+                <SingleContentLayout>
+                    <LinkHead icon={<FiLayers className="stroke-2" />}
+                        links={[
+                            {
+                                href: `/phi/${username}`,
+                                name: username,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}`,
+                                name: projectname,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}/${phasename}`,
+                                name: phasename,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}/${phasename}/history`,
+                                name: "History",
+                            }
+                        ]}
+                    />
+
+                    <div className="w-full flex flex-col 2xl:flex-row justify-between">
+                        <PhaseTabBar />
+                        <div />
+                    </div>
+
+                    <div className="m-8">
+                        {/* @ts-ignore */}
+                        <UseTripleJudgementHistoryTable phase={phase.phase} />
                     </div>
 
                 </SingleContentLayout>

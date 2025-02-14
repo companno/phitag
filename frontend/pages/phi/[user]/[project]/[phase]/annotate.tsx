@@ -14,6 +14,7 @@ import SingleContentLayout from "../../../../../components/generic/layout/single
 import LinkHead from "../../../../../components/generic/linker/linkhead";
 import FullLoadingPage from "../../../../../components/pages/fullloadingpage";
 import UsePairAnnotation from "../../../../../components/specific/annotation/usepair/usepairannotation";
+import UseTripleAnnotation from "../../../../../components/specific/annotation/usetriple/usetripleannotation";
 import WSSIMAnnotation from "../../../../../components/specific/annotation/wssim/wssimannotation";
 import ANNOTATIONTYPES from "../../../../../lib/AnnotationTypes";
 
@@ -99,6 +100,47 @@ const AnnotatePage: NextPage = () => {
 
                     <div className="mt-2 xl:mt-10">
                         <UsePairAnnotation phase={phase.phase} />
+                    </div>
+
+                </SingleContentLayout>
+            </Layout>
+        );
+    }
+
+    if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_USETRIPLE) {
+        return (
+            <Layout>
+
+                <Head>
+                    <title>PhiTag : {phase.phase.getName()} : Annotate </title>
+                </Head>
+
+                <SingleContentLayout>
+
+                    <LinkHead icon={<FiEdit3 className="stroke-2" />}
+                        links={[
+                            {
+                                href: `/phi/${username}`,
+                                name: username,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}`,
+                                name: projectname,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}/${phasename}`,
+                                name: phasename,
+                            },
+                            {
+                                href: `/phi/${username}/${projectname}/${phasename}/annotate`,
+                                name: "Annotate",
+                            }
+                        ]}
+                    />
+
+
+                    <div className="mt-2 xl:mt-10">
+                        <UseTripleAnnotation phase={phase.phase} />
                     </div>
 
                 </SingleContentLayout>

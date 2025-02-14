@@ -13,6 +13,7 @@ import useAuthenticated from "../../../../../lib/hook/useAuthenticated";
 import FullLoadingPage from "../../../../../components/pages/fullloadingpage";
 import { useFetchPhase } from "../../../../../lib/service/phase/PhaseResource";
 import UsePairTutorial from "../../../../../components/specific/tutorial/usepair/usepairtutorial";
+import UseTripleTutorial from "../../../../../components/specific/tutorial/usetriple/usetripletutorial";
 import ANNOTATIONTYPES from "../../../../../lib/AnnotationTypes";
 import WSSIMTutorial from "../../../../../components/specific/tutorial/wssim/wssimtutorial";
 import LexSubTutorial from "../../../../../components/specific/tutorial/lexsub/lexsubtutorial";
@@ -59,6 +60,10 @@ const TutorialPage: NextPage = () => {
 
     if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_USEPAIR) {
         return <UsePairTutorial phase={phase.phase} />;
+    }
+
+    if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_USETRIPLE) {
+        return <UseTripleTutorial phase={phase.phase} />;
     }
 
     if (phase.phase.getAnnotationType().getName() === ANNOTATIONTYPES.ANNOTATIONTYPE_WSSIM) {
