@@ -111,6 +111,10 @@ const UsePairAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
 
     return (
         <div className="w-full flex flex-col justify-between">
+            {/* randomize usages */}
+            {true ?
+                <div className="w-full flex flex-row justify-center space-y-4 ">
+                    <div>
                         <thead className="font-bold text-lg">
                             <tr>
                                <th scope="col"
@@ -121,6 +125,13 @@ const UsePairAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
                                     className="FirstGroup">
                                     Character: <div>{annotation.instance.getGroup1()}</div>
                                 </th>
+                            </tr>
+                        </thead> 
+                        <UsageField key={0} usage={annotation.instance.getFirstusage()} />
+                    </div>
+                    <div>
+                        <thead className="font-bold text-lg">
+                            <tr>
                                 <th scope="col"
                                     className="SecondLemma">
                                     Category: <div>{annotation.instance.getLemma2()}</div>
@@ -131,19 +142,41 @@ const UsePairAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
                                 </th>
                             </tr>
                         </thead> 
-
-                    
-            {/* randomize usages */}
-            {true ?
-                
-                <div className="w-full flex flex-row justify-center space-y-4 ">
-                    <UsageField key={0} usage={annotation.instance.getFirstusage()} />
-                    <UsageField key={1} usage={annotation.instance.getSecondusage()} />
+                        <UsageField key={1} usage={annotation.instance.getSecondusage()} />
+                    </div>
                 </div>
                 :
                 <div className="w-full flex flex-row justify-center space-y-4 ">
-                    <UsageField key={0} usage={annotation.instance.getSecondusage()} />
-                    <UsageField key={1} usage={annotation.instance.getFirstusage()} />
+                    <div>
+                        <thead className="font-bold text-lg">
+                            <tr>
+                                <th scope="col"
+                                    className="SecondLemma">
+                                    Category: <div>{annotation.instance.getLemma2()}</div>
+                                </th>
+                                <th scope="col"
+                                    className="SecondGroup">
+                                    Character: <div>{annotation.instance.getGroup2()}</div>
+                                </th>
+                            </tr>
+                        </thead> 
+                        <UsageField key={1} usage={annotation.instance.getSecondusage()} />
+                    </div>
+                    <div>
+                        <thead className="font-bold text-lg">
+                            <tr>
+                               <th scope="col"
+                                    className="FirstLemma">
+                                    Category: <div>{annotation.instance.getLemma1()}</div>
+                                </th>
+                                <th scope="col"
+                                    className="FirstGroup">
+                                    Character: <div>{annotation.instance.getGroup1()}</div>
+                                </th>
+                            </tr>
+                        </thead> 
+                        <UsageField key={0} usage={annotation.instance.getFirstusage()} />
+                    </div>
                 </div>
             }
 
@@ -153,7 +186,7 @@ const UsePairAnnotation: React.FC<{ phase: Phase }> = ({ phase }) => {
                         <div key={label}
                             className="flex shadow-md cursor-pointer hover:bg-base16-gray-900 hover:text-base16-gray-100 transition-all duration-200 font-dm-mono-medium"
                             onClick={() => handleSubmitAnnotation(label)}>
-                            <div className="w-8 h-8 m-6 text-center text-lg">
+                            <div className="h-8 m-6 text-center text-lg">
                                 {label}
                             </div>
                         </div>
