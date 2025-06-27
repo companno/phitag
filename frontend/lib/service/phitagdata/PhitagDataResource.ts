@@ -1,6 +1,7 @@
 import axios from "axios";
 import useSWR from "swr";
 import fileDownload from "js-file-download";
+import { saveAs } from 'file-saver';
 
 // Custom Hooks
 import useStorage from "../../hook/useStorage";
@@ -98,7 +99,10 @@ export function exportUsage(owner: string, project: string, get: Function = () =
         }
     }).then(res => {
         // TODO: Dont rely on this extension, but for now ok
-        fileDownload(res.data, 'usages.csv');
+        const BOM = "\uFEFF";
+        const blob = new Blob([BOM, res.data], { type: "text/csv;charset=utf-8" });
+        saveAs(blob, "usages.csv");
+        
     });
 }
 
